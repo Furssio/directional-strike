@@ -1,0 +1,353 @@
+/* ═══════════════════════════════════════
+   STYLE.CSS
+   Tutti gli stili di Directional Strike
+   Dipende da: niente
+   Usato da: index.html
+   ═══════════════════════════════════════ */
+
+/* ── RESET & BASE ── */
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;}
+#G{width:100%;max-width:500px;padding:1rem;}
+
+/* ── SCHERMATE ── */
+#screen-menu,#screen-char,#screen-game,#screen-over,#screen-story-soon{width:100%;}
+#screen-char,#screen-game,#screen-over,#screen-story-soon{display:none;}
+
+/* ══════════════════════════════════════
+   ARENA
+   ══════════════════════════════════════ */
+#arena{
+  width:100%;aspect-ratio:1;max-width:500px;
+  position:relative;background:#2a2a2a;
+  border-radius:12px;border:1px solid #444;
+  overflow:hidden;transition:transform 0.05s;
+}
+
+/* shake quando ricevi danno */
+#arena.shake{animation:arenaShake 0.28s ease-out;}
+@keyframes arenaShake{
+  0%  {transform:translate(0,0);}
+  15% {transform:translate(-5px,3px);}
+  30% {transform:translate(5px,-3px);}
+  45% {transform:translate(-4px,2px);}
+  60% {transform:translate(4px,-2px);}
+  75% {transform:translate(-2px,1px);}
+  100%{transform:translate(0,0);}
+}
+
+/* ── PLAYER ── */
+#player{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:48px;height:48px;border-radius:50%;
+  background:#222;border:1.5px solid #888;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;z-index:10;
+  transition:border-color 0.1s,background 0.1s;
+}
+#player.shielded{border:2.5px solid #378ADD;background:#1a2a3a;}
+#player.special-active{border:2.5px solid #FFD700;background:#2a2200;}
+
+/* ── ANELLI EFFETTI ── */
+#shield-ring{
+  position:absolute;top:50%;left:50%;
+  width:68px;height:68px;border-radius:50%;
+  border:2.5px solid #378ADD;
+  transform:translate(-50%,-50%) scale(0);opacity:0;
+  z-index:9;transition:transform 0.12s,opacity 0.12s;pointer-events:none;
+}
+#shield-ring.active{transform:translate(-50%,-50%) scale(1);opacity:0.7;}
+
+#special-ring{
+  position:absolute;top:50%;left:50%;
+  width:90px;height:90px;border-radius:50%;
+  border:2px solid #FFD700;
+  transform:translate(-50%,-50%) scale(0);opacity:0;
+  z-index:8;transition:transform 0.15s,opacity 0.15s;pointer-events:none;
+}
+#special-ring.active{transform:translate(-50%,-50%) scale(1);opacity:0.6;}
+
+/* ── RANGE ATTACCO ── */
+#attack-range{
+  position:absolute;top:50%;left:50%;border-radius:50%;
+  border:1.5px dashed rgba(226,75,74,0.5);
+  background:rgba(226,75,74,0.06);
+  transform:translate(-50%,-50%);
+  pointer-events:none;z-index:4;
+}
+
+/* ── FLASH DANNO ARENA ── */
+#flash{
+  position:absolute;inset:0;border-radius:12px;
+  background:rgba(226,75,74,0.22);
+  opacity:0;pointer-events:none;z-index:20;
+}
+
+/* ── POPUP LEVEL UP ── */
+#level-up-pop{
+  position:absolute;top:35%;left:50%;
+  transform:translateX(-50%);
+  font-size:17px;font-weight:600;color:#fff;
+  opacity:0;pointer-events:none;z-index:25;
+  white-space:nowrap;transition:opacity 0.15s;
+}
+
+/* ── SCORE POP (+punti) ── */
+.score-pop{
+  position:absolute;font-size:13px;font-weight:600;
+  pointer-events:none;z-index:26;color:#fff;
+  animation:popUp 0.7s ease-out forwards;
+}
+@keyframes popUp{
+  0%  {opacity:1;transform:translate(-50%,0);}
+  100%{opacity:0;transform:translate(-50%,-28px);}
+}
+
+/* ── PARTICELLE MORTE NEMICO ── */
+.particle{
+  position:absolute;border-radius:50%;
+  pointer-events:none;z-index:30;
+  transform:translate(-50%,-50%);
+}
+
+/* ══════════════════════════════════════
+   NEMICI E PROIETTILI
+   ══════════════════════════════════════ */
+.enemy{
+  position:absolute;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transform:translate(-50%,-50%);z-index:5;
+}
+
+/* flash bianco quando il nemico viene colpito */
+.enemy-hit{animation:enemyHit 0.12s ease-out;}
+@keyframes enemyHit{
+  0%  {filter:brightness(3) saturate(0);}
+  100%{filter:brightness(1) saturate(1);}
+}
+
+/* nemico rallentato (warrior bullet time) */
+.enemy.slowed{filter:hue-rotate(180deg) brightness(0.8);}
+
+/* barra HP nemico */
+.enemy-hp-wrap{
+  position:absolute;bottom:-8px;left:50%;
+  transform:translateX(-50%);
+  width:80%;height:3px;
+  background:rgba(0,0,0,0.4);border-radius:2px;
+}
+.enemy-hp-fill{
+  height:100%;background:#D85A30;
+  border-radius:2px;transition:width 0.1s;
+}
+
+/* proiettile nemico */
+.bullet{
+  position:absolute;width:10px;height:10px;border-radius:50%;
+  background:#378ADD;border:1.5px solid #185FA5;
+  transform:translate(-50%,-50%);z-index:7;
+}
+
+/* ══════════════════════════════════════
+   HUD — info partita in alto
+   ══════════════════════════════════════ */
+#hud{padding:0 4px;margin-bottom:6px;}
+#hud-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+#score-display{font-size:18px;font-weight:600;color:#fff;}
+#combo-display{font-size:13px;font-weight:600;color:#378ADD;min-width:60px;text-align:center;opacity:0;transition:opacity 0.15s;}
+#level-display{font-size:13px;color:#aaa;}
+
+/* barra HP giocatore */
+#player-hp-wrap{width:100%;height:6px;background:#333;border-radius:3px;margin-bottom:4px;overflow:hidden;}
+#player-hp-bar{height:100%;background:#639922;border-radius:3px;transition:width 0.2s,background 0.3s;}
+
+/* barra decay combo — scompare quando combo azzera */
+#combo-timer-wrap{width:100%;height:3px;background:#333;border-radius:2px;margin-bottom:4px;overflow:hidden;opacity:0;transition:opacity 0.2s;}
+#combo-timer-bar{height:100%;background:#378ADD;border-radius:2px;width:100%;transition:width 0.05s linear;}
+
+/* barra speciale */
+#special-label{font-size:10px;color:#888;text-align:right;margin-bottom:2px;transition:color 0.2s;}
+#special-wrap{width:100%;height:5px;background:#333;border-radius:2px;margin-bottom:4px;overflow:hidden;}
+#special-bar{height:100%;border-radius:2px;width:0%;transition:width 0.15s,background 0.3s;}
+
+/* pulse barra speciale quando piena */
+#special-wrap.ready{animation:specialBarPulse 0.6s ease-in-out infinite alternate;}
+@keyframes specialBarPulse{
+  from{box-shadow:0 0 0px transparent;}
+  to{box-shadow:0 0 8px var(--special-color,#FFD700);}
+}
+
+/* barra progresso livello */
+#progress-wrap{width:100%;height:3px;background:#333;border-radius:2px;overflow:hidden;}
+#progress-bar{height:100%;background:#888;border-radius:2px;transition:width 0.3s;width:0%;}
+
+/* ══════════════════════════════════════
+   CONTROLLI TOUCH
+   ══════════════════════════════════════ */
+#controls{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;margin-top:10px;
+  max-width:210px;margin-left:auto;margin-right:auto;
+}
+.cbtn{
+  aspect-ratio:1;border-radius:8px;border:1px solid #555;
+  background:#222;font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;-webkit-tap-highlight-color:transparent;
+  transition:background 0.08s,transform 0.05s;
+}
+.cbtn:active,.cbtn.pressed{background:#333;transform:scale(0.93);}
+.cbtn.empty{visibility:hidden;}
+
+/* bottone scudo */
+#btn-shield.active{background:#1a2a3a;border-color:#378ADD;color:#378ADD;}
+
+/* bottone speciale — 3 stati: inattivo / pronto / attivo */
+#btn-special{border-color:#555;background:#222;color:#888;transition:background 0.1s,border-color 0.1s,color 0.1s;}
+#btn-special.ready{
+  border-color:#FFD700;background:#2a2200;color:#FFD700;
+  animation:btnSpecialPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes btnSpecialPulse{
+  from{box-shadow:0 0 4px #FFD70066;}
+  to{box-shadow:0 0 14px #FFD700cc;}
+}
+#btn-special.active-special{
+  border-color:#FFD700;background:#3a3000;color:#FFD700;
+  animation:specialPulse 0.4s ease-in-out infinite alternate;
+}
+@keyframes specialPulse{
+  from{box-shadow:0 0 4px #FFD70066;}
+  to{box-shadow:0 0 12px #FFD700aa;}
+}
+
+/* ══════════════════════════════════════
+   OVERLAY SCELTA ABILITÀ
+   appare a fine livello sopra l'arena
+   ══════════════════════════════════════ */
+#ability-overlay{
+  position:absolute;inset:0;border-radius:12px;
+  background:rgba(10,10,10,0.92);z-index:40;
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:16px;gap:10px;
+}
+#ability-overlay.visible{display:flex;}
+#ability-title{font-size:15px;font-weight:700;color:#fff;text-align:center;margin-bottom:2px;}
+#ability-subtitle{font-size:11px;color:#aaa;text-align:center;margin-bottom:6px;}
+
+/* card singola abilità */
+.ability-card{
+  width:100%;background:#1e1e1e;border:1.5px solid #444;
+  border-radius:10px;padding:12px 14px;cursor:pointer;
+  transition:background 0.1s,border-color 0.12s,transform 0.07s;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.ability-card:hover{background:#2a2a2a;border-color:#666;}
+.ability-card:active{transform:scale(0.97);}
+.ability-card.exclusive{border-color:#FFD70066;}
+.ability-card.exclusive:hover{border-color:#FFD700;}
+.ability-icon{font-size:26px;flex-shrink:0;margin-top:2px;}
+.ability-info{flex:1;}
+.ability-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px;}
+.ability-desc{font-size:11px;color:#aaa;line-height:1.5;}
+.ability-tag{font-size:9px;font-weight:600;color:#FFD700;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* ══════════════════════════════════════
+   SCHERMATE CARD (menu, game over, presto)
+   ══════════════════════════════════════ */
+#menu-card,#over-card,#soon-card{
+  background:#222;border:1px solid #444;border-radius:12px;
+  padding:2rem 1.5rem;text-align:center;
+  max-width:340px;margin:0 auto;
+}
+#menu-card h1,#over-card h2,#soon-card h2{font-size:22px;font-weight:600;color:#fff;margin-bottom:8px;}
+.subtitle{font-size:13px;color:#aaa;margin-bottom:24px;}
+.arrows-preview{font-size:26px;margin-bottom:14px;letter-spacing:4px;}
+
+/* griglia modalità nel menu */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.mode-card{
+  border-radius:8px;border:1px solid #555;background:#2a2a2a;
+  padding:16px 12px;cursor:pointer;
+  transition:background 0.1s,transform 0.08s;position:relative;
+}
+.mode-card:hover{background:#333;}
+.mode-card:active{transform:scale(0.97);}
+.mode-card.locked{cursor:default;opacity:0.5;}
+.mode-card.locked:hover{background:#2a2a2a;}
+.mode-card.locked:active{transform:none;}
+.mode-icon{font-size:28px;margin-bottom:8px;}
+.mode-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.mode-desc{font-size:11px;color:#aaa;line-height:1.5;}
+.lock-badge{position:absolute;top:8px;right:8px;font-size:14px;}
+
+.best-score{font-size:12px;color:#666;margin-top:16px;}
+.legend{display:flex;gap:10px;justify-content:center;font-size:11px;color:#aaa;flex-wrap:wrap;}
+
+/* game over */
+#final-score{font-size:36px;font-weight:600;color:#fff;margin:12px 0;}
+#final-level{font-size:13px;color:#aaa;margin-bottom:4px;}
+#best-label{font-size:12px;color:#666;margin-bottom:20px;}
+.btn-row{display:flex;gap:10px;justify-content:center;}
+
+/* bottoni generici */
+button.game-btn{
+  padding:10px 24px;font-size:14px;font-weight:600;
+  border-radius:8px;border:1px solid #555;
+  background:#222;color:#fff;cursor:pointer;
+}
+button.game-btn:hover{background:#333;}
+#btn-mute{font-size:12px;padding:6px 14px;margin-top:12px;}
+
+/* soon */
+#soon-card .soon-icon{font-size:40px;margin-bottom:16px;}
+#soon-card p{font-size:13px;color:#aaa;line-height:1.6;margin-bottom:24px;}
+
+/* ══════════════════════════════════════
+   SELEZIONE PERSONAGGIO
+   ══════════════════════════════════════ */
+#char-card{
+  background:#222;border:1px solid #444;border-radius:12px;
+  padding:1.5rem 1.2rem;text-align:center;
+  max-width:380px;margin:0 auto;
+}
+#char-card h2{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
+#char-card .subtitle{margin-bottom:16px;}
+
+/* griglia 3 personaggi */
+.char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.char-card{
+  border-radius:10px;border:2px solid #444;background:#2a2a2a;
+  padding:14px 8px;cursor:pointer;
+  transition:background 0.1s,border-color 0.15s,transform 0.08s;
+  position:relative;
+}
+.char-card:hover{background:#333;border-color:#666;}
+.char-card:active{transform:scale(0.96);}
+
+/* bordo colorato sul personaggio selezionato — colore via JS con CSS var */
+.char-card.selected{border-color:var(--char-color);background:#1e1e1e;}
+
+.char-emoji{font-size:32px;margin-bottom:6px;}
+.char-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;}
+.char-desc{font-size:10px;color:#aaa;line-height:1.5;margin-bottom:8px;}
+
+/* stat bar per range/damage/hp */
+.char-stats{display:flex;flex-direction:column;gap:3px;}
+.stat-row{display:flex;align-items:center;gap:4px;font-size:9px;color:#888;}
+.stat-label{width:36px;text-align:right;flex-shrink:0;}
+.stat-bar-wrap{flex:1;height:3px;background:#333;border-radius:2px;overflow:hidden;}
+.stat-bar-fill{height:100%;border-radius:2px;}
+
+.char-ability{font-size:9px;color:#FFD700;margin-top:6px;line-height:1.4;}
+
+/* bottone conferma personaggio */
+#btn-char-confirm{
+  width:100%;padding:12px;font-size:15px;font-weight:600;
+  border-radius:8px;border:1px solid #555;
+  background:#222;color:#fff;cursor:pointer;transition:background 0.1s;
+}
+#btn-char-confirm:hover{background:#333;}
+#btn-char-back{font-size:12px;padding:6px 14px;margin-top:10px;width:100%;}
