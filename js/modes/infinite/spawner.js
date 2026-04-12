@@ -95,7 +95,7 @@ function spawnGroup(state, wave) {
 
   for (let i = 0; i < toSpawn; i++) {
     const enemyName = pool[Math.floor(Math.random() * pool.length)];
-    const def       = CONFIG.enemies[enemyName];
+    const def = EnemyRegistry.get(enemyName);
     const dir       = pickDir();
 
     dirCooldowns[dir] = DIR_COOLDOWN_MS;

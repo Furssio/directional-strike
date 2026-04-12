@@ -15,7 +15,15 @@ const SCRIPTS = [
   'js/core/AbilityRegistry.js',
   'js/core/WaveRegistry.js',
 
+  /* ── ENEMIES ── */
+  'js/enemies/Enemy.js',
+  'js/enemies/Bullet.js',
+  'js/enemies/ravager.js',
+  'js/enemies/crusher.js',
+  'js/enemies/golem.js',
+
   /* ── PLAYER ── */
+  'js/player/Player.js',
   'js/player/characters/kael.js',
   'js/player/characters/syra.js',
   'js/player/characters/bron.js',
