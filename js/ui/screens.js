@@ -5,7 +5,8 @@
 
    Used by: input.js, loop.js, director
    Depends on: dom.js, state.js, config.js,
-               abilities.js, audio.js
+               AbilityRegistry, CharacterRegistry,
+               audio.js
    ═══════════════════════════════════════ */
 
 /* ── SCREEN NAVIGATION ── */
@@ -48,7 +49,7 @@ function buildCharScreen(selectedCharId) {
   const grid = document.getElementById('char-grid');
   grid.innerHTML = '';
 
-  Object.values(CONFIG.characters).forEach(ch => {
+  CharacterRegistry.all().forEach(ch => {
     const card = document.createElement('div');
     card.className = 'char-card' + (ch.id === selectedCharId ? ' selected' : '');
     card.style.setProperty('--char-color', ch.color);
@@ -128,8 +129,8 @@ function selectAbility(ab) {
 
 function pickAbilities() {
   const charId    = player.charDef.id;
-  const exclusive = ABILITIES.filter(a => a.exclusive === charId && !player.acquiredAbilities.includes(a.id));
-  const generic   = ABILITIES.filter(a => a.exclusive === null   && !player.acquiredAbilities.includes(a.id));
+  const exclusive = AbilityRegistry.all(a => a.exclusive === charId && !player.acquiredAbilities.includes(a.id));
+  const generic   = AbilityRegistry.all(a => a.exclusive === null   && !player.acquiredAbilities.includes(a.id));
   const all       = [...exclusive, ...generic];
 
   for (let i = all.length - 1; i > 0; i--) {
@@ -149,7 +150,8 @@ function pickAbilities() {
   }
 
   while (result.length < 3) {
-    const fallback = ABILITIES[Math.floor(Math.random() * ABILITIES.length)];
+    const all2 = AbilityRegistry.all();
+    const fallback = all2[Math.floor(Math.random() * all2.length)];
     if (!result.includes(fallback)) result.push(fallback);
   }
 

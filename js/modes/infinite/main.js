@@ -1,20 +1,22 @@
-/* ═══════════════════════════════════════
-   MAIN.JS
-   Entry point for Infinite Mode.
-   Loads all scripts in order.
-
-   This is the only script referenced in
-   index.html for this mode.
-   ═══════════════════════════════════════ */
-
 const SCRIPTS = [
   'js/config.js',
-  'js/abilities.js',
+  'js/core/CharacterRegistry.js',
+  'js/core/EnemyRegistry.js',
+  'js/core/AbilityRegistry.js',
+  'js/core/WaveRegistry.js',
+  'js/player/characters/kael.js',
+  'js/player/characters/syra.js',
+  'js/player/characters/bron.js',
+  'js/player/abilities/common.js',
   'js/audio.js',
   'js/classes/Player.js',
   'js/classes/Enemy.js',
   'js/classes/Bullet.js',
   'js/state.js',
+  'js/modes/infinite/waves.js',
+  'js/modes/infinite/stress/calculator.js',
+  'js/modes/infinite/stress/events.js',
+  'js/modes/infinite/spawner.js',
   'js/modes/infinite/director.js',
   'js/ui/dom.js',
   'js/ui/hud.js',
