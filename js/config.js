@@ -245,5 +245,110 @@ const CONFIG = {
     shakeOnDamage:    true,
     shakeOnKillElite: true,
   },
+/* ── DIRECTOR AI ────────────────────────
+     Sistema che controlla il pacing del gioco.
+     Calcola lo stress del giocatore in tempo
+     reale e decide quando e cosa spawnare.
 
+     STRESS: numero 0-100 che rappresenta
+     la pressione attuale sul giocatore.
+     Sale con danno/nemici pericolosi,
+     scende con kill/tempo senza danno.
+
+     WAVE TARGET: ogni wave ha un livello
+     di stress ideale. Il Director lavora
+     per mantenere il giocatore a quel livello.
+  ─────────────────────────────────────── */
+  director: {
+
+    /* ── PESI STRESS NEMICI ──
+       Quanto stress aggiunge ogni nemico
+       in base al tipo e alla situazione.
+       distMid/distClose in px dall'arena center */
+    stress: {
+      tank:              25,   // tank in campo — sempre alto
+      armorFar:           5,   // armor lontano — quasi ignorabile
+      armorMid:          15,   // armor a metà strada
+      armorClose:        30,   // armor vicino — urgente
+      gruntAlone:         5,   // grunt da solo — facile
+      gruntExtra:         8,   // ogni grunt aggiuntivo in campo
+      armorDistMid:     160,   // px — soglia lontano→medio
+      armorDistClose:    80,   // px — soglia medio→vicino
+
+      /* modificatori eventi */
+      onDamage:          20,   // danno ricevuto → stress immediato
+      onKill:           -10,   // kill → stress immediato
+      lowHp50:           10,   // vita sotto 50% → stress passivo
+      lowHp25:           20,   // vita sotto 25% → stress passivo
+      decayPerSecond:     3,   // stress decay ogni secondo senza eventi
+    },
+
+    /* ── STRESS TARGET PER WAVE ──
+       Il Director cerca di mantenere
+       il giocatore a questo livello.
+       Wave boss (multipli di 10) molto più alti. */
+    waveTargets: [
+      0,   // indice 0 non usato
+      25,  // wave 1
+      30,  // wave 2
+      35,  // wave 3
+      38,  // wave 4
+      42,  // wave 5
+      45,  // wave 6
+      48,  // wave 7
+      52,  // wave 8
+      58,  // wave 9
+      75,  // wave 10 — BOSS
+    ],
+
+    /* stress target per wave oltre la 10
+       calcolato automaticamente dal Director
+       con questa formula:
+       baseTarget + (wave - 1) * targetIncreasePerWave
+       cap a maxTarget */
+    baseTarget:              30,
+    targetIncreasePerWave:    1.5,
+    maxTarget:               92,
+    bossTargetBonus:         20,  // wave boss → target + questo valore
+
+    /* ── STATI DIRECTOR ──
+       tolerance: margine prima di cambiare stato
+       se stress < target - tolerance → spawna di più
+       se stress > target + tolerance → rallenta */
+    tolerance:               15,
+
+    /* ── SPAWN ──
+       intervalli spawn in ms per stato Director */
+    spawnIntervalFast:      400,   // stress troppo basso → spawn aggressivo
+    spawnIntervalNormal:    900,   // stress nel target → ritmo normale
+    spawnIntervalSlow:     1800,   // stress troppo alto → pausa
+
+    /* dimensione gruppo spawn per stato */
+    groupSizeFast:            3,   // stress basso → gruppi da 3
+    groupSizeNormal:          2,   // normale → gruppi da 2
+    groupSizeSlow:            1,   // stress alto → uno alla volta
+
+    /* ── WAVE ──
+       killsToAdvance: kill necessarie per passare
+       alla wave successiva — scala per wave */
+    killsToAdvanceBase:      12,
+    killsToAdvanceScaling:    1.18,
+
+    /* nemici max in arena contemporaneamente
+       aumenta con le wave */
+    maxEnemiesBase:           4,
+    maxEnemiesPerWave:        0.3,  // +0.3 per wave
+    maxEnemiesCap:           12,
+
+    /* ── COMPOSIZIONE NEMICI PER WAVE ──
+       ogni entry definisce da quale wave
+       quel nemico inizia ad apparire e
+       il suo peso nel pool (più alto = più frequente) */
+    enemyPool: {
+      grunt: { fromWave: 1,  weight: 6 },
+      tank:  { fromWave: 3,  weight: 3 },
+      armor: { fromWave: 5,  weight: 2 },
+    },
+
+  },
 };

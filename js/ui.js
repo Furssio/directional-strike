@@ -1,30 +1,28 @@
 /* ═══════════════════════════════════════
    UI.JS
-   Tutto ciò che tocca il DOM.
-   Aggiornamenti HUD, schermate, overlay
-   scelta abilità, schermata personaggi.
+   Everything that touches the DOM.
+   HUD updates, screens, ability choice
+   overlay, character selection screen.
 
-   Dipende da: config.js, abilities.js,
+   Depends on: config.js, abilities.js,
                classes/Player.js, audio.js
-   Usato da: game.js
+   Used by: game.js
 
-   REGOLA: questo file non contiene logica
-   di gioco. Legge lo stato da player/CONFIG
-   e aggiorna il DOM di conseguenza.
-   Non modifica mai lo stato del player
-   tranne selectAbility() che applica l'effetto
-   dell'abilità scelta e choosingAbility in game.js.
+   RULE: this file contains no game logic.
+   It reads state from player/CONFIG and
+   updates the DOM accordingly.
+   It never modifies player state except
+   selectAbility() which applies the chosen
+   ability effect and choosingAbility in game.js.
 
-   VARIABILI GLOBALI CHE USA (da game.js):
-   - player          → oggetto Player corrente
-   - enemies         → array nemici correnti
-   - choosingAbility → flag pausa scelta abilità
+   GLOBAL VARIABLES USED (from game.js):
+   - player          → current Player object
+   - enemies         → current enemies array
+   - choosingAbility → ability choice pause flag
    ═══════════════════════════════════════ */
 
 /* ══════════════════════════════════════
    DOM REFS
-   Tutti i riferimenti agli elementi HTML.
-   Definiti qui una volta sola e riusati.
    ══════════════════════════════════════ */
 const sMenu    = document.getElementById('screen-menu');
 const sChar    = document.getElementById('screen-char');
@@ -61,18 +59,16 @@ const abilityCardsEl = document.getElementById('ability-cards');
 const abilityTitle   = document.getElementById('ability-title');
 
 /* ══════════════════════════════════════
-   NAVIGAZIONE SCHERMATE
+   SCREEN NAVIGATION
    ══════════════════════════════════════ */
 
-/* mostra una schermata e nasconde tutte le altre
-   @param s  elemento DOM della schermata da mostrare */
 function showScreen(s) {
   [sMenu, sChar, sGame, sOver, sSoon].forEach(x => x.style.display = 'none');
   s.style.display = 'block';
 }
 
 /* ══════════════════════════════════════
-   LOCALSTORAGE — RECORD
+   LOCALSTORAGE — HIGH SCORE
    ══════════════════════════════════════ */
 
 function getBestScore() {
@@ -83,18 +79,15 @@ function saveBestScore(score) {
   localStorage.setItem('ds_best', score);
 }
 
-/* aggiorna il testo record nel menu principale */
 function updateMenuBest() {
   const b = getBestScore();
-  menuBest.textContent = b > 0 ? 'record: ' + b + ' punti' : '';
+  menuBest.textContent = b > 0 ? 'best: ' + b + ' pts' : '';
 }
 
 /* ══════════════════════════════════════
-   HUD — BARRA HP PLAYER
+   HUD — PLAYER HP BAR
    ══════════════════════════════════════ */
 
-/* aggiorna larghezza e colore barra HP
-   verde → giallo → rosso in base alle soglie in CONFIG */
 function updateHpBar() {
   const pct = player.hpPercent();
   hpBar.style.width      = Math.round(pct * 100) + '%';
@@ -106,31 +99,38 @@ function updateHpBar() {
 }
 
 /* ══════════════════════════════════════
-   HUD — BARRA PROGRESSO LIVELLO
+   HUD — WAVE PROGRESS BAR
    ══════════════════════════════════════ */
 
-/* aggiorna la barra grigia in fondo all'HUD
-   mostra le kill del livello corrente su quelle necessarie */
 function updateProgress() {
-  const needed = player.killsForNextLevel();
-  const pct    = Math.min(player.killsThisLevel / needed, 1);
+  const needed = Director.getKillsNeeded();
+  const pct    = Math.min(Director.getKills() / needed, 1);
   progressBar.style.width = Math.round(pct * 100) + '%';
 }
 
 /* ══════════════════════════════════════
-   HUD — COMBO E DECAY TIMER
+   HUD — WAVE DISPLAY
    ══════════════════════════════════════ */
 
-/* aggiorna testo combo e barra azzurra del decay timer
-   la barra scompare quando la combo si azzera */
+function updateWaveDisplay(wave, isBoss) {
+  levelEl.textContent = isBoss ? '⚠️ wave ' + wave + ' — BOSS' : 'wave ' + wave;
+
+  lvlPop.textContent   = isBoss ? '⚠️ BOSS WAVE!' : 'wave ' + wave + '!';
+  lvlPop.style.opacity = '1';
+  setTimeout(() => lvlPop.style.opacity = '0', 1200);
+}
+
+/* ══════════════════════════════════════
+   HUD — COMBO AND DECAY TIMER
+   ══════════════════════════════════════ */
+
 function updateComboDisplay() {
   const c = player.combo;
 
   if (c >= CONFIG.combo.minKills) {
-    comboEl.textContent  = 'x' + player.getComboMult().toFixed(1) + ' (' + c + ' kill)';
+    comboEl.textContent   = 'x' + player.getComboMult().toFixed(1) + ' (' + c + ' kills)';
     comboEl.style.opacity = '1';
 
-    // barra decay — mostra il tempo rimanente prima del reset
     comboTimerWrap.style.opacity = '1';
     const maxDecay = CONFIG.combo.decayMs + player.comboDecayBonus;
     comboTimerBar.style.width = Math.max(0, player.comboTimer / maxDecay * 100) + '%';
@@ -142,42 +142,33 @@ function updateComboDisplay() {
 }
 
 /* ══════════════════════════════════════
-   HUD — BARRA SPECIALE
+   HUD — SPECIAL BAR
    ══════════════════════════════════════ */
 
-/* aggiorna barra speciale, label e stato bottone.
-   Quando piena: pulse CSS + suono una volta sola.
-   3 stati bottone: inattivo / pronto / attivo */
 function updateSpecialBar() {
   const pct     = player.specialCharge;
   const ch      = player.charDef;
   const isReady = player.isSpecialReady();
 
-  // barra
   specialBar.style.width      = pct + '%';
   specialBar.style.background = ch.special.barColor;
 
-  // label
   specialLabel.textContent = `${ch.special.icon} ${ch.special.name} ${Math.round(pct)}%`;
 
-  // CSS variable per il colore del pulse
   specialWrap.style.setProperty('--special-color', ch.special.barColor);
 
   if (isReady && !player.specialActive) {
-    // stato PRONTO
     specialWrap.classList.add('ready');
     btnSpecial.className    = 'cbtn ready';
     btnSpecial.textContent  = ch.special.icon;
     specialLabel.style.color = ch.special.barColor;
 
-    // suono "speciale pronta" — una sola volta
     if (!player._wasSpecialReady) {
       player._wasSpecialReady = true;
       SFX.specialReady();
     }
 
   } else if (!player.specialActive) {
-    // stato INATTIVO
     specialWrap.classList.remove('ready');
     btnSpecial.className    = 'cbtn';
     btnSpecial.textContent  = '⚡';
@@ -190,9 +181,6 @@ function updateSpecialBar() {
    HUD — RANGE CIRCLE
    ══════════════════════════════════════ */
 
-/* aggiorna dimensione e colore del cerchio
-   tratteggiato che mostra il range di attacco.
-   Colore preso dal personaggio corrente. */
 function updateRangeCircle() {
   const { w, h } = getArenaSize();
   const size  = Math.min(w, h);
@@ -206,12 +194,9 @@ function updateRangeCircle() {
 }
 
 /* ══════════════════════════════════════
-   POPUP SCORE
+   SCORE POPUP
    ══════════════════════════════════════ */
 
-/* mostra "+N" animato nella posizione del nemico ucciso
-   @param x, y  coordinate in px nell'arena
-   @param pts   punti da mostrare */
 function showScorePop(x, y, pts) {
   const pop = document.createElement('div');
   pop.className   = 'score-pop';
@@ -223,23 +208,9 @@ function showScorePop(x, y, pts) {
 }
 
 /* ══════════════════════════════════════
-   POPUP LEVEL UP
+   CHARACTER SELECTION
    ══════════════════════════════════════ */
 
-/* mostra "livello N!" al centro dell'arena per 900ms */
-function showLevelUpPop() {
-  lvlPop.textContent  = 'livello ' + player.level + '!';
-  lvlPop.style.opacity = '1';
-  setTimeout(() => lvlPop.style.opacity = '0', 900);
-}
-
-/* ══════════════════════════════════════
-   SELEZIONE PERSONAGGIO
-   ══════════════════════════════════════ */
-
-/* costruisce la griglia di selezione personaggio
-   con stat bar e descrizione abilità speciale.
-   @param selectedCharId  id del personaggio selezionato */
 function buildCharScreen(selectedCharId) {
   const grid = document.getElementById('char-grid');
   grid.innerHTML = '';
@@ -247,11 +218,8 @@ function buildCharScreen(selectedCharId) {
   Object.values(CONFIG.characters).forEach(ch => {
     const card = document.createElement('div');
     card.className = 'char-card' + (ch.id === selectedCharId ? ' selected' : '');
-
-    // CSS var per il colore del bordo selezione
     card.style.setProperty('--char-color', ch.color);
 
-    // stat bar per range / damage / hp (valori 1-5)
     const statRows = ['range', 'damage', 'hp'].map(s => `
       <div class="stat-row">
         <span class="stat-label">${s}</span>
@@ -268,7 +236,6 @@ function buildCharScreen(selectedCharId) {
       <div class="char-ability">${ch.special.icon} ${ch.special.name}<br>${ch.special.desc}</div>
     `;
 
-    // selezione — aggiorna selectedCharId in game.js tramite callback
     card.addEventListener('click', () => {
       onCharSelected(ch.id);
       document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
@@ -280,16 +247,13 @@ function buildCharScreen(selectedCharId) {
 }
 
 /* ══════════════════════════════════════
-   OVERLAY SCELTA ABILITÀ
+   ABILITY CHOICE OVERLAY
    ══════════════════════════════════════ */
 
-/* mostra l'overlay con 3 abilità casuali da scegliere.
-   Blocca il gioco tramite choosingAbility in game.js.
-   Garantisce almeno 1 esclusiva del personaggio se disponibile. */
 function showAbilityChoice() {
   choosingAbility = true;
 
-  abilityTitle.textContent = `⬆ livello ${player.level}!`;
+  abilityTitle.textContent = `⬆ wave ${Director.getWave()} complete!`;
 
   const choices = pickAbilities();
   abilityCardsEl.innerHTML = '';
@@ -303,7 +267,7 @@ function showAbilityChoice() {
       <div class="ability-info">
         <div class="ability-name">${ab.name}</div>
         <div class="ability-desc">${ab.desc}</div>
-        ${ab.exclusive ? `<div class="ability-tag">⭐ esclusiva ${ab.exclusive}</div>` : ''}
+        ${ab.exclusive ? `<div class="ability-tag">⭐ exclusive ${ab.exclusive}</div>` : ''}
       </div>
     `;
 
@@ -319,8 +283,6 @@ function showAbilityChoice() {
   abilityOverlay.classList.add('visible');
 }
 
-/* applica l'abilità scelta al player e chiude l'overlay
-   @param ab  oggetto abilità da ABILITIES */
 function selectAbility(ab) {
   ab.effect(player);
   player.acquiredAbilities.push(ab.id);
@@ -329,21 +291,16 @@ function selectAbility(ab) {
   abilityOverlay.classList.remove('visible');
   choosingAbility = false;
 
-  // aggiorna HUD dopo l'effetto
   updateHpBar();
   updateRangeCircle();
 }
 
-/* seleziona 3 abilità casuali per la scelta.
-   Logica: garantisce almeno 1 esclusiva del personaggio
-   se disponibile, poi riempie con generiche. */
 function pickAbilities() {
   const charId    = player.charDef.id;
   const exclusive = ABILITIES.filter(a => a.exclusive === charId && !player.acquiredAbilities.includes(a.id));
   const generic   = ABILITIES.filter(a => a.exclusive === null   && !player.acquiredAbilities.includes(a.id));
   const all       = [...exclusive, ...generic];
 
-  // mescola
   for (let i = all.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [all[i], all[j]] = [all[j], all[i]];
@@ -351,18 +308,15 @@ function pickAbilities() {
 
   const result = [];
 
-  // garantisce almeno 1 esclusiva
   if (exclusive.length > 0) {
     result.push(exclusive[Math.floor(Math.random() * exclusive.length)]);
   }
 
-  // riempie fino a 3
   for (const a of all) {
     if (result.length >= 3) break;
     if (!result.includes(a)) result.push(a);
   }
 
-  // fallback se il pool è quasi esaurito
   while (result.length < 3) {
     const fallback = ABILITIES[Math.floor(Math.random() * ABILITIES.length)];
     if (!result.includes(fallback)) result.push(fallback);
@@ -372,20 +326,14 @@ function pickAbilities() {
 }
 
 /* ══════════════════════════════════════
-   UTILITIES DOM
+   DOM UTILITIES
    ══════════════════════════════════════ */
 
-/* dimensioni attuali dell'arena in px
-   (varia in base alla dimensione del browser) */
 function getArenaSize() {
   const r = arena.getBoundingClientRect();
   return { w: r.width, h: r.height };
 }
 
-/* converte colore hex in stringa "R,G,B"
-   usata per rgba() nel CSS via JS
-   @param hex  stringa tipo '#E24B4A'
-   @return     stringa tipo '226,75,74' */
 function hexToRgb(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);

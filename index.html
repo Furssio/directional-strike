@@ -16,26 +16,26 @@
     <div id="menu-card">
       <div class="arrows-preview">← ↑ → ↓</div>
       <h1>Directional Strike</h1>
-      <div class="subtitle">scegli una modalità</div>
+     <div class="subtitle">choose a mode</div>
       <div class="mode-grid">
         <div class="mode-card" id="btn-infinite">
           <div class="mode-icon">⚡</div>
-          <div class="mode-title">infinita</div>
-          <div class="mode-desc">sopravvivi il più a lungo possibile</div>
+          <div class="mode-title">infinite</div>
+<div class="mode-desc">survive as long as possible</div>
         </div>
         <div class="mode-card locked" id="btn-story">
           <div class="lock-badge">🔒</div>
           <div class="mode-icon">⚔️</div>
-          <div class="mode-title">storia</div>
-          <div class="mode-desc">boss e livelli. prossimamente.</div>
+          <div class="mode-title">story</div>
+<div class="mode-desc">bosses and levels. coming soon.</div>
         </div>
       </div>
       <div class="legend">
         <span>👹 1hit</span>
-        <span>👾 2hit+spara</span>
+        <span>👾 2hit+shots</span>
         <span>🗿 3hit</span>
-        <span>🛡️ S=scudo</span>
-        <span>⚡ D=speciale</span>
+        <span>🛡️ S=shield</span>
+<span>⚡ D=special</span>
       </div>
       <div class="best-score" id="menu-best"></div>
       <button class="game-btn" id="btn-mute">🔊 audio on</button>
@@ -45,11 +45,11 @@
   <!-- ── SELEZIONE PERSONAGGIO ── -->
   <div id="screen-char">
     <div id="char-card">
-      <h2>scegli il personaggio</h2>
-      <div class="subtitle">ogni personaggio ha un'abilità speciale unica</div>
+     <h2>choose your character</h2>
+<div class="subtitle">each character has a unique special ability</div>
       <div class="char-grid" id="char-grid"></div>
-      <button id="btn-char-confirm">inizia partita</button>
-      <button class="game-btn" id="btn-char-back">← indietro</button>
+      <button id="btn-char-confirm">start game</button>
+<button class="game-btn" id="btn-char-back">← back</button>
     </div>
   </div>
 
@@ -59,7 +59,7 @@
       <div id="hud-top">
         <div id="score-display">0</div>
         <div id="combo-display"></div>
-        <div id="level-display">livello 1</div>
+        <div id="level-display">wave 1</div>
       </div>
       <div id="player-hp-wrap"><div id="player-hp-bar" style="width:100%"></div></div>
       <div id="combo-timer-wrap"><div id="combo-timer-bar"></div></div>
@@ -76,8 +76,8 @@
       <div id="player">🧑</div>
       <!-- overlay scelta abilità — appare a fine livello -->
       <div id="ability-overlay">
-        <div id="ability-title">⬆ livello!</div>
-        <div id="ability-subtitle">scegli un potenziamento</div>
+        <div id="ability-title">⬆ wave up!</div>
+<div id="ability-subtitle">choose an upgrade</div>
         <div id="ability-cards"></div>
       </div>
     </div>
@@ -103,7 +103,7 @@
       <div id="best-label"></div>
       <div class="btn-row">
         <button class="game-btn" id="btn-home">home</button>
-        <button class="game-btn" id="btn-restart">rigioca</button>
+<button class="game-btn" id="btn-restart">play again</button>
       </div>
     </div>
   </div>
@@ -112,9 +112,9 @@
   <div id="screen-story-soon">
     <div id="soon-card">
       <div class="soon-icon">⚔️</div>
-      <h2>modalità storia</h2>
-      <p>boss fight, livelli e sfide in arrivo.</p>
-      <button class="game-btn" id="btn-soon-back" style="width:100%;">torna al menu</button>
+      <h2>story mode</h2>
+<p>boss fights, levels and challenges coming soon.</p>
+<button class="game-btn" id="btn-soon-back" style="width:100%;">back to menu</button>
     </div>
   </div>
 
@@ -124,14 +124,15 @@
      ORDINE IMPORTANTE: ogni file dipende da quelli sopra di lui.
      Non cambiare l'ordine senza aggiornare le dipendenze.
 -->
-<script src="js/config.js"></script>      <!-- 1. dati globali -->
-<script src="js/abilities.js"></script>   <!-- 2. pool abilità roguelite -->
-<script src="js/audio.js"></script>       <!-- 3. sistema audio -->
+<script src="js/config.js"></script>          <!-- 1. dati globali -->
+<script src="js/abilities.js"></script>       <!-- 2. pool abilità roguelite -->
+<script src="js/audio.js"></script>           <!-- 3. sistema audio -->
 <script src="js/classes/Player.js"></script>  <!-- 4a. classe Player -->
 <script src="js/classes/Enemy.js"></script>   <!-- 4b. classe Enemy -->
 <script src="js/classes/Bullet.js"></script>  <!-- 4c. classe Bullet -->
-<script src="js/ui.js"></script>          <!-- 5. aggiornamenti DOM/HUD -->
-<script src="js/game.js"></script>        <!-- 6. logica di gioco — entry point -->
+<script src="js/director.js"></script>        <!-- 5. AI Director -->
+<script src="js/ui.js"></script>              <!-- 6. aggiornamenti DOM/HUD -->
+<script src="js/game.js"></script>            <!-- 7. logica di gioco — entry point -->
 
 </body>
 </html>
