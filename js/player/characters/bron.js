@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════
    BRON.JS
    The Tank — balanced, invincible special.
-   Registers itself into CharacterRegistry.
    ═══════════════════════════════════════ */
 
 CharacterRegistry.register({
@@ -13,15 +12,20 @@ CharacterRegistry.register({
   damageMult: 1.0,
   color:      '#22C55E',
   special: {
-    name:     'Fortress',
-    desc:     'invincible for 4s',
-    icon:     '🔰',
-    duration: 4000,
-    barColor: '#22C55E',
+    name:          'Fortress',
+    desc:          'invincible for 4s',
+    icon:          '🔰',
+    duration:      4000,
+    barColor:      '#22C55E',
+    piercing:      false,
+    blocksBullets: true,
+    onActivate(enemies) {},
+    onDeactivate(enemies) {},
   },
   stats: { range: 3, damage: 3, hp: 5 },
   abilities: ['bron_fort_ext', 'bron_thorns'],
 });
+
 [
   {
     id:        'bron_fort_ext',

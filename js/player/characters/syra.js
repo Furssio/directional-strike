@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════
    SYRA.JS
    The Mage — long range, low damage.
-   Registers itself into CharacterRegistry.
    ═══════════════════════════════════════ */
 
 CharacterRegistry.register({
@@ -13,15 +12,20 @@ CharacterRegistry.register({
   damageMult: 0.7,
   color:      '#8B5CF6',
   special: {
-    name:     'Piercing',
-    desc:     'shots pass through enemies for 3s',
-    icon:     '✨',
-    duration: 3000,
-    barColor: '#8B5CF6',
+    name:          'Piercing',
+    desc:          'shots pass through enemies for 3s',
+    icon:          '✨',
+    duration:      3000,
+    barColor:      '#8B5CF6',
+    piercing:      true,
+    blocksBullets: false,
+    onActivate(enemies) {},
+    onDeactivate(enemies) {},
   },
   stats: { range: 5, damage: 2, hp: 2 },
   abilities: ['syra_pierce_ext', 'syra_double'],
 });
+
 [
   {
     id:        'syra_pierce_ext',

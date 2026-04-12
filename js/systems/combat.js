@@ -2,10 +2,6 @@
    COMBAT.JS
    Attack, kill registration, shield
    and special ability activation.
-
-   Used by: loop.js, input.js
-   Depends on: state.js, dom.js, config.js,
-               audio.js, juice.js, ui/hud.js
    ═══════════════════════════════════════ */
 
 /* ── KILL ── */
@@ -56,15 +52,12 @@ function activateSpecial() {
 
   SFX.special();
 
-  const charId = player.charDef.id;
   playerEl.classList.add('special-active');
   specialRing.classList.add('active');
   btnSpecial.classList.add('active-special');
   specialWrap.classList.remove('ready');
 
-  if (charId === 'warrior') {
-    enemies.forEach(e => e.setSlowed(true, player.charDef.special.slowMult));
-  }
+  player.charDef.special.onActivate(enemies);
 
   setTimeout(() => {
     player.specialActive = false;
@@ -72,9 +65,7 @@ function activateSpecial() {
     specialRing.classList.remove('active');
     btnSpecial.className = 'cbtn';
 
-    if (charId === 'warrior') {
-      enemies.forEach(e => e.setSlowed(false, 1));
-    }
+    player.charDef.special.onDeactivate(enemies);
   }, player.charDef.special.duration);
 }
 
@@ -89,7 +80,7 @@ function handleDir(dir) {
   const cy          = h / 2;
   const arenaSize   = Math.min(w, h);
   const attackRange = player.getAttackRange(arenaSize);
-  const isPiercing  = player.specialActive && player.charDef.id === 'mage';
+  const isPiercing  = player.specialActive && player.charDef.special.piercing;
 
   const dirs = player.doubleAttack && !isPiercing
     ? [dir, ...getAdjacentDirs(dir)]

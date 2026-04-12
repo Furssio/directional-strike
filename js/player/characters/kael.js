@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════
    KAEL.JS
    The Warrior — short range, high damage.
-   Registers itself into CharacterRegistry.
    ═══════════════════════════════════════ */
 
 CharacterRegistry.register({
@@ -13,16 +12,24 @@ CharacterRegistry.register({
   damageMult: 1.6,
   color:      '#E24B4A',
   special: {
-    name:     'Bullet Time',
-    desc:     'slows all enemies for 3s',
-    icon:     '🌀',
-    duration: 3000,
-    slowMult: 0.25,
-    barColor: '#E24B4A',
+    name:          'Bullet Time',
+    desc:          'slows all enemies for 3s',
+    icon:          '🌀',
+    duration:      3000,
+    barColor:      '#E24B4A',
+    piercing:      false,
+    blocksBullets: false,
+    onActivate(enemies) {
+      enemies.forEach(e => e.setSlowed(true, 0.25));
+    },
+    onDeactivate(enemies) {
+      enemies.forEach(e => e.setSlowed(false, 1));
+    },
   },
   stats: { range: 1, damage: 5, hp: 3 },
   abilities: ['kael_slow_ext', 'kael_heavy'],
 });
+
 [
   {
     id:        'kael_slow_ext',

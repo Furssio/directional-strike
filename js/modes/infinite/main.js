@@ -24,10 +24,6 @@ const SCRIPTS = [
   /* ── AUDIO ── */
   'js/audio.js',
 
-  /* ── CLASSES ── */
-  'js/classes/Player.js',
-  'js/classes/Enemy.js',
-  'js/classes/Bullet.js',
 
   /* ── STATE ── */
   'js/state.js',

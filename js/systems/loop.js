@@ -14,7 +14,7 @@
 function startGame() {
   SFX.init();
 
-  const charDef   = CONFIG.characters[selectedCharId];
+  const charDef = CharacterRegistry.get(selectedCharId);
   player          = new Player(charDef);
   enemies         = [];
   bullets         = [];
@@ -132,7 +132,7 @@ function tick() {
 
     if (dist < hitR) {
 
-      if (player.thorns && player.specialActive && player.charDef.id === 'tank') {
+      if (player.thorns && player.specialActive && player.charDef.special.blocksBullets) {
         e.hit(Math.round(CONFIG.player.maxHp * 0.15));
         e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
         if (!e.isAlive()) {
@@ -185,7 +185,7 @@ function tick() {
       b.el.remove();
       bullets.splice(i, 1);
 
-      if (player.shielded || (player.specialActive && player.charDef.id === 'tank')) continue;
+      if (player.shielded || (player.specialActive && player.charDef.special.blocksBullets)) continue;
 
       player.takeDamage(b.damagePct);
       updateHpBar();

@@ -31,9 +31,9 @@ function spawnEnemyDirected(def, dir) {
   const sMult     = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);
 
-  if (player.specialActive && player.charDef.id === 'warrior') {
-    enemy.setSlowed(true, player.charDef.special.slowMult);
-  }
+ if (player.specialActive) {
+  player.charDef.special.onActivate([enemy]);
+}
 
   const el = document.createElement('div');
   el.className      = 'enemy';
