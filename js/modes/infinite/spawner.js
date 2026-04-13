@@ -8,8 +8,7 @@
                systems/spawn.js, waves.js
    ═══════════════════════════════════════ */
 
-const dirCooldowns    = { up: 0, down: 0, left: 0, right: 0 };
-const DIR_COOLDOWN_MS = 1200;
+const dirCooldowns = { up: 0, down: 0, left: 0, right: 0 };
 
 /* ── RESET ──────────────────────────────
    Called on init to reset cooldowns.    */
@@ -98,10 +97,10 @@ function spawnGroup(state, wave) {
     const def = EnemyRegistry.get(enemyName);
     const dir       = pickDir();
 
-    dirCooldowns[dir] = DIR_COOLDOWN_MS;
+    dirCooldowns[dir] = CONFIG.spawn.dirCooldownMs;
 
     setTimeout(() => {
       if (running) spawnEnemyDirected(def, dir);
-    }, i * 180);
+    }, i * CONFIG.spawn.groupSpawnDelay);
   }
 }

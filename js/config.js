@@ -44,10 +44,10 @@ const CONFIG = {
      killsPerLevelScaling:  multiplier per wave
   ─────────────────────────────────────── */
   difficulty: {
-    killsPerLevelBase:    8,
-    killsPerLevelScaling: 1.20,
-    speedIncreasePerLevel: 0.10,
-    maxSpeedMult:          2.5,
+    killsPerLevelBase:     8,
+    killsPerLevelScaling:  1.20,
+    speedIncreasePerLevel: 0.06,
+    maxSpeedMult:          2.0,
   },
 
   /* ── BASE ───────────────────────────────
@@ -55,7 +55,7 @@ const CONFIG = {
      hitDamagePct:   base player damage as % of maxHp
   ─────────────────────────────────────── */
   base: {
-    enemyBaseSpeed: 2.2,
+    enemyBaseSpeed: 1.8,
     hitDamagePct:   0.34,
   },
 
@@ -94,6 +94,23 @@ const CONFIG = {
     shakeOnKillElite: true,
   },
 
+  /* ── SPAWN ──────────────────────────────
+     dirCooldownMs:   ms before same direction can spawn again
+     groupSpawnDelay: ms between each enemy in a group
+     spread:          random position offset on spawn (px)
+     edgeMargin:      how far outside arena enemies spawn (px)
+     hitRadius:       collision radius player vs enemy (px)
+     bulletHitRadius: collision radius player vs bullet (px)
+  ─────────────────────────────────────── */
+  spawn: {
+    dirCooldownMs:   2200,
+    groupSpawnDelay: 300,
+    spread:          60,
+    edgeMargin:      30,
+    hitRadius:       28,
+    bulletHitRadius: 22,
+  },
+
   /* ── DIRECTOR ───────────────────────────
      Controls game pacing via stress meter.
   ─────────────────────────────────────── */
@@ -113,51 +130,51 @@ const CONFIG = {
     /* stress target per wave 1-10 */
     waveTargets: [
       0,   // index 0 unused
-      25,  // wave 1
-      30,  // wave 2
-      35,  // wave 3
-      38,  // wave 4
-      42,  // wave 5
-      45,  // wave 6
-      48,  // wave 7
-      52,  // wave 8
+      20,  // wave 1  — very easy, 1-2 grunts max
+      24,  // wave 2  — still easy
+      28,  // wave 3  — first crusher possible but rare
+      32,  // wave 4
+      36,  // wave 5  — golem enters pool
+      40,  // wave 6
+      44,  // wave 7
+      50,  // wave 8
       58,  // wave 9
-      75,  // wave 10 — BOSS
+      72,  // wave 10 — BOSS
     ],
 
     /* wave 11+ formula */
-    baseTarget:           30,
+    baseTarget:            28,
     targetIncreasePerWave: 1.5,
-    maxTarget:            92,
-    bossTargetBonus:      20,
+    maxTarget:             92,
+    bossTargetBonus:       20,
 
     /* director states */
     tolerance: 15,
 
     /* spawn intervals in ms */
-    spawnIntervalFast:   400,
-    spawnIntervalNormal: 900,
-    spawnIntervalSlow:   1800,
+    spawnIntervalFast:   600,
+    spawnIntervalNormal: 1200,
+    spawnIntervalSlow:   2400,
 
     /* group sizes */
-    groupSizeFast:   3,
-    groupSizeNormal: 2,
+    groupSizeFast:   2,
+    groupSizeNormal: 1,
     groupSizeSlow:   1,
 
     /* wave progression */
-    killsToAdvanceBase:    12,
+    killsToAdvanceBase:    10,
     killsToAdvanceScaling: 1.18,
 
     /* max enemies in arena */
-    maxEnemiesBase:    4,
-    maxEnemiesPerWave: 0.3,
-    maxEnemiesCap:     12,
+    maxEnemiesBase:    3,
+    maxEnemiesPerWave: 0.25,
+    maxEnemiesCap:     10,
 
     /* enemy pool per wave — uses registry ids */
     enemyPool: {
-      ravager: { fromWave: 1, weight: 6 },
-      crusher: { fromWave: 3, weight: 3 },
-      golem:   { fromWave: 5, weight: 2 },
+      ravager: { fromWave: 1, weight: 8 },
+      crusher: { fromWave: 4, weight: 2 },
+      golem:   { fromWave: 6, weight: 1 },
     },
 
   },

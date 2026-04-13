@@ -15,7 +15,7 @@ function spawnEnemyDirected(def, dir) {
   const { w, h } = getArenaSize();
   const cx = w / 2;
   const cy = h / 2;
-  const m  = 30;
+  const m  = CONFIG.spawn.edgeMargin;
 
   let x, y;
   if (dir === 'up')    { x = cx;    y = -m;    }
@@ -23,7 +23,7 @@ function spawnEnemyDirected(def, dir) {
   if (dir === 'left')  { x = -m;    y = cy;    }
   if (dir === 'right') { x = w + m; y = cy;    }
 
-  const spread = 60;
+  const spread = CONFIG.spawn.spread;
   if (dir === 'up'   || dir === 'down')  x += (Math.random() - 0.5) * spread;
   if (dir === 'left' || dir === 'right') y += (Math.random() - 0.5) * spread;
 
@@ -53,9 +53,10 @@ function spawnEnemyDirected(def, dir) {
   el.appendChild(hpWrap);
 
   arena.appendChild(el);
-  enemy.el     = el;
-  enemy.hpFill = hpFill;
-  enemies.push(enemy);
+  b.el     = el;
+  b.owner  = enemy;
+  bullets.push(b);
+  SFX.bullet();
 }
 
 function spawnBullet(enemy) {

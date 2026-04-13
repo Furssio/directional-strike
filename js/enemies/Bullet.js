@@ -14,6 +14,8 @@ class Bullet {
     this.y         = y;
     this.vx        = vx;
     this.vy        = vy;
+    this.vxBase    = vx;
+    this.vyBase    = vy;
     this.damagePct = dmgPct;
     this.el        = null;
   }

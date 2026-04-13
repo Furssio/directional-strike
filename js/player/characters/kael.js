@@ -21,9 +21,17 @@ CharacterRegistry.register({
     blocksBullets: false,
     onActivate(enemies) {
       enemies.forEach(e => e.setSlowed(true, 0.25));
+      bullets.forEach(b => {
+        b.vx = b.vxBase * 0.25;
+        b.vy = b.vyBase * 0.25;
+      });
     },
     onDeactivate(enemies) {
       enemies.forEach(e => e.setSlowed(false, 1));
+      bullets.forEach(b => {
+        b.vx = b.vxBase;
+        b.vy = b.vyBase;
+      });
     },
   },
   stats: { range: 1, damage: 5, hp: 3 },

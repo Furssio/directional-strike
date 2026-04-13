@@ -94,8 +94,8 @@ function tick() {
   const { w, h }    = getArenaSize();
   const cx          = w / 2;
   const cy          = h / 2;
-  const hitR        = 28;
-  const bulletHitR  = 22;
+  const hitR        = CONFIG.spawn.hitRadius;
+  const bulletHitR  = CONFIG.spawn.bulletHitRadius;
   const arenaSize   = Math.min(w, h);
   const attackRange = player.getAttackRange(arenaSize);
 
@@ -119,12 +119,12 @@ function tick() {
 
       if (!e.firstShotFired && curDist <= e.firstShotDist) {
         e.firstShotFired = true;
-        spawnBullet(e);
+        if (!e.hasBullet) { e.hasBullet = true; spawnBullet(e); }
         e.shootTimer = 0;
       } else if (e.firstShotFired) {
         e.shootTimer += dt;
         if (e.shootTimer >= e.shootInterval) {
-          spawnBullet(e);
+          if (!e.hasBullet) { e.hasBullet = true; spawnBullet(e); }
           e.shootTimer = 0;
         }
       }
@@ -171,8 +171,9 @@ function tick() {
     b.el.style.left = b.x + 'px';
     b.el.style.top  = b.y + 'px';
 
-    if (b.x < -20 || b.x > w + 20 || b.y < -20 || b.y > h + 20) {
+   if (b.x < -20 || b.x > w + 20 || b.y < -20 || b.y > h + 20) {
       b.el.remove();
+      if (b.owner) b.owner.hasBullet = false;
       bullets.splice(i, 1);
       continue;
     }
@@ -183,6 +184,7 @@ function tick() {
 
     if (dist < bulletHitR) {
       b.el.remove();
+      if (b.owner) b.owner.hasBullet = false;
       bullets.splice(i, 1);
 
       if (player.shielded || (player.specialActive && player.charDef.special.blocksBullets)) continue;

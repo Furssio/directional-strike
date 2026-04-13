@@ -72,8 +72,9 @@ function activateSpecial() {
 /* ── ATTACK ── */
 
 function handleDir(dir) {
-  if (!running || player.shielded || choosingAbility) return;
-
+  if (!running || player.shielded || choosingAbility || isAttacking) return;
+  isAttacking = true;
+  setTimeout(() => isAttacking = false, 80);
   const hitDmg      = player.getHitDamage();
   const { w, h }    = getArenaSize();
   const cx          = w / 2;

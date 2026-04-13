@@ -14,4 +14,5 @@ let gameLoop        = null;
 let running         = false;
 let choosingAbility = false;
 let lastTick        = 0;
-let selectedCharId  = 'warrior';
+let selectedCharId  = 'kael';
+let isAttacking     = false;
