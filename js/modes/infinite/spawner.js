@@ -90,7 +90,7 @@ function spawnGroup(state, wave) {
     Math.floor(d.maxEnemiesBase + wave * d.maxEnemiesPerWave)
   );
 
-  const toSpawn = Math.min(groupSize, Math.max(0, maxEnemies - enemies.length));
+  const toSpawn = enemies.length === 0 ? 1 : Math.min(groupSize, Math.max(0, maxEnemies - enemies.length));
 
   for (let i = 0; i < toSpawn; i++) {
     const enemyName = pool[Math.floor(Math.random() * pool.length)];

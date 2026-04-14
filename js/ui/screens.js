@@ -125,6 +125,22 @@ function selectAbility(ab) {
 
   updateHpBar();
   updateRangeCircle();
+
+  // 3 second countdown then resume
+  let count = 3;
+  const pop = document.getElementById('level-up-pop');
+  pop.style.opacity = '1';
+  pop.textContent   = count + '...';
+
+  const cd = setInterval(() => {
+    count--;
+    if (count > 0) {
+      pop.textContent = count + '...';
+    } else {
+      clearInterval(cd);
+      pop.style.opacity = '0';
+    }
+  }, 1000);
 }
 
 function pickAbilities() {

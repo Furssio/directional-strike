@@ -172,9 +172,9 @@ const CONFIG = {
 
     /* enemy pool per wave — uses registry ids */
     enemyPool: {
-      ravager: { fromWave: 1, weight: 8 },
-      crusher: { fromWave: 4, weight: 2 },
-      golem:   { fromWave: 6, weight: 1 },
+      ravager: { fromWave: 1, weight: 9 },
+      crusher: { fromWave: 5, weight: 1 },
+      golem:   { fromWave: 7, weight: 1 },
     },
 
   },

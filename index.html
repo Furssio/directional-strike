@@ -9,6 +9,58 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+ <!-- DEV PREVIEW — remove before publish -->
+<canvas id="sprite-preview" width="160" height="160" style="
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:#1a1a1a;
+  border:1px solid #444;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  z-index:9999;
+"></canvas>
+
+<script>
+(function() {
+  const canvas  = document.getElementById('sprite-preview');
+  const ctx     = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const img     = new Image();
+  img.src       = 'assets/sprites/idle.png';
+
+  const FRAME_W  = 20;
+  const FRAME_H  = 20;
+  const FRAMES   = 4;
+  const SCALE    = 8;
+  const FPS      = 4;
+
+  let frame      = 0;
+  let lastTime   = 0;
+  const interval = 1000 / FPS;
+
+  function draw(now) {
+    requestAnimationFrame(draw);
+    if (now - lastTime < interval) return;
+    lastTime = now;
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      img,
+      frame * FRAME_W, 0,
+      FRAME_W, FRAME_H,
+      0, 0,
+      FRAME_W * SCALE,
+      FRAME_H * SCALE
+    );
+
+    frame = (frame + 1) % FRAMES;
+  }
+
+  img.onload = () => requestAnimationFrame(draw);
+})();
+</script>
 <div id="G">
 
   <!-- ── MENU PRINCIPALE ── -->

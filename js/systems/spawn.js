@@ -31,9 +31,9 @@ function spawnEnemyDirected(def, dir) {
   const sMult     = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);
 
- if (player.specialActive) {
-  player.charDef.special.onActivate([enemy]);
-}
+  if (player.specialActive) {
+    player.charDef.special.onActivate([enemy]);
+  }
 
   const el = document.createElement('div');
   el.className      = 'enemy';
@@ -53,10 +53,9 @@ function spawnEnemyDirected(def, dir) {
   el.appendChild(hpWrap);
 
   arena.appendChild(el);
-  b.el     = el;
-  b.owner  = enemy;
-  bullets.push(b);
-  SFX.bullet();
+  enemy.el     = el;
+  enemy.hpFill = hpFill;
+  enemies.push(enemy);
 }
 
 function spawnBullet(enemy) {
@@ -79,7 +78,8 @@ function spawnBullet(enemy) {
   el.style.top  = b.y + 'px';
 
   arena.appendChild(el);
-  b.el = el;
+  b.el    = el;
+  b.owner = enemy;
   bullets.push(b);
   SFX.bullet();
 }

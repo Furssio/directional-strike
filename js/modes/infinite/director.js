@@ -47,17 +47,23 @@ const Director = (() => {
       }
     },
 
-    nextWave() {
+   nextWave() {
       wave++;
       killsThisWave = 0;
       _isBossWave   = isBossWave(wave);
 
       if (typeof updateWaveDisplay === 'function') updateWaveDisplay(wave, _isBossWave);
 
-      if (_isBossWave) {
+      if (isBossWave(wave - 1)) {
+        // clear all enemies instantly
+        enemies.forEach(e => e.el.remove());
+        enemies.length = 0;
+        bullets.forEach(b => b.el.remove());
+        bullets.length = 0;
+
         setTimeout(() => {
           if (active) showAbilityChoice();
-        }, 800);
+        }, 300);
       }
     },
 

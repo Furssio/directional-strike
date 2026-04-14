@@ -110,4 +110,38 @@ document.addEventListener('keyup', e => {
 function onCharSelected(charId) {
   selectedCharId = charId;
 }
+
+/* ── DEV CHEATS ── */
+const DEV_CHEATS = true; // set to false before publishing
+
+document.addEventListener('keydown', e => {
+  if (!DEV_CHEATS || !running || choosingAbility) return;
+
+  // W — skip to next wave
+  if (e.code === 'KeyW') {
+    e.preventDefault();
+    const needed = Director.getKillsNeeded();
+    const kills  = Director.getKills();
+    const diff   = needed - kills;
+    for (let i = 0; i < diff; i++) Director.onKill();
+    return;
+  }
+
+  // K — full HP
+  if (e.code === 'KeyK') {
+    e.preventDefault();
+    player.hp = player.maxHp;
+    updateHpBar();
+    return;
+  }
+
+  // F — full special bar
+  if (e.code === 'KeyF') {
+    e.preventDefault();
+    player.specialCharge = 100;
+    updateSpecialBar();
+    return;
+  }
+});
+
 updateMenuBest();

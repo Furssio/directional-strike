@@ -114,19 +114,13 @@ function tick() {
 
     e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
 
-    if (e.shoots) {
+   if (e.shoots && !e.hasBullet) {
       const curDist = e.distToCenter(cx, cy);
 
       if (!e.firstShotFired && curDist <= e.firstShotDist) {
         e.firstShotFired = true;
-        if (!e.hasBullet) { e.hasBullet = true; spawnBullet(e); }
-        e.shootTimer = 0;
-      } else if (e.firstShotFired) {
-        e.shootTimer += dt;
-        if (e.shootTimer >= e.shootInterval) {
-          if (!e.hasBullet) { e.hasBullet = true; spawnBullet(e); }
-          e.shootTimer = 0;
-        }
+        e.hasBullet = true;
+        spawnBullet(e);
       }
     }
 
