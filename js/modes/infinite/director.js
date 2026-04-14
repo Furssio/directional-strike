@@ -47,28 +47,24 @@ const Director = (() => {
       }
     },
 
-   nextWave() {
+    nextWave() {
       wave++;
       killsThisWave = 0;
       _isBossWave   = isBossWave(wave);
 
       if (typeof updateWaveDisplay === 'function') updateWaveDisplay(wave, _isBossWave);
 
+      // after a boss wave → clear all enemies and bullets
       if (isBossWave(wave - 1)) {
-        // clear all enemies instantly
         enemies.forEach(e => e.el.remove());
         enemies.length = 0;
         bullets.forEach(b => b.el.remove());
         bullets.length = 0;
-
-        setTimeout(() => {
-          if (active) showAbilityChoice();
-        }, 300);
       }
     },
 
     tick(dt) {
-      if (!active || choosingAbility) return;
+      if (!active) return;
 
       const { w, h } = getArenaSize();
       const cx = w / 2;

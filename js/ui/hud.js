@@ -49,21 +49,21 @@ function updateComboDisplay() {
 
 function updateSpecialBar() {
   const pct     = player.specialCharge;
-  const ch      = player.charDef;
+  const ab      = player.ability;
   const isReady = player.isSpecialReady();
 
   specialBar.style.width      = pct + '%';
-  specialBar.style.background = ch.special.barColor;
+  specialBar.style.background = ab.barColor;
 
-  specialLabel.textContent = `${ch.special.icon} ${ch.special.name} ${Math.round(pct)}%`;
+  specialLabel.textContent = `${ab.icon} ${ab.name} ${Math.round(pct)}%`;
 
-  specialWrap.style.setProperty('--special-color', ch.special.barColor);
+  specialWrap.style.setProperty('--special-color', ab.barColor);
 
   if (isReady && !player.specialActive) {
     specialWrap.classList.add('ready');
     btnSpecial.className     = 'cbtn ready';
-    btnSpecial.textContent   = ch.special.icon;
-    specialLabel.style.color = ch.special.barColor;
+    btnSpecial.textContent   = ab.icon;
+    specialLabel.style.color = ab.barColor;
 
     if (!player._wasSpecialReady) {
       player._wasSpecialReady = true;
@@ -87,6 +87,6 @@ function updateRangeCircle() {
 
   rangeEl.style.width       = d + 'px';
   rangeEl.style.height      = d + 'px';
-  rangeEl.style.borderColor = `rgba(${hexToRgb(player.charDef.color)}, 0.5)`;
-  rangeEl.style.background  = `rgba(${hexToRgb(player.charDef.color)}, 0.05)`;
+  rangeEl.style.borderColor = `rgba(${hexToRgb(player.color)}, 0.5)`;
+  rangeEl.style.background  = `rgba(${hexToRgb(player.color)}, 0.05)`;
 }

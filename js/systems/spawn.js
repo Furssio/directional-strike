@@ -32,7 +32,7 @@ function spawnEnemyDirected(def, dir) {
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);
 
   if (player.specialActive) {
-    player.charDef.special.onActivate([enemy]);
+    player.ability.onActivate([enemy]);
   }
 
   const el = document.createElement('div');

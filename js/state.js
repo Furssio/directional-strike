@@ -12,7 +12,9 @@ let enemies         = [];
 let bullets         = [];
 let gameLoop        = null;
 let running         = false;
-let choosingAbility = false;
+let choosingAbility = false;   // kept for director clear-enemies compat
 let lastTick        = 0;
-let selectedCharId  = 'kael';
 let isAttacking     = false;
+
+// ability equipped for next match (default = player's default ability)
+let equippedAbilityId = null;

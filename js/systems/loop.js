@@ -2,11 +2,11 @@
    LOOP.JS
    Game loop, start and end game.
 
-   Used by: nobody — entry point
+   Used by: input.js
    Depends on: state.js, dom.js, config.js,
                combat.js, spawn.js, juice.js,
                ui/hud.js, ui/screens.js,
-               audio.js, classes/Player.js
+               audio.js, Player.js
    ═══════════════════════════════════════ */
 
 /* ── START / END ── */
@@ -14,16 +14,13 @@
 function startGame() {
   SFX.init();
 
-  const charDef = CharacterRegistry.get(selectedCharId);
-  player          = new Player(charDef);
-  enemies         = [];
-  bullets         = [];
-  running         = true;
-  choosingAbility = false;
-  lastTick        = performance.now();
+  player    = new Player(equippedAbilityId);
+  enemies   = [];
+  bullets   = [];
+  running   = true;
+  lastTick  = performance.now();
 
   document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
-  abilityOverlay.classList.remove('visible');
 
   updateHpBar();
   updateProgress();
@@ -32,9 +29,8 @@ function startGame() {
   scoreEl.textContent = '0';
   levelEl.textContent = 'wave 1';
 
-  playerEl.textContent   = charDef.emoji;
+  playerEl.textContent   = player.emoji;
   playerEl.className     = '';
-  shieldRing.className   = '';
   specialRing.className  = '';
   btnSpecial.className   = 'cbtn';
   btnSpecial.textContent = '⚡';
@@ -51,8 +47,7 @@ function startGame() {
 function endGame() {
   SFX.gameOver();
 
-  running         = false;
-  choosingAbility = false;
+  running = false;
 
   clearInterval(gameLoop);
   Director.stop();
@@ -61,7 +56,6 @@ function endGame() {
   document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
   enemies = [];
   bullets = [];
-  abilityOverlay.classList.remove('visible');
 
   const best  = getBestScore();
   const isNew = player.score > best;
@@ -80,7 +74,7 @@ function endGame() {
 /* ── TICK ── */
 
 function tick() {
-  if (!running || choosingAbility) return;
+  if (!running) return;
 
   const now = performance.now();
   const dt  = Math.min(now - lastTick, 50);
@@ -114,7 +108,7 @@ function tick() {
 
     e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
 
-   if (e.shoots && !e.hasBullet) {
+    if (e.shoots && !e.hasBullet) {
       const curDist = e.distToCenter(cx, cy);
 
       if (!e.firstShotFired && curDist <= e.firstShotDist) {
@@ -126,11 +120,11 @@ function tick() {
 
     if (dist < hitR) {
 
-      if (player.thorns && player.specialActive && player.charDef.special.blocksBullets) {
-        e.hit(Math.round(CONFIG.player.maxHp * 0.15));
+      if (player.thorns && player.specialActive && player.ability.blocksBullets) {
+        e.hit(Math.round(PLAYER_STATS.maxHp * 0.15));
         e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
         if (!e.isAlive()) {
-          spawnParticles(e.x, e.y, player.charDef.color, e.isElite);
+          spawnParticles(e.x, e.y, player.color, e.isElite);
           e.el.remove();
           registerKill(e);
           enemies.splice(i, 1);
@@ -151,7 +145,7 @@ function tick() {
       setTimeout(() => flashEl.style.opacity = '0', 200);
 
       const p = player.hpPercent();
-      playerEl.textContent = p > 0.5 ? player.charDef.emoji : p > 0.25 ? '😨' : '😰';
+      playerEl.textContent = p > 0.5 ? player.emoji : p > 0.25 ? '😨' : '😰';
 
       if (!player.isAlive()) { endGame(); return; }
     }
@@ -165,7 +159,7 @@ function tick() {
     b.el.style.left = b.x + 'px';
     b.el.style.top  = b.y + 'px';
 
-   if (b.x < -20 || b.x > w + 20 || b.y < -20 || b.y > h + 20) {
+    if (b.x < -20 || b.x > w + 20 || b.y < -20 || b.y > h + 20) {
       b.el.remove();
       if (b.owner) b.owner.hasBullet = false;
       bullets.splice(i, 1);
@@ -181,7 +175,7 @@ function tick() {
       if (b.owner) b.owner.hasBullet = false;
       bullets.splice(i, 1);
 
-      if (player.shielded || (player.specialActive && player.charDef.special.blocksBullets)) continue;
+      if (player.specialActive && player.ability.blocksBullets) continue;
 
       player.takeDamage(b.damagePct);
       updateHpBar();
@@ -194,7 +188,7 @@ function tick() {
       setTimeout(() => flashEl.style.opacity = '0', 150);
 
       const p = player.hpPercent();
-      playerEl.textContent = p > 0.5 ? player.charDef.emoji : p > 0.25 ? '😨' : '😰';
+      playerEl.textContent = p > 0.5 ? player.emoji : p > 0.25 ? '😨' : '😰';
 
       if (!player.isAlive()) { endGame(); return; }
     }

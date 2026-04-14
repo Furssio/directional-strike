@@ -10,17 +10,12 @@
 /* ── MENU NAVIGATION ── */
 
 document.getElementById('btn-infinite').addEventListener('click', () => {
-  buildCharScreen(selectedCharId);
-  showScreen(sChar);
+  startGame();
 });
 document.getElementById('btn-story').addEventListener('click', () => showScreen(sSoon));
 
-document.getElementById('btn-char-confirm').addEventListener('click', startGame);
-document.getElementById('btn-char-back').addEventListener('click', () => showScreen(sMenu));
-
 document.getElementById('btn-restart').addEventListener('click', () => {
-  buildCharScreen(selectedCharId);
-  showScreen(sChar);
+  startGame();
 });
 document.getElementById('btn-home').addEventListener('click', () => {
   updateMenuBest();
@@ -48,17 +43,6 @@ btnMute.addEventListener('click', () => {
   }, { passive: false });
 });
 
-/* ── SHIELD ── */
-
-btnShield.addEventListener('mousedown', () => setShield(true));
-btnShield.addEventListener('touchstart', e => {
-  e.preventDefault();
-  setShield(true);
-}, { passive: false });
-
-document.addEventListener('mouseup',  () => { if (player && running) setShield(false); });
-document.addEventListener('touchend', () => { if (player && running) setShield(false); });
-
 /* ── SPECIAL ── */
 
 btnSpecial.addEventListener('mousedown', activateSpecial);
@@ -70,12 +54,8 @@ btnSpecial.addEventListener('touchstart', e => {
 /* ── KEYBOARD ── */
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyS') {
-    e.preventDefault();
-    if (running && !choosingAbility) setShield(true);
-    return;
-  }
-  if (e.code === 'KeyD') {
+  // Space = special
+  if (e.code === 'Space') {
     e.preventDefault();
     activateSpecial();
     return;
@@ -97,25 +77,11 @@ document.addEventListener('keydown', e => {
   }
 });
 
-document.addEventListener('keyup', e => {
-  if (e.code === 'KeyS') {
-    e.preventDefault();
-    if (running) setShield(false);
-  }
-});
-/* ══════════════════════════════════════
-   UI CALLBACKS
-   ══════════════════════════════════════ */
-
-function onCharSelected(charId) {
-  selectedCharId = charId;
-}
-
 /* ── DEV CHEATS ── */
 const DEV_CHEATS = true; // set to false before publishing
 
 document.addEventListener('keydown', e => {
-  if (!DEV_CHEATS || !running || choosingAbility) return;
+  if (!DEV_CHEATS || !running) return;
 
   // W — skip to next wave
   if (e.code === 'KeyW') {

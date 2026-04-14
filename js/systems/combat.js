@@ -1,7 +1,11 @@
 /* ═══════════════════════════════════════
    COMBAT.JS
-   Attack, kill registration, shield
-   and special ability activation.
+   Attack, kill registration and
+   special ability activation.
+
+   Used by: input.js, loop.js
+   Depends on: state.js, dom.js, config.js,
+               audio.js, hud.js, juice.js
    ═══════════════════════════════════════ */
 
 /* ── KILL ── */
@@ -24,30 +28,10 @@ function registerKill(e) {
   updateProgress();
 }
 
-/* ── SHIELD ── */
-
-function setShield(on) {
-  player.shielded = on;
-
-  if (on) {
-    playerEl.classList.add('shielded');
-    SFX.shield();
-    if (player.shieldHealAmt > 0) {
-      player.hp = Math.min(player.maxHp, player.hp + player.shieldHealAmt);
-      updateHpBar();
-    }
-  } else {
-    playerEl.classList.remove('shielded');
-  }
-
-  shieldRing.className = on ? 'active' : '';
-  btnShield.className  = 'cbtn' + (on ? ' active' : '');
-}
-
 /* ── SPECIAL ── */
 
 function activateSpecial() {
-  if (!running || player.shielded || choosingAbility) return;
+  if (!running) return;
   if (!player.activateSpecial()) return;
 
   SFX.special();
@@ -57,7 +41,7 @@ function activateSpecial() {
   btnSpecial.classList.add('active-special');
   specialWrap.classList.remove('ready');
 
-  player.charDef.special.onActivate(enemies);
+  player.ability.onActivate(enemies);
 
   setTimeout(() => {
     player.specialActive = false;
@@ -65,23 +49,24 @@ function activateSpecial() {
     specialRing.classList.remove('active');
     btnSpecial.className = 'cbtn';
 
-    player.charDef.special.onDeactivate(enemies);
-  }, player.charDef.special.duration);
+    player.ability.onDeactivate(enemies);
+  }, player.ability.duration);
 }
 
 /* ── ATTACK ── */
 
 function handleDir(dir) {
-  if (!running || player.shielded || choosingAbility || isAttacking) return;
+  if (!running || isAttacking) return;
   isAttacking = true;
   setTimeout(() => isAttacking = false, 80);
+
   const hitDmg      = player.getHitDamage();
   const { w, h }    = getArenaSize();
   const cx          = w / 2;
   const cy          = h / 2;
   const arenaSize   = Math.min(w, h);
   const attackRange = player.getAttackRange(arenaSize);
-  const isPiercing  = player.specialActive && player.charDef.special.piercing;
+  const isPiercing  = player.specialActive && player.ability.piercing;
 
   const dirs = player.doubleAttack && !isPiercing
     ? [dir, ...getAdjacentDirs(dir)]
@@ -108,7 +93,7 @@ function handleDir(dir) {
         e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
 
         if (!e.isAlive()) {
-          spawnParticles(e.x, e.y, player.charDef.color, e.isElite);
+          spawnParticles(e.x, e.y, player.color, e.isElite);
           e.el.remove();
           enemies.splice(i, 1);
           registerKill(e);
@@ -141,7 +126,7 @@ function handleDir(dir) {
         }
 
         if (!best.isAlive()) {
-          spawnParticles(best.x, best.y, player.charDef.color, best.isElite);
+          spawnParticles(best.x, best.y, player.color, best.isElite);
           best.el.remove();
           enemies.splice(enemies.indexOf(best), 1);
           registerKill(best);

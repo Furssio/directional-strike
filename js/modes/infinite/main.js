@@ -10,7 +10,6 @@ const SCRIPTS = [
   'js/config.js',
 
   /* ── CORE REGISTRIES ── */
-  'js/core/CharacterRegistry.js',
   'js/core/EnemyRegistry.js',
   'js/core/AbilityRegistry.js',
   'js/core/WaveRegistry.js',
@@ -23,15 +22,12 @@ const SCRIPTS = [
   'js/enemies/golem.js',
 
   /* ── PLAYER ── */
+  'js/player/stats.js',
   'js/player/Player.js',
-  'js/player/characters/kael.js',
-  'js/player/characters/syra.js',
-  'js/player/characters/bron.js',
-  'js/player/characters/abilities/common.js',
+  'js/player/abilities/bulletTime.js',
 
   /* ── AUDIO ── */
   'js/audio.js',
-
 
   /* ── STATE ── */
   'js/state.js',

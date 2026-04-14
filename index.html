@@ -4,63 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Directional Strike</title>
-
-  <!-- STILE -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
- <!-- DEV PREVIEW — remove before publish -->
-<canvas id="sprite-preview" width="160" height="160" style="
-  position:fixed;
-  top:20px;
-  right:20px;
-  background:#1a1a1a;
-  border:1px solid #444;
-  image-rendering:pixelated;
-  image-rendering:crisp-edges;
-  z-index:9999;
-"></canvas>
 
-<script>
-(function() {
-  const canvas  = document.getElementById('sprite-preview');
-  const ctx     = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
-  const img     = new Image();
-  img.src       = 'assets/sprites/idle.png';
-
-  const FRAME_W  = 20;
-  const FRAME_H  = 20;
-  const FRAMES   = 4;
-  const SCALE    = 8;
-  const FPS      = 4;
-
-  let frame      = 0;
-  let lastTime   = 0;
-  const interval = 1000 / FPS;
-
-  function draw(now) {
-    requestAnimationFrame(draw);
-    if (now - lastTime < interval) return;
-    lastTime = now;
-
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(
-      img,
-      frame * FRAME_W, 0,
-      FRAME_W, FRAME_H,
-      0, 0,
-      FRAME_W * SCALE,
-      FRAME_H * SCALE
-    );
-
-    frame = (frame + 1) % FRAMES;
-  }
-
-  img.onload = () => requestAnimationFrame(draw);
-})();
-</script>
 <div id="G">
 
   <!-- ── MENU PRINCIPALE ── -->
@@ -68,40 +15,28 @@
     <div id="menu-card">
       <div class="arrows-preview">← ↑ → ↓</div>
       <h1>Directional Strike</h1>
-     <div class="subtitle">choose a mode</div>
+      <div class="subtitle">choose a mode</div>
       <div class="mode-grid">
         <div class="mode-card" id="btn-infinite">
           <div class="mode-icon">⚡</div>
           <div class="mode-title">infinite</div>
-<div class="mode-desc">survive as long as possible</div>
+          <div class="mode-desc">survive as long as possible</div>
         </div>
         <div class="mode-card locked" id="btn-story">
           <div class="lock-badge">🔒</div>
           <div class="mode-icon">⚔️</div>
-          <div class="mode-title">story</div>
-<div class="mode-desc">bosses and levels. coming soon.</div>
+          <div class="mode-title">adventure</div>
+          <div class="mode-desc">maps, bosses, progression. coming soon.</div>
         </div>
       </div>
       <div class="legend">
         <span>👹 1hit</span>
         <span>👾 2hit+shots</span>
         <span>🗿 3hit</span>
-        <span>🛡️ S=shield</span>
-<span>⚡ D=special</span>
+        <span>⚡ Space=special</span>
       </div>
       <div class="best-score" id="menu-best"></div>
       <button class="game-btn" id="btn-mute">🔊 audio on</button>
-    </div>
-  </div>
-
-  <!-- ── SELEZIONE PERSONAGGIO ── -->
-  <div id="screen-char">
-    <div id="char-card">
-     <h2>choose your character</h2>
-<div class="subtitle">each character has a unique special ability</div>
-      <div class="char-grid" id="char-grid"></div>
-      <button id="btn-char-confirm">start game</button>
-<button class="game-btn" id="btn-char-back">← back</button>
     </div>
   </div>
 
@@ -115,7 +50,7 @@
       </div>
       <div id="player-hp-wrap"><div id="player-hp-bar" style="width:100%"></div></div>
       <div id="combo-timer-wrap"><div id="combo-timer-bar"></div></div>
-      <div id="special-label">speciale 0%</div>
+      <div id="special-label">special 0%</div>
       <div id="special-wrap"><div id="special-bar"></div></div>
       <div id="progress-wrap"><div id="progress-bar"></div></div>
     </div>
@@ -124,21 +59,14 @@
       <div id="attack-range"></div>
       <div id="level-up-pop"></div>
       <div id="special-ring"></div>
-      <div id="shield-ring"></div>
       <div id="player">🧑</div>
-      <!-- overlay scelta abilità — appare a fine livello -->
-      <div id="ability-overlay">
-        <div id="ability-title">⬆ wave up!</div>
-<div id="ability-subtitle">choose an upgrade</div>
-        <div id="ability-cards"></div>
-      </div>
     </div>
     <div id="controls">
       <div class="cbtn empty"></div>
       <button class="cbtn" id="btn-up">↑</button>
-      <button class="cbtn" id="btn-special">⚡</button>
+      <div class="cbtn empty"></div>
       <button class="cbtn" id="btn-left">←</button>
-      <button class="cbtn" id="btn-shield">🛡️</button>
+      <button class="cbtn" id="btn-special">⚡</button>
       <button class="cbtn" id="btn-right">→</button>
       <div class="cbtn empty"></div>
       <button class="cbtn" id="btn-down">↓</button>
@@ -155,29 +83,24 @@
       <div id="best-label"></div>
       <div class="btn-row">
         <button class="game-btn" id="btn-home">home</button>
-<button class="game-btn" id="btn-restart">play again</button>
+        <button class="game-btn" id="btn-restart">play again</button>
       </div>
     </div>
   </div>
 
-  <!-- ── STORIA PRESTO ── -->
+  <!-- ── ADVENTURE PRESTO ── -->
   <div id="screen-story-soon">
     <div id="soon-card">
       <div class="soon-icon">⚔️</div>
-      <h2>story mode</h2>
-<p>boss fights, levels and challenges coming soon.</p>
-<button class="game-btn" id="btn-soon-back" style="width:100%;">back to menu</button>
+      <h2>adventure mode</h2>
+      <p>maps, bosses and progression coming soon.</p>
+      <button class="game-btn" id="btn-soon-back" style="width:100%;">back to menu</button>
     </div>
   </div>
 
 </div><!-- #G -->
 
-<!-- ── SCRIPTS ──
-     ORDINE IMPORTANTE: ogni file dipende da quelli sopra di lui.
-     Non cambiare l'ordine senza aggiornare le dipendenze.
--->
-           <script src="js/modes/infinite/main.js"></script>
-
+<script src="js/modes/infinite/main.js"></script>
 
 </body>
 </html>
