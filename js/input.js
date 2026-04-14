@@ -12,9 +12,15 @@
 
 document.getElementById('btn-infinite').addEventListener('click', () => {
   equippedAbilityId = getEquippedAbility();
+  ActiveDirector = Director;
   startGame();
 });
-document.getElementById('btn-story').addEventListener('click', () => showScreen(sSoon));
+document.getElementById('btn-adventure').addEventListener('click', () => {
+  loadAdventureMode(() => {
+    buildMapSelectScreen();
+    showScreen(sMapSelect);
+  });
+});
 
 document.getElementById('btn-abilities').addEventListener('click', () => {
   buildAbilityScreen();
@@ -31,7 +37,7 @@ document.getElementById('btn-home').addEventListener('click', () => {
   showScreen(sMenu);
 });
 
-document.getElementById('btn-soon-back').addEventListener('click', () => showScreen(sMenu));
+document.getElementById('btn-map-back').addEventListener('click', () => showScreen(sMenu));
 
 /* ── AUDIO ── */
 
@@ -94,10 +100,10 @@ document.addEventListener('keydown', e => {
 
   if (e.code === 'KeyW') {
     e.preventDefault();
-    const needed = Director.getKillsNeeded();
-    const kills  = Director.getKills();
+    const needed = ActiveDirector.getKillsNeeded();
+    const kills  = ActiveDirector.getKills();
     const diff   = needed - kills;
-    for (let i = 0; i < diff; i++) Director.onKill();
+    for (let i = 0; i < diff; i++) ActiveDirector.onKill();
     return;
   }
 

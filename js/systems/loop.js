@@ -39,8 +39,9 @@ function startGame() {
   showScreen(sGame);
   setTimeout(updateRangeCircle, 50);
 
-  clearInterval(gameLoop);
-  Director.init();
+ clearInterval(gameLoop);
+  if (ActiveDirector === Director) ActiveDirector.init();
+  // AdventureDirector.init() is called separately in startAdventureMap() with mapId
   gameLoop = setInterval(tick, 16);
 }
 
@@ -50,7 +51,7 @@ function endGame() {
   running = false;
 
   clearInterval(gameLoop);
-  Director.stop();
+  ActiveDirector.stop();
 
   enemies.forEach(e => e.setSlowed(false, 1));
   document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
@@ -62,7 +63,7 @@ function endGame() {
   if (isNew) saveBestScore(player.score);
 
   finalScoreEl.textContent = player.score;
-  finalLevelEl.textContent = 'wave ' + Director.getWave() + ' · ' + player.kills + ' kills';
+  finalLevelEl.textContent = 'wave ' + ActiveDirector.getWave() + ' · ' + player.kills + ' kills';
   bestLabel.textContent    = isNew
     ? 'new record! 🎉'
     : 'best: ' + Math.max(best, player.score);
@@ -81,7 +82,7 @@ function tick() {
   lastTick  = now;
 
   player.tickSpecial(dt);
-  Director.tick(dt);
+  ActiveDirector.tick(dt);
   updateComboDisplay();
   updateSpecialBar();
 
@@ -181,7 +182,7 @@ function tick() {
       updateHpBar();
       updateComboDisplay();
       SFX.damage();
-      Director.onDamage();
+      ActiveDirector.onDamage();
       triggerShake();
 
       flashEl.style.opacity = '1';

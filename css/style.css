@@ -11,7 +11,7 @@ body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;m
 
 /* ── SCHERMATE ── */
 #screen-menu,#screen-game,#screen-over,#screen-story-soon{width:100%;}
-#screen-game,#screen-over,#screen-story-soon{display:none;}
+#screen-game,#screen-over,#screen-story-soon,#screen-ability,#screen-map-select{display:none;}
 
 /* ══════════════════════════════════════
    ARENA
@@ -288,3 +288,41 @@ button.game-btn:hover{background:#333;}
   width:100%;margin-bottom:16px;
   font-size:13px;padding:10px;
 }
+/* ══════════════════════════════════════
+   ADVENTURE — SELEZIONE MAPPA
+   ══════════════════════════════════════ */
+#map-select-card{
+  background:#222;border:1px solid #444;border-radius:12px;
+  padding:1.5rem 1.2rem;text-align:center;
+  max-width:380px;margin:0 auto;
+}
+#map-select-card h2{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
+#map-select-card .subtitle{margin-bottom:16px;}
+
+#map-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+
+.map-card{
+  display:flex;align-items:center;gap:12px;
+  background:#2a2a2a;border:1.5px solid #444;border-radius:10px;
+  padding:12px 14px;text-align:left;
+  transition:background 0.1s,border-color 0.12s,transform 0.07s;
+}
+.map-card.unlocked{cursor:pointer;}
+.map-card.unlocked:hover{background:#333;border-color:#666;}
+.map-card.unlocked:active{transform:scale(0.97);}
+.map-card.locked{opacity:0.45;cursor:default;}
+.map-card.completed{border-color:#22C55E66;}
+.map-card.completed.unlocked:hover{border-color:#22C55E;}
+
+.map-order{
+  font-size:11px;color:#888;font-weight:600;
+  width:20px;text-align:center;flex-shrink:0;
+}
+.map-icon{font-size:28px;flex-shrink:0;}
+.map-info{flex:1;min-width:0;}
+.map-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;}
+.map-status{font-size:11px;color:#aaa;}
+.map-badge{font-size:18px;color:#888;flex-shrink:0;}
+.map-card.completed .map-badge{color:#22C55E;}
+
+#btn-map-back{width:100%;padding:10px;font-size:13px;}

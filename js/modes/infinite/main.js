@@ -53,7 +53,9 @@ const SCRIPTS = [
 
   /* ── INPUT ── */
   'js/input.js',
-
+  
+ /* ── ADVENTURE (entry, does not auto-run) ── */
+  'js/modes/adventure/main.js',
 ];
 
 (function loadScripts(scripts, index) {

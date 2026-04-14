@@ -19,7 +19,7 @@ function registerKill(e) {
   player.score += pts;
   player.kills += 1;
   player.addKill();
-  Director.onKill();
+  ActiveDirector.onKill();
 
   showScorePop(e.x, e.y, pts);
   scoreEl.textContent = player.score;

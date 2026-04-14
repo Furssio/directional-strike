@@ -17,8 +17,8 @@ function updateHpBar() {
 }
 
 function updateProgress() {
-  const needed = Director.getKillsNeeded();
-  const pct    = Math.min(Director.getKills() / needed, 1);
+  const needed = ActiveDirector.getKillsNeeded();
+  const pct    = Math.min(ActiveDirector.getKills() / needed, 1);
   progressBar.style.width = Math.round(pct * 100) + '%';
 }
 

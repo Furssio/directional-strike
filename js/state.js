@@ -18,3 +18,4 @@ let isAttacking     = false;
 
 // ability equipped for next match (default = player's default ability)
 let equippedAbilityId = null;
+let ActiveDirector = null;

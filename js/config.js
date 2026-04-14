@@ -178,5 +178,17 @@ const CONFIG = {
     },
 
   },
+/* ── ADVENTURE ──────────────────────────
+     Adventure Mode — structured progression
+     through themed maps. Each map has its
+     own stress target and enemy pool.
 
+     wavesPerMap:   number of waves to complete a map
+     stressTarget:  fixed stress target for normal waves (1 to wavesPerMap-1)
+                    overridable per map in map.js
+  ─────────────────────────────────────── */
+  adventure: {
+    wavesPerMap:  9,   // for now only 1-9, boss wave added later
+    stressTarget: 25,  // default, each map can override
+  },
 };
