@@ -7,6 +7,7 @@
    ═══════════════════════════════════════ */
 
 const sMenu    = document.getElementById('screen-menu');
+const sAbility = document.getElementById('screen-ability');
 const sGame    = document.getElementById('screen-game');
 const sOver    = document.getElementById('screen-over');
 const sSoon    = document.getElementById('screen-story-soon');

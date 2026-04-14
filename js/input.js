@@ -4,17 +4,26 @@
 
    Used by: nobody — self-executing
    Depends on: state.js, combat.js,
-               ui/screens.js, audio.js
+               ui/screens.js, ui/abilityScreen.js,
+               audio.js
    ═══════════════════════════════════════ */
 
 /* ── MENU NAVIGATION ── */
 
 document.getElementById('btn-infinite').addEventListener('click', () => {
+  equippedAbilityId = getEquippedAbility();
   startGame();
 });
 document.getElementById('btn-story').addEventListener('click', () => showScreen(sSoon));
 
+document.getElementById('btn-abilities').addEventListener('click', () => {
+  buildAbilityScreen();
+  showScreen(sAbility);
+});
+document.getElementById('btn-ability-back').addEventListener('click', () => showScreen(sMenu));
+
 document.getElementById('btn-restart').addEventListener('click', () => {
+  equippedAbilityId = getEquippedAbility();
   startGame();
 });
 document.getElementById('btn-home').addEventListener('click', () => {
@@ -78,12 +87,11 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = true; // set to false before publishing
+const DEV_CHEATS = true;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;
 
-  // W — skip to next wave
   if (e.code === 'KeyW') {
     e.preventDefault();
     const needed = Director.getKillsNeeded();
@@ -93,7 +101,6 @@ document.addEventListener('keydown', e => {
     return;
   }
 
-  // K — full HP
   if (e.code === 'KeyK') {
     e.preventDefault();
     player.hp = player.maxHp;
@@ -101,7 +108,6 @@ document.addEventListener('keydown', e => {
     return;
   }
 
-  // F — full special bar
   if (e.code === 'KeyF') {
     e.preventDefault();
     player.specialCharge = 100;

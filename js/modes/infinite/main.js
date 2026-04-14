@@ -43,6 +43,7 @@ const SCRIPTS = [
   'js/ui/dom.js',
   'js/ui/hud.js',
   'js/ui/screens.js',
+  'js/ui/abilityScreen.js',
 
   /* ── SYSTEMS ── */
   'js/systems/juice.js',
