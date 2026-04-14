@@ -74,7 +74,29 @@ function handleDir(dir) {
 
   let anyHit = false;
 
-  for (const d of dirs) {
+ for (const d of dirs) {
+
+    /* ── PARRY BULLETS ──
+       Destroy any bullet coming from direction d
+       within attack range. Each directional strike
+       can intercept incoming bullets. */
+    for (let bi = bullets.length - 1; bi >= 0; bi--) {
+      const b = bullets[bi];
+      if (!b.owner || b.owner.dir !== d) continue;
+
+      const bdx   = b.x - cx;
+      const bdy   = b.y - cy;
+      const bdist = Math.sqrt(bdx * bdx + bdy * bdy);
+      if (bdist > attackRange) continue;
+
+      // hit!
+      anyHit = true;
+      SFX.hit();
+      spawnParticles(b.x, b.y, '#378ADD', false);
+      b.el.remove();
+      if (b.owner) b.owner.hasBullet = false;
+      bullets.splice(bi, 1);
+    }
 
     if (isPiercing) {
       for (let i = enemies.length - 1; i >= 0; i--) {
