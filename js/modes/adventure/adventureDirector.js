@@ -331,8 +331,17 @@ const AdventureDirector = (() => {
     },
 
     getCurrentMap() { return currentMap; },
-    isCompleted()   { return completed; },
-    isBossPaused()  { return bossPaused; },
+      isCompleted()   { return completed; },
+      isBossPaused()  { return bossPaused; },
+
+      /* ── RESTART ──────────────────────
+         Re-initializes the same map.
+         Used by "play again" button after
+         death in Adventure Mode.            */
+      restart() {
+        if (!currentMap) return false;
+        return this.init(currentMap.id);
+      },
 
   };
 

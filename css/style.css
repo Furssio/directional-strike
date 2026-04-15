@@ -8,7 +8,6 @@
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;}
 body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;}
 #G{width:100%;max-width:500px;padding:1rem;}
-
 /* ── SCHERMATE ── */
 #screen-menu,#screen-game,#screen-over,#screen-story-soon{width:100%;}
 #screen-game,#screen-over,#screen-story-soon,#screen-ability,#screen-map-select{display:none;}

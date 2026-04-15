@@ -30,6 +30,16 @@ document.getElementById('btn-ability-back').addEventListener('click', () => show
 
 document.getElementById('btn-restart').addEventListener('click', () => {
   equippedAbilityId = getEquippedAbility();
+
+  // Adventure Mode: re-init the current map before starting
+  if (ActiveDirector && ActiveDirector === AdventureDirector) {
+    if (!AdventureDirector.restart()) {
+      // safety fallback — no map loaded, go back to menu
+      showScreen(sMenu);
+      return;
+    }
+  }
+
   startGame();
 });
 document.getElementById('btn-home').addEventListener('click', () => {
