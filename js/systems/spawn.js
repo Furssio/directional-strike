@@ -27,8 +27,17 @@ function spawnEnemyDirected(def, dir) {
   if (dir === 'up'   || dir === 'down')  x += (Math.random() - 0.5) * spread;
   if (dir === 'left' || dir === 'right') y += (Math.random() - 0.5) * spread;
 
-  const speedMult = 1 + (Director.getWave() - 1) * CONFIG.difficulty.speedIncreasePerLevel;
-  const sMult     = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
+let speedMult = 1 + (ActiveDirector.getWave() - 1) * CONFIG.difficulty.speedIncreasePerLevel;
+
+  // adventure mode boss can apply an extra speed multiplier
+  if (typeof ActiveDirector.isBoss === 'function' && ActiveDirector.isBoss()) {
+    const map = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
+    if (map && map.boss && map.boss.speedMult) {
+      speedMult *= map.boss.speedMult;
+    }
+  }
+
+  const sMult = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);
 
   if (player.specialActive) {

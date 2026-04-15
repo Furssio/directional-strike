@@ -326,3 +326,52 @@ button.game-btn:hover{background:#333;}
 .map-card.completed .map-badge{color:#22C55E;}
 
 #btn-map-back{width:100%;padding:10px;font-size:13px;}
+/* ══════════════════════════════════════
+   BOSS ANNOUNCE POPUP
+   ══════════════════════════════════════ */
+#boss-announce{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.7);
+  background:rgba(20,0,0,0.92);
+  border:2px solid #E24B4A;
+  border-radius:12px;
+  padding:18px 28px;
+  text-align:center;
+  z-index:50;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.35s ease-out, transform 0.35s ease-out;
+  min-width:220px;
+}
+#boss-announce.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+#boss-announce.hidden{display:none;}
+
+.boss-announce-icon{
+  font-size:38px;
+  margin-bottom:6px;
+  animation:bossIconPulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes bossIconPulse{
+  from{transform:scale(1);}
+  to{transform:scale(1.15);}
+}
+.boss-announce-label{
+  font-size:11px;
+  font-weight:700;
+  color:#E24B4A;
+  letter-spacing:3px;
+  margin-bottom:4px;
+}
+.boss-announce-name{
+  font-size:20px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:4px;
+}
+.boss-announce-desc{
+  font-size:11px;
+  color:#aaa;
+}

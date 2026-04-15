@@ -36,6 +36,15 @@ const CONFIG = {
     chargePerKill:      8,
     chargePerComboKill: 14,
   },
+  /* ── ATTACK ─────────────────────────────
+     hitCooldownMs:   ms between attacks on a successful hit
+     missCooldownMs:  ms penalty when attack hits nothing
+                      (longer = punishes random spam)
+  ─────────────────────────────────────── */
+  attack: {
+    hitCooldownMs:  80,
+    missCooldownMs: 350,
+  },
 
   /* ── DIFFICULTY ─────────────────────────
      speedIncreasePerLevel: +% enemy speed per wave
@@ -187,8 +196,10 @@ const CONFIG = {
      stressTarget:  fixed stress target for normal waves (1 to wavesPerMap-1)
                     overridable per map in map.js
   ─────────────────────────────────────── */
-  adventure: {
-    wavesPerMap:  9,   // for now only 1-9, boss wave added later
-    stressTarget: 25,  // default, each map can override
+ adventure: {
+    wavesPerMap:    10,    // last wave is always the boss wave
+    stressTarget:   25,    // default, each map can override
+    bossPauseMs:    3000,  // pause before boss wave starts
+    bossAnnounceMs: 2200,  // how long the BOSS popup stays on screen
   },
 };

@@ -56,9 +56,9 @@ function activateSpecial() {
 /* ── ATTACK ── */
 
 function handleDir(dir) {
-  if (!running || isAttacking) return;
+  if (!running || choosingAbility || isAttacking) return;
   isAttacking = true;
-  setTimeout(() => isAttacking = false, 80);
+  // cooldown will be set at the end of the function based on hit/miss
 
   const hitDmg      = player.getHitDamage();
   const { w, h }    = getArenaSize();
@@ -158,6 +158,12 @@ function handleDir(dir) {
   }
 
   if (!anyHit) SFX.miss();
+
+  // dynamic cooldown: shorter on hit, longer on miss
+  const cd = anyHit
+    ? CONFIG.attack.hitCooldownMs
+    : CONFIG.attack.missCooldownMs;
+  setTimeout(() => isAttacking = false, cd);
 }
 
 function getAdjacentDirs(dir) {

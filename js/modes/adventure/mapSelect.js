@@ -59,4 +59,31 @@ function onMapSelected(mapId) {
   selectedMapId = mapId;
   SFX.abilityPick();
   startAdventureMap(mapId);
+  /* ── SHOW BOSS ANNOUNCE ────────────────
+   Called by AdventureDirector when wave 10
+   starts. Shows a centered popup with the
+   boss name for ~2 seconds.
+   @param map  current map def with boss config
+─────────────────────────────────────── */
+function showBossAnnounce(map) {
+  if (!map.boss) return;
+
+  const boss = map.boss;
+  const pop  = document.getElementById('boss-announce');
+
+  pop.innerHTML = `
+    <div class="boss-announce-icon">${boss.icon || '⚠️'}</div>
+    <div class="boss-announce-label">BOSS WAVE</div>
+    <div class="boss-announce-name">${boss.name}</div>
+    <div class="boss-announce-desc">${boss.desc || ''}</div>
+  `;
+
+  pop.classList.remove('hidden');
+  pop.classList.add('show');
+
+  setTimeout(() => {
+    pop.classList.remove('show');
+    setTimeout(() => pop.classList.add('hidden'), 400);
+  }, CONFIG.adventure.bossAnnounceMs);
+}
 }

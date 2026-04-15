@@ -25,11 +25,14 @@ function updateProgress() {
 function updateWaveDisplay(wave, isBoss) {
   levelEl.textContent = isBoss ? '⚠️ wave ' + wave + ' — BOSS' : 'wave ' + wave;
 
-  lvlPop.textContent   = isBoss ? '⚠️ BOSS WAVE!' : 'wave ' + wave + '!';
+  // skip the small "wave N!" popup on boss waves
+  // (the BOSS ANNOUNCE popup handles that with more flair)
+  if (isBoss) return;
+
+  lvlPop.textContent   = 'wave ' + wave + '!';
   lvlPop.style.opacity = '1';
   setTimeout(() => lvlPop.style.opacity = '0', 1200);
 }
-
 function updateComboDisplay() {
   const c = player.combo;
 
