@@ -49,12 +49,14 @@ const AdventureDirector = (() => {
       _spawnHistory = [];
       _pendingBurst = null;
 
-      resetSpawnerCooldowns();
-      return true;
+     resetSpawnerCooldowns();
+setArenaBackground(currentMap.background || null);
+return true;
     },
 
     stop() {
       active = false;
+setArenaBackground(null);
     },
 
     /* ── EVENTS ───────────────────────── */

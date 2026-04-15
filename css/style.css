@@ -17,7 +17,11 @@ body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;m
    ══════════════════════════════════════ */
 #arena{
   width:100%;aspect-ratio:1;max-width:500px;
-  position:relative;background:#2a2a2a;
+  position:relative;
+  background-image: url('../assets/maps/map01_forest/background_01.png');
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
   border-radius:12px;border:1px solid #444;
   overflow:hidden;transition:transform 0.05s;
 }

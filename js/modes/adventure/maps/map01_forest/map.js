@@ -16,6 +16,7 @@ MapRegistry.register({
   name:  'Forest',
   theme: 'forest',
   icon:  '🌲',
+  background: 'assets/maps/map01_forest/background_01.png',
 
   /* ── DIFFICULTY (waves 1-9) ──────── */
   stressTarget: 22,

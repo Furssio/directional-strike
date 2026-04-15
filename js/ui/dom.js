@@ -49,3 +49,8 @@ function hexToRgb(hex) {
   const b = parseInt(hex.slice(5, 7), 16);
   return `${r},${g},${b}`;
 }
+
+function setArenaBackground(url) {
+  arena.style.backgroundImage = url ? `url('${url}')` : 'none';
+  arena.style.backgroundColor = url ? 'transparent' : '#2a2a2a';
+}
