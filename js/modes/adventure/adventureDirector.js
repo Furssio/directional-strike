@@ -19,16 +19,14 @@ const AdventureDirector = (() => {
   let killsThisWave = 0;
   let active        = false;
   let completed     = false;
-  let bossPaused    = false;   // true during the 3s pause before boss
-  let bossPauseT    = 0;        // ms remaining of the pause
-// boss pattern state
-  let _lastSpawnDir   = null;   // last direction spawned (for anti-pattern)
-  let _spawnHistory   = [];     // last N directions (for anti-rotation)
-  let _pendingBurst   = null;   // { dir, msLeft } if a burst follow-up is queued
+  let bossPaused    = false;
+  let bossPauseT    = 0;
+  let _lastSpawnDir   = null;
+  let _spawnHistory   = [];
+  let _pendingBurst   = null;
 
   return {
 
-    /* ── INIT ─────────────────────────── */
     init(mapId) {
       currentMap = MapRegistry.get(mapId);
       if (!currentMap) {
@@ -49,17 +47,15 @@ const AdventureDirector = (() => {
       _spawnHistory = [];
       _pendingBurst = null;
 
-     resetSpawnerCooldowns();
-setArenaBackground(currentMap.background || null);
-return true;
+      resetSpawnerCooldowns();
+      setArenaBackground(currentMap.background || null);
+      return true;
     },
 
     stop() {
       active = false;
-setArenaBackground(null);
+      setArenaBackground(null);
     },
-
-    /* ── EVENTS ───────────────────────── */
 
     onDamage() {
       stress = stressOnDamage(stress);
@@ -68,18 +64,13 @@ setArenaBackground(null);
     onKill() {
       stress = stressOnKill(stress);
       killsThisWave++;
-
       if (killsThisWave >= this.getKillsNeeded()) {
         this.nextWave();
       }
     },
 
-    /* ── WAVE PROGRESSION ─────────────── */
-
     nextWave() {
       const maxWave = CONFIG.adventure.wavesPerMap;
-
-      // last wave cleared → map complete
       if (wave >= maxWave) {
         this.completeMap();
         return;
@@ -89,8 +80,6 @@ setArenaBackground(null);
       killsThisWave = 0;
 
       const isBoss = (wave === maxWave);
-
-      // boss wave → enter pause
       if (isBoss) {
         this._startBossPause();
         return;
@@ -105,13 +94,11 @@ setArenaBackground(null);
       bossPaused = true;
       bossPauseT = CONFIG.adventure.bossPauseMs;
 
-      // clear arena so the player faces the boss with a clean slate
       enemies.forEach(e => e.el.remove());
       enemies.length = 0;
       bullets.forEach(b => b.el.remove());
       bullets.length = 0;
 
-      // announce boss
       if (typeof showBossAnnounce === 'function') {
         showBossAnnounce(currentMap);
       }
@@ -137,12 +124,10 @@ setArenaBackground(null);
       }
     },
 
-    /* ── TICK ─────────────────────────── */
-
     tick(dt) {
       if (!active) return;
 
-      // boss pause: countdown, no spawning
+      // boss pause: usa dt normale (la pausa non deve rallentare)
       if (bossPaused) {
         bossPauseT -= dt;
         if (bossPauseT <= 0) {
@@ -162,12 +147,13 @@ setArenaBackground(null);
       stress = calcStress(cx, cy);
       stress = stressDecay(stress, dt);
 
-      const isBoss = this.isBoss();
-      const boss   = this._bossConfig();
+      const isBoss  = this.isBoss();
+      const boss    = this._bossConfig();
+      const effDt   = getEffectiveDt(dt);  // rallenta durante Bullet Time
 
       // pending burst follow-up (boss only)
       if (isBoss && _pendingBurst) {
-        _pendingBurst.msLeft -= dt;
+        _pendingBurst.msLeft -= effDt;
         if (_pendingBurst.msLeft <= 0) {
           this._spawnBossSingle(_pendingBurst.dir);
           _pendingBurst = null;
@@ -176,7 +162,7 @@ setArenaBackground(null);
 
       // standard spawn cycle
       const state = this._getStateForCurrentWave();
-      spawnTimer -= dt;
+      spawnTimer -= effDt;
       if (spawnTimer <= 0) {
         if (isBoss && boss) {
           this._spawnBossPattern(boss);
@@ -190,14 +176,11 @@ setArenaBackground(null);
       updateSpawnerCooldowns(dt);
     },
 
-    /* ── INTERNAL: state/spawn for current wave ── */
-
     _getStateForCurrentWave() {
-      // boss wave: force fast spawning regardless of stress
       if (this.isBoss()) {
         const target = this.getTarget();
         const tol    = CONFIG.director.tolerance;
-        if (stress > target + tol) return 'normal'; // ease up if overwhelmed
+        if (stress > target + tol) return 'normal';
         return 'fast';
       }
       return getDirectorState(stress, wave, false);
@@ -214,16 +197,11 @@ setArenaBackground(null);
     _bossConfig() {
       return currentMap && currentMap.boss ? currentMap.boss : null;
     },
-    /* ── BOSS SPAWN PATTERN ────────────
-       Pick a direction with anti-pattern
-       rules, then spawn. Optionally queue
-       a burst follow-up.                */
 
     _spawnBossPattern(boss) {
       const dir = this._pickBossDir();
       this._spawnBossSingle(dir);
 
-      // chance of a burst: queue a follow-up spawn from the same direction
       if (boss.burstChance && Math.random() < boss.burstChance) {
         _pendingBurst = {
           dir:    dir,
@@ -236,11 +214,9 @@ setArenaBackground(null);
       const boss = this._bossConfig();
       if (!boss) return;
 
-      // respect maxEnemies cap
       const cap = boss.maxEnemies !== undefined ? boss.maxEnemies : 6;
       if (enemies.length >= cap) return;
 
-      // pick enemy from boss pool (only ravager for now in map 1)
       const pool = [];
       for (const [name, cfg] of Object.entries(boss.enemyPool)) {
         for (let i = 0; i < cfg.weight; i++) pool.push(name);
@@ -253,7 +229,6 @@ setArenaBackground(null);
 
       spawnEnemyDirected(def, dir);
 
-      // record spawn direction for anti-pattern
       _lastSpawnDir = dir;
       _spawnHistory.push(dir);
       if (_spawnHistory.length > 4) _spawnHistory.shift();
@@ -262,21 +237,16 @@ setArenaBackground(null);
     _pickBossDir() {
       const dirs = ['up', 'down', 'left', 'right'];
 
-      // count enemies per direction currently in arena
       const countByDir = { up: 0, down: 0, left: 0, right: 0 };
       for (const e of enemies) countByDir[e.dir] = (countByDir[e.dir] || 0) + 1;
 
-      // RULE 1: forbid directions with 4+ enemies (anti-accumulation)
       let candidates = dirs.filter(d => countByDir[d] < 4);
       if (candidates.length === 0) candidates = dirs;
 
-      // RULE 2: forbid same direction as last spawn (anti-spam, unless burst forced it)
       if (_lastSpawnDir && candidates.length > 1) {
         candidates = candidates.filter(d => d !== _lastSpawnDir);
       }
 
-      // RULE 3: anti-rotation — if last 3 spawns form a clockwise/counter-clockwise sequence,
-      //         forbid the next direction in that rotation
       if (_spawnHistory.length >= 3 && candidates.length > 1) {
         const cw  = ['up', 'right', 'down', 'left', 'up'];
         const ccw = ['up', 'left', 'down', 'right', 'up'];
@@ -285,7 +255,7 @@ setArenaBackground(null);
         const isRotation = (seq, ref) => {
           for (let i = 0; i < ref.length - 2; i++) {
             if (seq[0] === ref[i] && seq[1] === ref[i+1] && seq[2] === ref[i+2]) {
-              return ref[(i + 3) % 4]; // the next direction in the rotation
+              return ref[(i + 3) % 4];
             }
           }
           return null;
@@ -303,8 +273,6 @@ setArenaBackground(null);
       return candidates[Math.floor(Math.random() * candidates.length)];
     },
 
-    /* ── GETTERS ──────────────────────── */
-
     getWave()        { return wave; },
     getMaxWave()     { return CONFIG.adventure.wavesPerMap; },
     getStress()      { return Math.round(stress); },
@@ -318,10 +286,7 @@ setArenaBackground(null);
       return currentMap.stressTarget;
     },
 
-    isBoss() {
-      return wave === CONFIG.adventure.wavesPerMap;
-    },
-
+    isBoss()   { return wave === CONFIG.adventure.wavesPerMap; },
     getKills() { return killsThisWave; },
 
     getKillsNeeded() {
@@ -333,17 +298,13 @@ setArenaBackground(null);
     },
 
     getCurrentMap() { return currentMap; },
-      isCompleted()   { return completed; },
-      isBossPaused()  { return bossPaused; },
+    isCompleted()   { return completed; },
+    isBossPaused()  { return bossPaused; },
 
-      /* ── RESTART ──────────────────────
-         Re-initializes the same map.
-         Used by "play again" button after
-         death in Adventure Mode.            */
-      restart() {
-        if (!currentMap) return false;
-        return this.init(currentMap.id);
-      },
+    restart() {
+      if (!currentMap) return false;
+      return this.init(currentMap.id);
+    },
 
   };
 

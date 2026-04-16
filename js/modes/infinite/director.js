@@ -75,7 +75,7 @@ const Director = (() => {
 
       const state = getDirectorState(stress, wave, _isBossWave);
 
-      spawnTimer -= dt;
+      spawnTimer -= getEffectiveDt(dt);
       if (spawnTimer <= 0) {
         spawnGroup(state, wave);
         spawnTimer = getSpawnInterval(state);

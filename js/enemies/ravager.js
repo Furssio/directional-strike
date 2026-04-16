@@ -7,7 +7,7 @@ EnemyRegistry.register({
   id:        'ravager',
   emoji:     '👹',
   sprite: 'assets/enemies/ravager.png',
-  size:      36,
+  size:      48,
   hpPct:     0.30,
   damagePct: 0.34,
   speedMult: 1.0,

@@ -91,16 +91,20 @@ function spawnBullet(enemy) {
   const vx = dx / dist * enemy.bulletSpeed;
   const vy = dy / dist * enemy.bulletSpeed;
 
-  const b  = new Bullet(enemy.x, enemy.y, vx, vy, enemy.bulletDamagePct);
- const el = document.createElement('div');
-el.className  = 'bullet';
-el.style.left = b.x + 'px';
-el.style.top  = b.y + 'px';
-el.style.backgroundImage = 'url(assets/enemies/bullet_rock.png)';
-el.style.backgroundSize  = 'cover';
-el.style.imageRendering  = 'pixelated';
-el.style.backgroundColor = 'transparent';
-el.style.border          = 'none';
+  const slowMult = (player && player.specialActive) ? 0.25 : 1;
+  const b = new Bullet(enemy.x, enemy.y, vx * slowMult, vy * slowMult, enemy.bulletDamagePct);
+// salva sempre velocità piena come base per onDeactivate
+b.vxBase = vx;
+b.vyBase = vy;
+  const el = document.createElement('div');
+  el.className  = 'bullet';
+  el.style.left = b.x + 'px';
+  el.style.top  = b.y + 'px';
+  el.style.backgroundImage = 'url(assets/enemies/bullet_rock.png)';
+  el.style.backgroundSize  = 'cover';
+  el.style.imageRendering  = 'pixelated';
+  el.style.backgroundColor = 'transparent';
+  el.style.border          = 'none';
 
   arena.appendChild(el);
   b.el    = el;

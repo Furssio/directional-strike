@@ -19,3 +19,10 @@ let isAttacking     = false;
 // ability equipped for next match (default = player's default ability)
 let equippedAbilityId = null;
 let ActiveDirector = null;
+
+function getEffectiveDt(dt) {
+  if (player && player.specialActive && !player.ability.piercing && !player.ability.blocksBullets) {
+    return dt * 0.25;
+  }
+  return dt;
+}

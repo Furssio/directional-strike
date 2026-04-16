@@ -7,7 +7,7 @@
 /* ── RESET & BASE ── */
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;}
 body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;}
-#G{width:100%;max-width:500px;padding:1rem;}
+#G{width:100%;max-width:620px;padding:1rem;}
 /* ── SCHERMATE ── */
 #screen-menu,#screen-game,#screen-over,#screen-story-soon{width:100%;}
 #screen-game,#screen-over,#screen-story-soon,#screen-ability,#screen-map-select{display:none;}
@@ -16,7 +16,7 @@ body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;m
    ARENA
    ══════════════════════════════════════ */
 #arena{
-  width:100%;aspect-ratio:1;max-width:500px;
+  width:100%;aspect-ratio:1;max-width:620px;
   position:relative;
   background-image: url('../assets/maps/map01_forest/background_01.png');
   background-size: cover;
@@ -43,10 +43,10 @@ background-color: rgba(0,0,0,0.45);
 #player{
   position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%);
-  width:48px;height:48px;border-radius:50%;
+  width:80px;height:80px;border-radius:50%;
   background:#222;border:1.5px solid #888;
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;z-index:10;
+  font-size:28px;z-index:10;
   transition:border-color 0.1s,background 0.1s;
 }
 #player.special-active{border:2.5px solid #FFD700;background:#2a2200;}

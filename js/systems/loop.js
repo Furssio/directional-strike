@@ -148,8 +148,7 @@ function tick() {
       flashEl.style.opacity = '1';
       setTimeout(() => flashEl.style.opacity = '0', 200);
 
-      const p = player.hpPercent();
-      playerEl.textContent = p > 0.5 ? player.emoji : p > 0.25 ? '😨' : '😰';
+      // sprite PNG — nessun cambio emoji
 
       if (!player.isAlive()) { endGame(); return; }
     }
@@ -191,8 +190,7 @@ function tick() {
       flashEl.style.opacity = '1';
       setTimeout(() => flashEl.style.opacity = '0', 150);
 
-      const p = player.hpPercent();
-      playerEl.textContent = '';
+      // sprite PNG — nessun cambio emoji
 
       if (!player.isAlive()) { endGame(); return; }
     }
