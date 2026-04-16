@@ -88,3 +88,53 @@ function showBossAnnounce(map) {
     setTimeout(() => pop.classList.add('hidden'), 400);
   }, CONFIG.adventure.bossAnnounceMs);
 }
+/* ── SHOW MAP COMPLETE ──────────────────
+   Called by AdventureDirector when map is done.
+   Shows popup, then auto-returns to map select.
+─────────────────────────────────────── */
+function showMapComplete(map, newlyUnlocked) {
+  const sMapComplete = document.getElementById('screen-map-complete');
+
+  document.getElementById('map-complete-icon').textContent = map.icon || '🗺️';
+  document.getElementById('map-complete-name').textContent = map.name;
+
+  const abilityBlock = document.getElementById('map-complete-ability');
+
+  if (newlyUnlocked && map.unlocksAbility) {
+    const ab = AbilityRegistry.get(map.unlocksAbility);
+    if (ab) {
+      document.getElementById('map-complete-ability-icon').textContent = ab.icon;
+      document.getElementById('map-complete-ability-name').textContent = ab.name;
+      document.getElementById('map-complete-ability-desc').textContent = ab.desc;
+      abilityBlock.classList.remove('hidden');
+    } else {
+      abilityBlock.classList.add('hidden');
+    }
+  } else {
+    abilityBlock.classList.add('hidden');
+  }
+
+  [sMenu, sGame, sOver, sAbility, sMapSelect].forEach(x => x.style.display = 'none');
+  sMapComplete.style.display = 'block';
+
+  // auto-ritorno dopo 6 secondi
+  const autoTimer = setTimeout(() => _returnToMapSelect(), 6000);
+
+  document.getElementById('btn-map-continue').onclick = () => {
+    clearTimeout(autoTimer);
+    _returnToMapSelect();
+  };
+
+  document.getElementById('btn-go-abilities').onclick = () => {
+    clearTimeout(autoTimer);
+    buildAbilityScreen();
+    showScreen(sAbility);
+  };
+}
+
+function _returnToMapSelect() {
+  buildMapSelectScreen();
+  const sMapComplete = document.getElementById('screen-map-complete');
+  sMapComplete.style.display = 'none';
+  showScreen(sMapSelect);
+}

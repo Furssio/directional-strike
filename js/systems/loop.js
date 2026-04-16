@@ -205,7 +205,7 @@ function tick() {
       flashEl.style.opacity = '1';
       setTimeout(() => flashEl.style.opacity = '0', 150);
 
-      if (!player.isAlive()) { endGame(); return; }\
+      if (!player.isAlive()) { endGame(); return; }
     }
   }
 }

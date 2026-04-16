@@ -22,10 +22,11 @@ const SCRIPTS = [
   'js/enemies/golem.js',
   'js/enemies/slimes.js',
 
-  /* ── PLAYER ── */
+ /* ── PLAYER ── */
   'js/player/stats.js',
   'js/player/Player.js',
   'js/player/abilities/bulletTime.js',
+  'js/player/abilities/rangeBoost.js',
 
   /* ── AUDIO ── */
   'js/audio.js',

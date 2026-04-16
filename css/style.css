@@ -380,3 +380,29 @@ button.game-btn:hover{background:#333;}
   font-size:11px;
   color:#aaa;
 }
+/* ══════════════════════════════════════
+   MAP COMPLETE
+   ══════════════════════════════════════ */
+#map-complete-card {
+  background:#222;border:1px solid #444;border-radius:12px;
+  padding:2rem 1.5rem;text-align:center;
+  max-width:340px;margin:0 auto;
+}
+#map-complete-card h2 {
+  font-size:22px;font-weight:600;color:#22C55E;margin-bottom:6px;
+}
+#map-complete-icon { font-size:40px;margin-bottom:10px; }
+#map-complete-name { font-size:14px;color:#aaa;margin-bottom:20px; }
+
+#map-complete-ability {
+  background:#1a1a1a;border:1.5px solid #FFD700;border-radius:10px;
+  padding:14px;margin-bottom:20px;
+}
+#map-complete-ability.hidden { display:none; }
+.ability-unlock-label {
+  font-size:10px;font-weight:700;color:#FFD700;
+  letter-spacing:2px;margin-bottom:8px;
+}
+#map-complete-ability-icon { font-size:28px;margin-bottom:6px; }
+#map-complete-ability-name { font-size:15px;font-weight:600;color:#fff;margin-bottom:4px; }
+#map-complete-ability-desc { font-size:11px;color:#aaa; }
