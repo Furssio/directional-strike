@@ -132,7 +132,7 @@ background-color: rgba(0,0,0,0.45);
 
 .bullet{
   position:absolute;width:10px;height:10px;border-radius:50%;
-  background:#378ADD;border:1.5px solid #185FA5;
+  background:transparent;
   transform:translate(-50%,-50%);z-index:7;
 }
 

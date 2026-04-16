@@ -29,7 +29,10 @@ function startGame() {
   scoreEl.textContent = '0';
   levelEl.textContent = 'wave 1';
 
-  playerEl.textContent   = player.emoji;
+  playerEl.textContent   = '';
+playerEl.style.backgroundImage = 'url(assets/characters/player.png)';
+playerEl.style.backgroundSize  = 'cover';
+playerEl.style.imageRendering  = 'pixelated';
   playerEl.className     = '';
   specialRing.className  = '';
   btnSpecial.className   = 'cbtn';
@@ -189,7 +192,7 @@ function tick() {
       setTimeout(() => flashEl.style.opacity = '0', 150);
 
       const p = player.hpPercent();
-      playerEl.textContent = p > 0.5 ? player.emoji : p > 0.25 ? '😨' : '😰';
+      playerEl.textContent = '';
 
       if (!player.isAlive()) { endGame(); return; }
     }

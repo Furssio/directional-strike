@@ -45,13 +45,24 @@ let speedMult = 1 + (ActiveDirector.getWave() - 1) * CONFIG.difficulty.speedIncr
   }
 
   const el = document.createElement('div');
-  el.className      = 'enemy';
-  el.style.width    = enemy.size + 'px';
-  el.style.height   = enemy.size + 'px';
+el.className      = 'enemy';
+el.style.width    = enemy.size + 'px';
+el.style.height   = enemy.size + 'px';
+el.style.left     = x + 'px';
+el.style.top      = y + 'px';
+
+if (enemy.def.sprite) {
+  el.style.backgroundImage = `url(${enemy.def.sprite})`;
+  el.style.backgroundSize  = 'cover';
+  el.style.imageRendering  = 'pixelated';
+} else {
   el.style.fontSize = Math.round(enemy.size * 0.5) + 'px';
   el.textContent    = enemy.emoji;
-  el.style.left     = x + 'px';
-  el.style.top      = y + 'px';
+}
+
+// rotazione in base alla direzione
+const rotMap = { down: 0, left: 90, up: 180, right: 270 };
+el.style.transform = `translate(-50%,-50%) rotate(${rotMap[dir]}deg)`;
 
   const hpWrap = document.createElement('div');
   hpWrap.className = 'enemy-hp-wrap';
@@ -81,10 +92,15 @@ function spawnBullet(enemy) {
   const vy = dy / dist * enemy.bulletSpeed;
 
   const b  = new Bullet(enemy.x, enemy.y, vx, vy, enemy.bulletDamagePct);
-  const el = document.createElement('div');
-  el.className  = 'bullet';
-  el.style.left = b.x + 'px';
-  el.style.top  = b.y + 'px';
+ const el = document.createElement('div');
+el.className  = 'bullet';
+el.style.left = b.x + 'px';
+el.style.top  = b.y + 'px';
+el.style.backgroundImage = 'url(assets/enemies/bullet_rock.png)';
+el.style.backgroundSize  = 'cover';
+el.style.imageRendering  = 'pixelated';
+el.style.backgroundColor = 'transparent';
+el.style.border          = 'none';
 
   arena.appendChild(el);
   b.el    = el;
