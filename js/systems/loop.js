@@ -30,9 +30,9 @@ function startGame() {
   levelEl.textContent = 'wave 1';
 
   playerEl.textContent   = '';
-playerEl.style.backgroundImage = 'url(assets/characters/player.png)';
-playerEl.style.backgroundSize  = 'cover';
-playerEl.style.imageRendering  = 'pixelated';
+  playerEl.style.backgroundImage = 'url(assets/characters/player.png)';
+  playerEl.style.backgroundSize  = 'cover';
+  playerEl.style.imageRendering  = 'pixelated';
   playerEl.className     = '';
   specialRing.className  = '';
   btnSpecial.className   = 'cbtn';
@@ -42,9 +42,8 @@ playerEl.style.imageRendering  = 'pixelated';
   showScreen(sGame);
   setTimeout(updateRangeCircle, 50);
 
- clearInterval(gameLoop);
+  clearInterval(gameLoop);
   if (ActiveDirector === Director) ActiveDirector.init();
-  // AdventureDirector.init() is called separately in startAdventureMap() with mapId
   gameLoop = setInterval(tick, 16);
 }
 
@@ -105,8 +104,21 @@ function tick() {
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 1) continue;
 
-    e.x += dx / dist * e.speed;
-    e.y += dy / dist * e.speed;
+    // ── MOVIMENTO (wobble per slime, dritto per gli altri) ──
+    const nx = dx / dist;
+    const ny = dy / dist;
+
+    let wx = 0, wy = 0;
+    if (e.wobble) {
+      e.wobbleTime = (e.wobbleTime || 0) + dt;
+      const perp = e.wobble.amplitude *
+                   Math.sin(e.wobbleTime * 0.001 * e.wobble.frequency * Math.PI * 2);
+      wx = -ny * perp * 0.05;
+      wy =  nx * perp * 0.05;
+    }
+
+    e.x += nx * e.speed + wx;
+    e.y += ny * e.speed + wy;
     e.el.style.left = e.x + 'px';
     e.el.style.top  = e.y + 'px';
 
@@ -114,7 +126,6 @@ function tick() {
 
     if (e.shoots && !e.hasBullet) {
       const curDist = e.distToCenter(cx, cy);
-
       if (!e.firstShotFired && curDist <= e.firstShotDist) {
         e.firstShotFired = true;
         e.hasBullet = true;
@@ -138,17 +149,21 @@ function tick() {
 
       e.el.remove();
       enemies.splice(i, 1);
-      player.takeDamage(e.damagePct);
+
+      // ── DANNO CONTATTO (multi-hit per slime medium/small) ──
+      const hits = e.contactHits || 1;
+      for (let h = 0; h < hits; h++) {
+        player.takeDamage(e.damagePct);
+      }
+
       updateHpBar();
       updateComboDisplay();
       SFX.damage();
-      Director.onDamage();
+      ActiveDirector.onDamage();
       triggerShake();
 
       flashEl.style.opacity = '1';
       setTimeout(() => flashEl.style.opacity = '0', 200);
-
-      // sprite PNG — nessun cambio emoji
 
       if (!player.isAlive()) { endGame(); return; }
     }
@@ -190,9 +205,7 @@ function tick() {
       flashEl.style.opacity = '1';
       setTimeout(() => flashEl.style.opacity = '0', 150);
 
-      // sprite PNG — nessun cambio emoji
-
-      if (!player.isAlive()) { endGame(); return; }
+      if (!player.isAlive()) { endGame(); return; }\
     }
   }
 }

@@ -6,7 +6,8 @@
 EnemyRegistry.register({
   id:        'golem',
   emoji:     '🗿',
-  size:      68,
+  sprite:    'assets/enemies/golem.png',
+  size:      52,
   hpPct:     0.95,
   damagePct: 0.40,
   speedMult: 0.38,

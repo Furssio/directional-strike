@@ -112,3 +112,57 @@ b.vyBase = vy;
   bullets.push(b);
   SFX.bullet();
 }
+/* ── SPAWN SLIME CHILDREN ───────────────
+   Called when a slime dies and splits.
+   Spawns N children at parent's position.
+─────────────────────────────────────── */
+function spawnSlimeChildren(parent) {
+  const childDef = EnemyRegistry.get(parent.splitInto);
+  if (!childDef) return;
+
+  const { w, h } = getArenaSize();
+
+  for (let i = 0; i < parent.splitCount; i++) {
+    setTimeout(() => {
+      if (!running) return;
+
+      const child = new Enemy(childDef, parent.x, parent.y, parent.dir, 1, w, h);
+
+      if (player.specialActive) {
+        player.ability.onActivate([child]);
+      }
+
+      const el = document.createElement('div');
+      el.className   = 'enemy';
+      el.style.width  = child.size + 'px';
+      el.style.height = child.size + 'px';
+      el.style.left   = parent.x + 'px';
+      el.style.top    = parent.y + 'px';
+
+      if (childDef.sprite) {
+        el.style.backgroundImage = `url(${childDef.sprite})`;
+        el.style.backgroundSize  = 'cover';
+        el.style.imageRendering  = 'pixelated';
+      } else {
+        el.style.fontSize = Math.round(child.size * 0.5) + 'px';
+        el.textContent    = child.emoji;
+      }
+
+      const rotMap = { down: 0, left: 90, up: 180, right: 270 };
+      el.style.transform = `translate(-50%,-50%) rotate(${rotMap[parent.dir]}deg)`;
+
+      const hpWrap = document.createElement('div');
+      hpWrap.className = 'enemy-hp-wrap';
+      const hpFill = document.createElement('div');
+      hpFill.className   = 'enemy-hp-fill';
+      hpFill.style.width = '100%';
+      hpWrap.appendChild(hpFill);
+      el.appendChild(hpWrap);
+
+      arena.appendChild(el);
+      child.el     = el;
+      child.hpFill = hpFill;
+      enemies.push(child);
+    }, i * 80);
+  }
+}

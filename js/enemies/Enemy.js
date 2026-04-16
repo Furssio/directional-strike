@@ -41,6 +41,22 @@ class Enemy {
     this.firstShotFired  = false;
     this.shootTimer      = 0;
 
+// ── points ── dopo questa riga
+this.points = def.points;
+
+// aggiungi queste 3 sezioni:
+
+// ── split on death (slime) ──
+this.splitInto  = def.splitInto  || null;
+this.splitCount = def.splitCount || 0;
+
+// ── multi-hit contact damage ──
+this.contactHits = def.contactHits || 1;
+
+// ── wobble movement ──
+this.wobble     = def.wobble || null;
+this.wobbleTime = 0;
+
     // ── position and direction ──
     this.x   = x;
     this.y   = y;

@@ -30,6 +30,7 @@ const ADVENTURE_SCRIPTS = [
 
   /* ── MAPS ── */
   'js/modes/adventure/maps/map01_forest/map.js',
+  'js/modes/adventure/maps/map02_dungeon/map.js',
 
   /* ── UI ── */
   'js/modes/adventure/mapSelect.js',

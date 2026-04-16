@@ -20,6 +20,7 @@ const SCRIPTS = [
   'js/enemies/ravager.js',
   'js/enemies/crusher.js',
   'js/enemies/golem.js',
+  'js/enemies/slimes.js',
 
   /* ── PLAYER ── */
   'js/player/stats.js',
