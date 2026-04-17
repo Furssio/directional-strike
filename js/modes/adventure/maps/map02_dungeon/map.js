@@ -12,7 +12,7 @@ MapRegistry.register({
   name:  'Dungeon',
   theme: 'dungeon',
   icon:  '🪨',
-
+  background: 'assets/maps/map02_dungeon/background_01.png',
   stressTarget: 28,
 
   enemyPool: {
