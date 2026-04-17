@@ -20,12 +20,21 @@ AbilityRegistry.register({
   blocksBullets: false,
 
   onActivate(enemies) {
-    if (player) player.attackRangePct *= 1.5;
-    updateRangeCircle();
+    if (!player) return;
+    // salva il base solo alla prima chiamata, ignora le successive (spawn nemici)
+    if (!this._baseRangePct) {
+      this._baseRangePct = player.attackRangePct;
+      player.attackRangePct = this._baseRangePct * 1.5;
+      updateRangeCircle();
+    }
   },
 
   onDeactivate(enemies) {
-    if (player) player.attackRangePct /= 1.5;
+    if (!player) return;
+    if (this._baseRangePct) {
+      player.attackRangePct = this._baseRangePct;
+      this._baseRangePct = null;
+    }
     updateRangeCircle();
   },
 });

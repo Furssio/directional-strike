@@ -126,7 +126,13 @@ function spawnSlimeChildren(parent) {
     setTimeout(() => {
       if (!running) return;
 
-      const child = new Enemy(childDef, parent.x, parent.y, parent.dir, 1, w, h);
+      // offset casuale per non sovrapporli
+      const angle  = (i / parent.splitCount) * Math.PI * 2 + Math.random() * 0.5;
+      const radius = 20 + Math.random() * 15;
+      const ox     = Math.cos(angle) * radius;
+      const oy     = Math.sin(angle) * radius;
+
+      const child = new Enemy(childDef, parent.x + ox, parent.y + oy, parent.dir, 1, w, h);
 
       if (player.specialActive) {
         player.ability.onActivate([child]);
@@ -136,8 +142,8 @@ function spawnSlimeChildren(parent) {
       el.className   = 'enemy';
       el.style.width  = child.size + 'px';
       el.style.height = child.size + 'px';
-      el.style.left   = parent.x + 'px';
-      el.style.top    = parent.y + 'px';
+      el.style.left   = (parent.x + ox) + 'px';
+      el.style.top    = (parent.y + oy) + 'px';
 
       if (childDef.sprite) {
         el.style.backgroundImage = `url(${childDef.sprite})`;

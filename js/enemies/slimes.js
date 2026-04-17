@@ -1,12 +1,9 @@
 /* ═══════════════════════════════════════
    SLIMES.JS
-   Slime enemy — 3 phases (large/medium/small).
-   On death, large spawns 2 medium,
-   medium spawns 3 small, small dies.
-   Same sprite scaled via CSS size property.
-
-   Used by: EnemyRegistry
-   Depends on: EnemyRegistry
+   Slime enemy — 2 phases (large/medium).
+   Large: 2 hit → dies → spawns 2 Medium
+   Medium: 1 hit → dies → gone
+   Total hits to clear a Large: 4.
    ═══════════════════════════════════════ */
 
 EnemyRegistry.register({
@@ -14,19 +11,19 @@ EnemyRegistry.register({
   emoji:       '🟢',
   sprite:      'assets/enemies/slime.png',
   size:        48,
-  hpPct:       0.30,
-  damagePct:   0.40,
+  hpPct:       0.80,
+  damagePct:   0.30,
   contactHits: 1,
   speedMult:   0.55,
-  points:      5,
+  points:      8,
   shoots:      false,
   splitInto:   'slime_medium',
   splitCount:  2,
   wobble:      { frequency: 1.8, amplitude: 18 },
   calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 35;
-    if (distToCenter <= 160) return 20;
-    return 10;
+    if (distToCenter <= 80)  return 25;
+    if (distToCenter <= 160) return 12;
+    return 5;
   },
 });
 
@@ -35,38 +32,18 @@ EnemyRegistry.register({
   emoji:       '🟢',
   sprite:      'assets/enemies/slime.png',
   size:        32,
-  hpPct:       0.18,
-  damagePct:   0.20,
-  contactHits: 2,
-  speedMult:   0.40,
+  hpPct:       0.45,
+  damagePct:   0.18,
+  contactHits: 1,
+  speedMult:   0.42,
   points:      3,
-  shoots:      false,
-  splitInto:   'slime_small',
-  splitCount:  3,
-  wobble:      { frequency: 2.8, amplitude: 10 },
-  calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 18;
-    if (distToCenter <= 160) return 10;
-    return 4;
-  },
-});
-
-EnemyRegistry.register({
-  id:          'slime_small',
-  emoji:       '🟢',
-  sprite:      'assets/enemies/slime.png',
-  size:        20,
-  hpPct:       0.10,
-  damagePct:   0.10,
-  contactHits: 3,
-  speedMult:   0.28,
-  points:      1,
   shoots:      false,
   splitInto:   null,
   splitCount:  0,
-  wobble:      { frequency: 4.2, amplitude: 5 },
+  wobble:      { frequency: 2.8, amplitude: 10 },
   calcStress(distToCenter) {
-    if (distToCenter <= 80) return 7;
+    if (distToCenter <= 80)  return 12;
+    if (distToCenter <= 160) return 6;
     return 2;
   },
 });
