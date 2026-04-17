@@ -1,10 +1,3 @@
-/* ═══════════════════════════════════════
-   MAP02_DUNGEON.JS
-   Second Adventure map — dungeon/cavern.
-   Introduces slimes and golem.
-   Boss wave: The Stone Warden.
-   ═══════════════════════════════════════ */
-
 MapRegistry.register({
 
   id:    'map02_dungeon',
@@ -14,28 +7,23 @@ MapRegistry.register({
   icon:  '🪨',
   background: 'assets/maps/map02_dungeon/background_01.png',
   stressTarget: 28,
-
-  enemyPool: {
-    ravager:     { fromWave: 1, weight: 5 },
-    slime_large: { fromWave: 2, weight: 5 },
+speedIncreasePerLevel: 0.12,
+ enemyPool: {
+    ravager:     { fromWave: 1, weight: 8 },
+    slime_large: { fromWave: 2, weight: 3 },
     golem:       { fromWave: 6, weight: 2 },
   },
 
-  boss: {
+ boss: {
     name:          'The Stone Warden',
     desc:          'The dungeon trembles under his steps',
     icon:          '🗿',
     enemyPool: {
-      golem:       { weight: 7 },
-      slime_large: { weight: 3 },
+      golem: { weight: 10 },
     },
-    killsToAdvance:  50,
-    speedMult:       1.4,
-    spawnIntervalMs: 700,
-    maxEnemies:      5,
-    burstChance:     0.20,
-    burstDelay:      400,
+    killsToAdvance:  15,
+    speedMult:       1.3,
+    maxEnemies:      4,
   },
-
   unlocksAbility: 'slow_field',
 });

@@ -13,9 +13,9 @@
 // sostituisci registerKill con questa versione
 
 function registerKill(e) {
-  // slime split — spawna figli, non è una vera kill
-  if (e.splitInto) {
-    spawnSlimeChildren(e);
+
+  if (e.def.onDeath) {
+    e.def.onDeath(e);
     showScorePop(e.x, e.y, e.points);
     player.score += e.points;
     scoreEl.textContent = player.score;

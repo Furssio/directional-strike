@@ -9,13 +9,13 @@ EnemyRegistry.register({
   sprite:    'assets/enemies/golem.png',
   size:      52,
   hpPct:     1.65,
-  damagePct: 0.40,
-  speedMult: 0.38,
+  hpPct: 1.20,
+  speedMult: 0.44,
   points:    40,
   shoots:    false,
   calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 30;
-    if (distToCenter <= 160) return 15;
-    return 5;
+    if (distToCenter <= 80)  return 35;
+    if (distToCenter <= 160) return 25;
+    return 18;
   },
 });

@@ -27,7 +27,12 @@ function spawnEnemyDirected(def, dir) {
   if (dir === 'up'   || dir === 'down')  x += (Math.random() - 0.5) * spread;
   if (dir === 'left' || dir === 'right') y += (Math.random() - 0.5) * spread;
 
-let speedMult = 1 + (ActiveDirector.getWave() - 1) * CONFIG.difficulty.speedIncreasePerLevel;
+const _map = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
+const _speedIncrease = (_map && _map.speedIncreasePerLevel)
+  ? _map.speedIncreasePerLevel
+  : CONFIG.difficulty.speedIncreasePerLevel;
+
+let speedMult = 1 + (ActiveDirector.getWave() - 1) * _speedIncrease;
 
   // adventure mode boss can apply an extra speed multiplier
   if (typeof ActiveDirector.isBoss === 'function' && ActiveDirector.isBoss()) {
@@ -111,64 +116,4 @@ b.vyBase = vy;
   b.owner = enemy;
   bullets.push(b);
   SFX.bullet();
-}
-/* ── SPAWN SLIME CHILDREN ───────────────
-   Called when a slime dies and splits.
-   Spawns N children at parent's position.
-─────────────────────────────────────── */
-function spawnSlimeChildren(parent) {
-  const childDef = EnemyRegistry.get(parent.splitInto);
-  if (!childDef) return;
-
-  const { w, h } = getArenaSize();
-
-  for (let i = 0; i < parent.splitCount; i++) {
-    setTimeout(() => {
-      if (!running) return;
-
-      // offset casuale per non sovrapporli
-      const angle  = (i / parent.splitCount) * Math.PI * 2 + Math.random() * 0.5;
-      const radius = 20 + Math.random() * 15;
-      const ox     = Math.cos(angle) * radius;
-      const oy     = Math.sin(angle) * radius;
-
-      const child = new Enemy(childDef, parent.x + ox, parent.y + oy, parent.dir, 1, w, h);
-
-      if (player.specialActive) {
-        player.ability.onActivate([child]);
-      }
-
-      const el = document.createElement('div');
-      el.className   = 'enemy';
-      el.style.width  = child.size + 'px';
-      el.style.height = child.size + 'px';
-      el.style.left   = (parent.x + ox) + 'px';
-      el.style.top    = (parent.y + oy) + 'px';
-
-      if (childDef.sprite) {
-        el.style.backgroundImage = `url(${childDef.sprite})`;
-        el.style.backgroundSize  = 'cover';
-        el.style.imageRendering  = 'pixelated';
-      } else {
-        el.style.fontSize = Math.round(child.size * 0.5) + 'px';
-        el.textContent    = child.emoji;
-      }
-
-      const rotMap = { down: 0, left: 90, up: 180, right: 270 };
-      el.style.transform = `translate(-50%,-50%) rotate(${rotMap[parent.dir]}deg)`;
-
-      const hpWrap = document.createElement('div');
-      hpWrap.className = 'enemy-hp-wrap';
-      const hpFill = document.createElement('div');
-      hpFill.className   = 'enemy-hp-fill';
-      hpFill.style.width = '100%';
-      hpWrap.appendChild(hpFill);
-      el.appendChild(hpWrap);
-
-      arena.appendChild(el);
-      child.el     = el;
-      child.hpFill = hpFill;
-      enemies.push(child);
-    }, i * 80);
-  }
 }

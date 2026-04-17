@@ -6,7 +6,7 @@
 EnemyRegistry.register({
   id:              'crusher',
   emoji:           '👾',
-  sprite: 'assets/enemies/crusher.png',
+  sprite:          'assets/enemies/crusher.png',
   size:            60,
   hpPct:           0.65,
   damagePct:       0.34,
@@ -18,5 +18,14 @@ EnemyRegistry.register({
   bulletSpeed:     4.5,
   calcStress(distToCenter) {
     return 25;
+  },
+  onTick(e, cx, cy) {
+    if (e.hasBullet) return;
+    const curDist = e.distToCenter(cx, cy);
+    if (!e.firstShotFired && curDist <= e.firstShotDist) {
+      e.firstShotFired = true;
+      e.hasBullet = true;
+      spawnBullet(e);
+    }
   },
 });

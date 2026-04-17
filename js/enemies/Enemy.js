@@ -23,8 +23,9 @@ class Enemy {
     this.maxHp = Math.round(CONFIG.player.maxHp * def.hpPct);
     this.hp    = this.maxHp;
 
-    // ── contact damage ──
-    this.damagePct = def.damagePct;
+    // ── damage ──
+    this.damagePct   = def.damagePct;
+    this.contactHits = def.contactHits || 1;
 
     // ── speed ──
     this.baseSpeed = CONFIG.base.enemyBaseSpeed * def.speedMult * sMult;
@@ -33,42 +34,27 @@ class Enemy {
     // ── points ──
     this.points = def.points;
 
-    // ── bullets (crusher only) ──
-    this.shoots          = def.shoots          || false;
-    this.shootInterval   = def.shootInterval   || 0;
-    this.bulletDamagePct = def.bulletDamagePct || 0;
-    this.bulletSpeed     = def.bulletSpeed     || 0;
-    this.firstShotFired  = false;
-    this.shootTimer      = 0;
+    // ── wobble movement ──
+    this.wobble     = def.wobble || null;
+    this.wobbleTime = 0;
 
-// ── points ── dopo questa riga
-this.points = def.points;
+    // ── bullet state (used by crusher via onTick) ──
+    this.hasBullet      = false;
+    this.firstShotFired = false;
+    this.bulletSpeed    = def.bulletSpeed     || 0;
+    this.bulletDamagePct= def.bulletDamagePct || 0;
 
-// aggiungi queste 3 sezioni:
-
-// ── split on death (slime) ──
-this.splitInto  = def.splitInto  || null;
-this.splitCount = def.splitCount || 0;
-
-// ── multi-hit contact damage ──
-this.contactHits = def.contactHits || 1;
-
-// ── wobble movement ──
-this.wobble     = def.wobble || null;
-this.wobbleTime = 0;
-
-    // ── position and direction ──
-    this.x   = x;
-    this.y   = y;
-    this.dir = dir;
-
-    // ── first shot distance ──
     const cx = arenaW / 2;
     const cy = arenaH / 2;
     const dx = cx - x;
     const dy = cy - y;
     this.spawnDist     = Math.sqrt(dx * dx + dy * dy);
     this.firstShotDist = this.spawnDist * CONFIG.bullet.firstShotDistPct;
+
+    // ── position and direction ──
+    this.x   = x;
+    this.y   = y;
+    this.dir = dir;
 
     // ── DOM ──
     this.el     = null;

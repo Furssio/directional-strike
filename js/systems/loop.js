@@ -123,15 +123,7 @@ function tick() {
     e.el.style.top  = e.y + 'px';
 
     e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
-
-    if (e.shoots && !e.hasBullet) {
-      const curDist = e.distToCenter(cx, cy);
-      if (!e.firstShotFired && curDist <= e.firstShotDist) {
-        e.firstShotFired = true;
-        e.hasBullet = true;
-        spawnBullet(e);
-      }
-    }
+if (e.def.onTick) e.def.onTick(e, cx, cy);
 
     if (dist < hitR) {
 

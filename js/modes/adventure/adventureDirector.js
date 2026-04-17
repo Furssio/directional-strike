@@ -47,7 +47,7 @@ const AdventureDirector = (() => {
       _spawnHistory = [];
       _pendingBurst = null;
 
-      resetSpawnerCooldowns();
+      resetAdventureSpawner();
       setArenaBackground(currentMap.background || null);
       return true;
     },
@@ -151,29 +151,17 @@ const AdventureDirector = (() => {
       const boss    = this._bossConfig();
       const effDt   = getEffectiveDt(dt);  // rallenta durante Bullet Time
 
-      // pending burst follow-up (boss only)
-      if (isBoss && _pendingBurst) {
-        _pendingBurst.msLeft -= effDt;
-        if (_pendingBurst.msLeft <= 0) {
-          this._spawnBossSingle(_pendingBurst.dir);
-          _pendingBurst = null;
-        }
-      }
+      
 
       // standard spawn cycle
       const state = this._getStateForCurrentWave();
       spawnTimer -= effDt;
-      if (spawnTimer <= 0) {
-        if (isBoss && boss) {
-          this._spawnBossPattern(boss);
-          spawnTimer = boss.spawnIntervalMs || 800;
-        } else {
-          spawnGroupForMap(state, wave, currentMap, false);
-          spawnTimer = this._getSpawnIntervalForCurrentWave(state);
-        }
+     if (spawnTimer <= 0) {
+        spawnGroupForMap(state, wave, currentMap, isBoss);
+        spawnTimer = this._getSpawnIntervalForCurrentWave(state);
       }
 
-      updateSpawnerCooldowns(dt);
+      
     },
 
     _getStateForCurrentWave() {
