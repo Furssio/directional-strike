@@ -4,134 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Directional Strike</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <!-- ── MAP COMPLETE ── -->
-<div id="screen-map-complete" style="display:none;">
-  <div id="map-complete-card">
-    <div id="map-complete-icon"></div>
-    <h2>map complete!</h2>
-    <div id="map-complete-name"></div>
-    <div id="map-complete-ability" class="hidden">
-      <div class="ability-unlock-label">new ability unlocked!</div>
-      <div id="map-complete-ability-icon"></div>
-      <div id="map-complete-ability-name"></div>
-      <div id="map-complete-ability-desc"></div>
-    </div>
-    <div class="btn-row" id="map-complete-btns">
-      <button class="game-btn" id="btn-go-abilities">🎯 go to abilities</button>
-      <button class="game-btn" id="btn-map-continue">continue →</button>
-    </div>
-  </div>
-</div>
 
-<div id="G">
-
-  <!-- ── MENU PRINCIPALE ── -->
-  <div id="screen-menu">
-    <div id="menu-card">
-      <div class="arrows-preview">← ↑ → ↓</div>
-      <h1>Directional Strike</h1>
-      <div class="subtitle">choose a mode</div>
-      <div class="mode-grid">
-        <div class="mode-card" id="btn-infinite">
-          <div class="mode-icon">⚡</div>
-          <div class="mode-title">infinite</div>
-          <div class="mode-desc">survive as long as possible</div>
-        </div>
-        <div class="mode-card" id="btn-adventure">
-          <div class="mode-icon">⚔️</div>
-          <div class="mode-title">adventure</div>
-          <div class="mode-desc">complete maps and unlock abilities</div>
-        </div>
-      </div>
-
-      <button class="game-btn manage-btn" id="btn-abilities">🎯 manage abilities</button>
-
-      <div class="legend">
-        <span>👹 1hit</span>
-        <span>👾 2hit+shots</span>
-        <span>🗿 3hit</span>
-        <span>⚡ Space=special</span>
-      </div>
-      <div class="best-score" id="menu-best"></div>
-      <button class="game-btn" id="btn-mute">🔊 audio on</button>
-    </div>
-  </div>
-
-  <!-- ── SCHERMATA ABILITÀ ── -->
-  <div id="screen-ability">
-    <div id="ability-card">
-      <h2>manage abilities</h2>
-      <div class="subtitle">choose the ability to equip</div>
-      <div id="ability-list"></div>
-      <button class="game-btn" id="btn-ability-back" style="width:100%;margin-top:12px;">← back</button>
-    </div>
-  </div>
+  <!-- ── BASE ── -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/effects.css">
 
   <!-- ── GIOCO ── -->
-  <div id="screen-game">
-    <div id="hud">
-      <div id="hud-top">
-        <div id="score-display">0</div>
-        <div id="combo-display"></div>
-        <div id="level-display">wave 1</div>
-      </div>
-      <div id="player-hp-wrap"><div id="player-hp-bar" style="width:100%"></div></div>
-      <div id="combo-timer-wrap"><div id="combo-timer-bar"></div></div>
-      <div id="special-label">special 0%</div>
-      <div id="special-wrap"><div id="special-bar"></div></div>
-      <div id="progress-wrap"><div id="progress-bar"></div></div>
-    </div>
-    <div id="arena">
-      <div id="flash"></div>
-      <div id="attack-range"></div>
-      <div id="level-up-pop"></div>
-      <div id="boss-announce" class="hidden"></div>
-      <div id="special-ring"></div>
-      <div id="player">🧑</div>
-    </div>
-    <div id="controls">
-      <div class="cbtn empty"></div>
-      <button class="cbtn" id="btn-up">↑</button>
-      <div class="cbtn empty"></div>
-      <button class="cbtn" id="btn-left">←</button>
-      <button class="cbtn" id="btn-special">⚡</button>
-      <button class="cbtn" id="btn-right">→</button>
-      <div class="cbtn empty"></div>
-      <button class="cbtn" id="btn-down">↓</button>
-      <div class="cbtn empty"></div>
-    </div>
-  </div>
+  <link rel="stylesheet" href="css/arena.css">
+  <link rel="stylesheet" href="css/hud.css">
+  <link rel="stylesheet" href="css/controls.css">
 
-  <!-- ── GAME OVER ── -->
-  <div id="screen-over">
-    <div id="over-card">
-      <h2>game over</h2>
-      <div id="final-score">0</div>
-      <div id="final-level"></div>
-      <div id="best-label"></div>
-      <div class="btn-row">
-        <button class="game-btn" id="btn-home">home</button>
-        <button class="game-btn" id="btn-restart">play again</button>
-      </div>
-    </div>
-  </div>
-
- 
-<!-- ── SELEZIONE MAPPA ADVENTURE ── -->
-  <div id="screen-map-select">
-    <div id="map-select-card">
-      <h2>choose a map</h2>
-      <div class="subtitle">complete maps to unlock abilities</div>
-      <div id="map-list"></div>
-      <button class="game-btn" id="btn-map-back">← back</button>
-    </div>
-  </div>
-</div><!-- #G -->
-
-<script src="js/modes/infinite/main.js"></script>
-
+  <!-- ── SCHERMATE ── -->
+  <link rel="stylesheet" href="css/screens/menu.css">
+  <link rel="stylesheet" href="css/screens/game-over.css">
+  <link rel="stylesheet" href="css/screens/ability.css">
+  <link rel="stylesheet" href="css/screens/map-select.css">
+  <link rel="stylesheet" href="css/screens/map-complete.css">
+</head>
+<body>
+  <div id="G"></div>
+  <script src="js/ui/htmlLoader.js"></script>
 </body>
 </html>
