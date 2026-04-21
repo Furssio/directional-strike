@@ -29,8 +29,21 @@ const ADVENTURE_SCRIPTS = [
   'js/modes/adventure/adventureDirector.js',
 
   /* ── MAPS ── */
+  
   'js/modes/adventure/maps/map01_forest/map.js',
   'js/modes/adventure/maps/map02_dungeon/map.js',
+  'js/modes/adventure/maps/map03_desert/map.js',
+  'js/modes/adventure/maps/map04_temple/map.js',
+  'js/modes/adventure/maps/map05_snow/map.js',
+  'js/modes/adventure/maps/map06_beach/map.js',
+  'js/modes/adventure/maps/map07_clouds/map.js',
+  'js/modes/adventure/maps/map08_storm/map.js',
+  'js/modes/adventure/maps/map09_volcano/map.js',
+  'js/modes/adventure/maps/map10_sakura/map.js',
+  'js/modes/adventure/maps/map11_dragon/map.js',
+  'js/modes/adventure/maps/map12_moon/map.js',
+  'js/modes/adventure/maps/map13_dark/map.js',
+  
 
   /* ── UI ── */
   'js/modes/adventure/mapSelect.js',
@@ -50,21 +63,25 @@ function loadAdventureMode(callback) {
     return;
   }
 
+  // prevent double-load if called while already loading
+  _adventureLoaded = true;
+
   (function loadScript(i) {
     if (i >= ADVENTURE_SCRIPTS.length) {
-      _adventureLoaded = true;
       if (callback) callback();
       return;
     }
 
     const s = document.createElement('script');
-    s.src   = ADVENTURE_SCRIPTS[i];
+    s.src     = ADVENTURE_SCRIPTS[i];
     s.onload  = () => loadScript(i + 1);
-    s.onerror = e => console.error('Failed to load:', ADVENTURE_SCRIPTS[i], e);
+    s.onerror = e => {
+      console.error('Failed to load:', ADVENTURE_SCRIPTS[i], e);
+      loadScript(i + 1); // continua anche se un file manca
+    };
     document.head.appendChild(s);
   })(0);
 }
-
 /* ── START ADVENTURE MAP ────────────────
    Called by mapSelect when user picks a map.
    @param mapId  id from MapRegistry

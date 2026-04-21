@@ -10,51 +10,113 @@
                dom.js, state.js, audio.js
    ═══════════════════════════════════════ */
 
-let selectedMapId = null;
+let selectedMapId  = null;
+let _carouselIndex = 0;
+let _carouselMaps  = [];
 
-/* ── BUILD MAP SELECT SCREEN ────────── */
+const BOSS_ORDERS = [4, 8, 11, 13];
+
+/* ── BUILD ── */
 function buildMapSelectScreen() {
-  const list = document.getElementById('map-list');
-  list.innerHTML = '';
+  _carouselMaps  = MapRegistry.all();
+  _carouselIndex = 0;
 
-  MapRegistry.all().forEach(map => {
-    const unlocked  = Progress.isMapUnlocked(map.id);
-    const completed = Progress.isMapCompleted(map.id);
+  // parti dalla prima mappa non completata, o la prima
+  const firstUnfinished = _carouselMaps.findIndex(m =>
+    Progress.isMapUnlocked(m.id) && !Progress.isMapCompleted(m.id)
+  );
+  if (firstUnfinished >= 0) _carouselIndex = firstUnfinished;
 
-    const card = document.createElement('div');
-    card.className = 'map-card'
-      + (unlocked  ? ' unlocked'  : ' locked')
-      + (completed ? ' completed' : '');
+  _buildCarouselTrack();
+  _renderCarousel();
+  _bindCarouselButtons();
+}
 
-    card.innerHTML = `
-      <div class="map-order">${map.order}</div>
-      <div class="map-icon">${map.icon || '🗺️'}</div>
-      <div class="map-info">
-        <div class="map-name">${map.name}</div>
-        <div class="map-status">${_statusLabel(unlocked, completed)}</div>
-      </div>
-      <div class="map-badge">${completed ? '✓' : unlocked ? '▶' : '🔒'}</div>
-    `;
+/* ── CREA LE SLIDE ── */
+function _buildCarouselTrack() {
+  const track = document.getElementById('carousel-track');
+  track.innerHTML = '';
 
-    if (unlocked) {
-      card.addEventListener('click',      () => onMapSelected(map.id));
-      card.addEventListener('touchstart', e => {
-        e.preventDefault();
-        onMapSelected(map.id);
-      }, { passive: false });
-    }
+  _carouselMaps.forEach((map, i) => {
+    const slide = document.createElement('div');
+    slide.className  = 'map-slide';
+    slide.dataset.index = i;
 
-    list.appendChild(card);
+    const bg = map.background || '';
+    if (bg) slide.style.backgroundImage = `url('${bg}')`;
+    else    slide.style.background = '#333';
+
+    if (BOSS_ORDERS.includes(map.order)) slide.classList.add('is-boss');
+
+    const unlocked = Progress.isMapUnlocked(map.id);
+    if (!unlocked) slide.classList.add('is-locked');
+
+    track.appendChild(slide);
   });
 }
 
-function _statusLabel(unlocked, completed) {
-  if (completed) return 'completed';
-  if (unlocked)  return 'tap to play';
-  return 'locked';
+/* ── RENDER POSIZIONI ── */
+function _renderCarousel() {
+  const maps  = _carouselMaps;
+  const idx   = _carouselIndex;
+  const map   = maps[idx];
+  const slides = document.querySelectorAll('.map-slide');
+
+  // posizioni relative all'indice corrente
+  const posMap = {
+    '-2': 'pos-far-left',
+    '-1': 'pos-left',
+     '0': 'pos-center',
+     '1': 'pos-right',
+     '2': 'pos-far-right',
+  };
+
+  slides.forEach((slide, i) => {
+    slide.className = slide.className
+      .replace(/\bpos-\S+/g, '')
+      .trim();
+
+    const diff = i - idx;
+    const key  = Math.max(-2, Math.min(2, diff)).toString();
+    const pos  = posMap[key];
+    if (pos) slide.classList.add(pos);
+  });
+
+  // header
+  const isBoss = BOSS_ORDERS.includes(map.order);
+  document.getElementById('carousel-map-name').textContent = map.name;
+  document.getElementById('carousel-map-sub').textContent  =
+    isBoss ? '⚔️ BOSS FIGHT' : `level ${map.order}`;
+
+  // completed
+  const completed = Progress.isMapCompleted(map.id);
+  document.getElementById('carousel-completed').textContent =
+    completed ? 'COMPLETED' : '';
+
+  // play button
+  const unlocked = Progress.isMapUnlocked(map.id);
+  const btn      = document.getElementById('btn-map-play');
+  btn.disabled   = !unlocked;
 }
 
-/* ── MAP SELECTED ────────────────────── */
+/* ── BIND BOTTONI ── */
+function _bindCarouselButtons() {
+  document.getElementById('carousel-prev').onclick = () => _shiftCarousel(-1);
+  document.getElementById('carousel-next').onclick = () => _shiftCarousel(1);
+  document.getElementById('btn-map-play').onclick  = () => {
+    const map = _carouselMaps[_carouselIndex];
+    if (map && Progress.isMapUnlocked(map.id)) onMapSelected(map.id);
+  };
+}
+
+function _shiftCarousel(dir) {
+  const next = _carouselIndex + dir;
+  if (next < 0 || next >= _carouselMaps.length) return;
+  _carouselIndex = next;
+  _renderCarousel();
+}
+
+/* ── MAP SELECTED ── */
 function onMapSelected(mapId) {
   selectedMapId = mapId;
   SFX.abilityPick();
