@@ -35,8 +35,6 @@ function startGame() {
   playerEl.style.imageRendering  = 'pixelated';
   playerEl.className     = '';
   specialRing.className  = '';
-  btnSpecial.className   = 'cbtn';
-  btnSpecial.textContent = '⚡';
   specialWrap.classList.remove('ready');
 
   showScreen(sGame);

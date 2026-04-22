@@ -61,20 +61,25 @@ btnMute.addEventListener('click', () => {
 
 ['up', 'down', 'left', 'right'].forEach(dir => {
   const btn = document.getElementById('btn-' + dir);
-  btn.addEventListener('click', () => handleDir(dir));
-  btn.addEventListener('touchstart', e => {
-    e.preventDefault();
-    handleDir(dir);
-  }, { passive: false });
+  if (btn) {
+    btn.addEventListener('click', () => handleDir(dir));
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      handleDir(dir);
+    }, { passive: false });
+  }
 });
 
 /* ── SPECIAL ── */
 
-btnSpecial.addEventListener('mousedown', activateSpecial);
-btnSpecial.addEventListener('touchstart', e => {
-  e.preventDefault();
-  activateSpecial();
-}, { passive: false });
+const specialBtn = document.getElementById('btn-special');
+if (specialBtn) {
+  specialBtn.addEventListener('mousedown', activateSpecial);
+  specialBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    activateSpecial();
+  }, { passive: false });
+}
 
 /* ── KEYBOARD ── */
 

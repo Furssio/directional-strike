@@ -33,7 +33,6 @@ const finalScoreEl   = document.getElementById('final-score');
 const finalLevelEl   = document.getElementById('final-level');
 const bestLabel      = document.getElementById('best-label');
 const menuBest       = document.getElementById('menu-best');
-const btnSpecial     = document.getElementById('btn-special');
 const btnMute        = document.getElementById('btn-mute');
 
 /* ── UTILITIES ── */

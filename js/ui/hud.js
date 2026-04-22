@@ -64,8 +64,7 @@ function updateSpecialBar() {
 
   if (isReady && !player.specialActive) {
     specialWrap.classList.add('ready');
-    btnSpecial.className     = 'cbtn ready';
-    btnSpecial.textContent   = ab.icon;
+    
     specialLabel.style.color = ab.barColor;
 
     if (!player._wasSpecialReady) {
@@ -75,8 +74,7 @@ function updateSpecialBar() {
 
   } else if (!player.specialActive) {
     specialWrap.classList.remove('ready');
-    btnSpecial.className     = 'cbtn';
-    btnSpecial.textContent   = '⚡';
+    
     specialLabel.style.color = '#888';
     player._wasSpecialReady  = false;
   }

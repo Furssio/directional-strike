@@ -1,7 +1,1 @@
-#controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;max-width:210px;margin-left:auto;margin-right:auto;}
-.cbtn{aspect-ratio:1;border-radius:8px;border:1px solid #555;background:#222;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;-webkit-tap-highlight-color:transparent;transition:background 0.08s,transform 0.05s;}
-.cbtn:active,.cbtn.pressed{background:#333;transform:scale(0.93);}
-.cbtn.empty{visibility:hidden;}
-#btn-special{border-color:#555;background:#222;color:#888;transition:background 0.1s,border-color 0.1s,color 0.1s;}
-#btn-special.ready{border-color:#FFD700;background:#2a2200;color:#FFD700;animation:btnSpecialPulse 0.5s ease-in-out infinite alternate;}
-#btn-special.active-special{border-color:#FFD700;background:#3a3000;color:#FFD700;animation:specialPulse 0.4s ease-in-out infinite alternate;}
+/* controls removed — keyboard only for browser version */
