@@ -101,8 +101,8 @@ document.addEventListener('keydown', e => {
   if (map[e.key]) {
     e.preventDefault();
     const btn = document.getElementById('btn-' + map[e.key]);
-    btn.classList.add('pressed');
-    setTimeout(() => btn.classList.remove('pressed'), 120);
+    if (btn) btn.classList.add('pressed');
+    setTimeout(() => { if (btn) btn.classList.remove('pressed'); }, 120);
     handleDir(map[e.key]);
   }
 });

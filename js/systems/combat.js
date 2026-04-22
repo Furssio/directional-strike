@@ -109,6 +109,24 @@ function handleDir(dir) {
       bullets.splice(bi, 1);
     }
 
+    // ── PARRY TORNADOES (parryable enemies) ──
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const e = enemies[i];
+      if (!e.def.parryable || e.dir !== d) continue;
+
+      const dx   = e.x - cx;
+      const dy   = e.y - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > attackRange) continue;
+
+      anyHit = true;
+      SFX.hit();
+      spawnParticles(e.x, e.y, '#aaaaff', false);
+      e.el.remove();
+      enemies.splice(i, 1);
+      registerKill(e);
+    }
+
     if (isPiercing) {
       for (let i = enemies.length - 1; i >= 0; i--) {
         const e  = enemies[i];

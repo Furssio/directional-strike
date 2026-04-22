@@ -50,3 +50,27 @@ function triggerShake() {
   clearTimeout(shakeTimeout);
   shakeTimeout = setTimeout(() => arena.classList.remove('shake'), 300);
 }
+function spawnSandParticle(x, y) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+
+  const size  = 2 + Math.random() * 3;
+  const angle = Math.random() * Math.PI * 2;
+  const speed = 0.8 + Math.random() * 1.5;
+  const vx    = Math.cos(angle) * speed;
+  const vy    = Math.sin(angle) * speed;
+
+  p.style.cssText = `width:${size}px;height:${size}px;background:#c8a850;left:${x}px;top:${y}px;opacity:0.8;`;
+  arena.appendChild(p);
+
+  const start = performance.now();
+  function anim(now) {
+    const t = (now - start) / 400;
+    if (t >= 1) { p.remove(); return; }
+    p.style.left    = (x + vx * speed * t * 12) + 'px';
+    p.style.top     = (y + vy * speed * t * 12) + 'px';
+    p.style.opacity = (1 - t) * 0.8 + '';
+    requestAnimationFrame(anim);
+  }
+  requestAnimationFrame(anim);
+}

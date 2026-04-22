@@ -55,7 +55,7 @@ const Progress = (() => {
     },
 
     isMapUnlocked(mapId) {
-      const map = MapRegistry.get(mapId);
+      /*const map = MapRegistry.get(mapId);
       if (!map) return false;
       if (map.order === 1) return true;
 
@@ -68,7 +68,8 @@ const Progress = (() => {
       if (!list.includes(mapId)) {
         list.push(mapId);
         _save(KEY_MAPS, list);
-      }
+      }*/
+     return true; // DEV: all maps unlocked
     },
 
     /* ── ABILITIES ────────────────────── */

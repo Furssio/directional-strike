@@ -9,7 +9,7 @@
 EnemyRegistry.register({
   id:          'slime_large',
   emoji:       '🟢',
-  sprite:      'assets/enemies/slime.png',
+  sprite: 'assets/enemies/slime/idle.png',
   size:        48,
   hpPct:       0.80,
   damagePct:   0.30,
@@ -75,7 +75,7 @@ EnemyRegistry.register({
 EnemyRegistry.register({
   id:          'slime_medium',
   emoji:       '🟢',
-  sprite:      'assets/enemies/slime.png',
+  sprite: 'assets/enemies/slime/idle.png',
   size:        32,
   hpPct:       0.45,
   damagePct:   0.18,

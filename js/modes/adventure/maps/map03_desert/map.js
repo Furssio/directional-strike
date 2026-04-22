@@ -5,9 +5,10 @@ MapRegistry.register({
   theme:      'desert',
   background: 'assets/maps/map03_desert/background_01.png',
   stressTarget: 30,
-  enemyPool: {
-    ravager: { fromWave: 1, weight: 8 },
-    crusher: { fromWave: 3, weight: 2 },
+   enemyPool: {
+    crusher:  { fromWave: 1, weight: 3 },
+    tornado:  { fromWave: 1, weight: 4 },
+    scorpion: { fromWave: 2, weight: 3 },
   },
   boss: {
     name: 'Sand Colossus',

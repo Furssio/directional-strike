@@ -18,6 +18,7 @@ class Bullet {
     this.vyBase    = vy;
     this.damagePct = dmgPct;
     this.el        = null;
+    this.sprite = 'assets/enemies/bullet_rock/idle.png';
   }
 
 }

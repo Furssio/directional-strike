@@ -82,6 +82,21 @@ function tick() {
   lastTick  = now;
 
   player.tickSpecial(dt);
+  // poison tick
+  if (player.poisonEffects && player.poisonEffects.length > 0) {
+    for (let i = player.poisonEffects.length - 1; i >= 0; i--) {
+      const pe = player.poisonEffects[i];
+      pe.timer += dt;
+      if (pe.timer >= 1000) {
+        pe.timer -= 1000;
+        player.takeDamage(0.05);
+        updateHpBar();
+        if (!player.isAlive()) { endGame(); return; }
+        pe.ticksLeft--;
+        if (pe.ticksLeft <= 0) player.poisonEffects.splice(i, 1);
+      }
+    }
+  }
   ActiveDirector.tick(dt);
   updateComboDisplay();
   updateSpecialBar();
@@ -120,10 +135,12 @@ function tick() {
     e.el.style.left = e.x + 'px';
     e.el.style.top  = e.y + 'px';
 
-    e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
-if (e.def.onTick) e.def.onTick(e, cx, cy);
+   if (!e.underground) {
+      e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
+    }
+    if (e.def.onTick) e.def.onTick(e, cx, cy, attackRange);
 
-    if (dist < hitR) {
+    if (dist < hitR && !e.underground) {
 
       if (player.thorns && player.specialActive && player.ability.blocksBullets) {
         e.hit(Math.round(PLAYER_STATS.maxHp * 0.15));
@@ -144,6 +161,7 @@ if (e.def.onTick) e.def.onTick(e, cx, cy);
       const hits = e.contactHits || 1;
       for (let h = 0; h < hits; h++) {
         player.takeDamage(e.damagePct);
+        if (e.def.onContact) e.def.onContact(player);
       }
 
       updateHpBar();

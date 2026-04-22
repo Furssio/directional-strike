@@ -69,17 +69,26 @@ if (enemy.def.sprite) {
 const rotMap = { down: 0, left: 90, up: 180, right: 270 };
 el.style.transform = `translate(-50%,-50%) rotate(${rotMap[dir]}deg)`;
 
-  const hpWrap = document.createElement('div');
-  hpWrap.className = 'enemy-hp-wrap';
-  const hpFill = document.createElement('div');
-  hpFill.className   = 'enemy-hp-fill';
-  hpFill.style.width = '100%';
-  hpWrap.appendChild(hpFill);
-  el.appendChild(hpWrap);
+ if (!enemy.def.noHpBar) {
+    const hpWrap = document.createElement('div');
+    hpWrap.className = 'enemy-hp-wrap';
+    const hpFill = document.createElement('div');
+    hpFill.className   = 'enemy-hp-fill';
+    hpFill.style.width = '100%';
+    hpWrap.appendChild(hpFill);
+    el.appendChild(hpWrap);
+    enemy.hpFill = hpFill;
+  } else {
+    enemy.hpFill = null;
+  }
 
   arena.appendChild(el);
-  enemy.el     = el;
-  enemy.hpFill = hpFill;
+  enemy.el = el;
+   // start underground if enemy has underground flag
+  enemy.underground = enemy.def.underground ? true : false;
+  if (enemy.underground) {
+    el.style.opacity = '0';
+  }
   enemies.push(enemy);
 }
 
@@ -105,7 +114,7 @@ b.vyBase = vy;
   el.className  = 'bullet';
   el.style.left = b.x + 'px';
   el.style.top  = b.y + 'px';
-  el.style.backgroundImage = 'url(assets/enemies/bullet_rock.png)';
+  el.style.backgroundImage = `url(${b.sprite})`;
   el.style.backgroundSize  = 'cover';
   el.style.imageRendering  = 'pixelated';
   el.style.backgroundColor = 'transparent';
