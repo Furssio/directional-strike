@@ -6,8 +6,9 @@ MapRegistry.register({
   background: 'assets/maps/map07_clouds/background_01.png',
   stressTarget: 36,
   enemyPool: {
-    ravager: { fromWave: 1, weight: 8 },
-    crusher: { fromWave: 3, weight: 2 },
+    tornado:        { fromWave: 1, weight: 4 },
+    eagle:          { fromWave: 1, weight: 3 },
+    thunder_hound:  { fromWave: 4, weight: 2 },
   },
   boss: {
     name:           'Storm Rider',

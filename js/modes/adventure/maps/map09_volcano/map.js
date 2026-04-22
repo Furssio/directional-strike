@@ -6,8 +6,8 @@ MapRegistry.register({
   background: 'assets/maps/map09_volcano/background_01.png',
   stressTarget: 38,
   enemyPool: {
-    ravager: { fromWave: 1, weight: 7 },
-    crusher: { fromWave: 2, weight: 3 },
+   
+    golem_lava: { fromWave: 1, weight: 2 },
   },
   boss: {
     name:           'Magma Lord',

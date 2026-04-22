@@ -127,10 +127,11 @@ function handleDir(dir) {
       registerKill(e);
     }
 
-    if (isPiercing) {
+   if (isPiercing) {
       for (let i = enemies.length - 1; i >= 0; i--) {
         const e  = enemies[i];
         if (e.dir !== d) continue;
+        if (e.underground) continue;
 
         const dx   = e.x - cx;
         const dy   = e.y - cy;
@@ -141,7 +142,9 @@ function handleDir(dir) {
         SFX.hit();
         e.flashHit();
         e.hit(hitDmg);
-        e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
+        if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
+
+        if (e.def.onHit && e.isAlive()) e.def.onHit(e);
 
         if (!e.isAlive()) {
           spawnParticles(e.x, e.y, player.color, e.isElite);
@@ -157,6 +160,7 @@ function handleDir(dir) {
 
       for (const e of enemies) {
         if (e.dir !== d) continue;
+        if (e.underground) continue;
 
         const dx   = e.x - cx;
         const dy   = e.y - cy;
@@ -170,7 +174,9 @@ function handleDir(dir) {
         SFX.hit();
         best.flashHit();
         best.hit(hitDmg);
-        best.hpFill.style.width = Math.round(best.hpPercent() * 100) + '%';
+        if (best.hpFill) best.hpFill.style.width = Math.round(best.hpPercent() * 100) + '%';
+
+        if (best.def.onHit && best.isAlive()) best.def.onHit(best);
 
         if (player.stunChance > 0 && Math.random() < player.stunChance) {
           best.stun(1000);

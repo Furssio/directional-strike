@@ -84,10 +84,13 @@ el.style.transform = `translate(-50%,-50%) rotate(${rotMap[dir]}deg)`;
 
   arena.appendChild(el);
   enemy.el = el;
-   // start underground if enemy has underground flag
+  // start underground if enemy has underground flag
   enemy.underground = enemy.def.underground ? true : false;
   if (enemy.underground) {
     el.style.opacity = '0';
+    if (enemy.def.undergroundSpeed) {
+      enemy.speed = enemy.baseSpeed * enemy.def.undergroundSpeed;
+    }
   }
   enemies.push(enemy);
 }

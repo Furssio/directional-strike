@@ -1,0 +1,50 @@
+/* ═══════════════════════════════════════
+   PARROT.JS
+   Ranged enemy — like crusher but 1 hit,
+   fires 2 rocks in sequence.
+   ═══════════════════════════════════════ */
+
+EnemyRegistry.register({
+  id:              'parrot',
+  sprite:          'assets/enemies/parrot/idle.png',
+  size:            36,
+  hpPct:           0.30,
+  damagePct:       0.20,
+  speedMult:       0.50,
+  points:          20,
+  shoots:          true,
+  bulletDamagePct: 0.15,
+  bulletSpeed:     4.0,
+  noHpBar:         true,
+
+  onTick(e, cx, cy) {
+    if (e._shotsFired === undefined) {
+      e._shotsFired = 0;
+      e._shotDelay  = 0;
+    }
+
+    const curDist = e.distToCenter(cx, cy);
+
+    // first shot at threshold distance
+    if (!e.firstShotFired && curDist <= e.firstShotDist) {
+      e.firstShotFired = true;
+      e._shotsFired = 1;
+      spawnBullet(e);
+      e._shotDelay = 600; // ms before second shot
+    }
+
+    // second shot after delay
+    if (e._shotsFired === 1 && e._shotDelay > 0) {
+      e._shotDelay -= 16;
+      if (e._shotDelay <= 0) {
+        e._shotsFired = 2;
+        spawnBullet(e);
+      }
+    }
+  },
+
+  calcStress(distToCenter) {
+    if (distToCenter <= 120) return 20;
+    return 8;
+  },
+});

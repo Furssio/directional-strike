@@ -1,10 +1,3 @@
-/* ═══════════════════════════════════════
-   SCORPION.JS
-   Hides underground while approaching.
-   Becomes visible when in attack range.
-   Poisons player on contact.
-   ═══════════════════════════════════════ */
-
 EnemyRegistry.register({
   id:        'scorpion',
   sprite:    'assets/enemies/scorpion/idle.png',
@@ -17,7 +10,8 @@ EnemyRegistry.register({
   noHpBar:   true,
 
   // while underground: not visible, not hittable
-  underground: true,
+  underground:      true,
+  undergroundSpeed:  0.4,   // multiplier while underground (slow)
 
   onContact(player) {
     // poison: 5% hp per second for 3 seconds
@@ -31,8 +25,9 @@ EnemyRegistry.register({
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     if (e.underground && dist <= attackRange) {
-      // emerge — become visible and hittable
+      // emerge — become visible, hittable, full speed
       e.underground = false;
+      e.speed = e.baseSpeed;
       if (e.el) {
         e.el.style.opacity = '1';
         e.el.style.pointerEvents = 'auto';
@@ -42,7 +37,7 @@ EnemyRegistry.register({
     // sand particles while underground
     if (e.underground && e.el) {
       e._particleTimer = (e._particleTimer || 0) + 16;
-      if (e._particleTimer >= 120) {
+      if (e._particleTimer >= 80) {
         e._particleTimer = 0;
         spawnSandParticle(e.x, e.y);
       }

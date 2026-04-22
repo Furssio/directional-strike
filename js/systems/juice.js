@@ -54,22 +54,25 @@ function spawnSandParticle(x, y) {
   const p = document.createElement('div');
   p.className = 'particle';
 
-  const size  = 2 + Math.random() * 3;
+  const size  = 5 + Math.random() * 5;
   const angle = Math.random() * Math.PI * 2;
-  const speed = 0.8 + Math.random() * 1.5;
+  const speed = 0.6 + Math.random() * 1.2;
   const vx    = Math.cos(angle) * speed;
   const vy    = Math.sin(angle) * speed;
 
-  p.style.cssText = `width:${size}px;height:${size}px;background:#c8a850;left:${x}px;top:${y}px;opacity:0.8;`;
+  const colors = ['#b5893a', '#a07830', '#c49a45'];
+  const color  = colors[Math.floor(Math.random() * colors.length)];
+
+  p.style.cssText = `width:${size}px;height:${size}px;background:${color};left:${x}px;top:${y}px;opacity:0.9;`;
   arena.appendChild(p);
 
   const start = performance.now();
   function anim(now) {
-    const t = (now - start) / 400;
+    const t = (now - start) / 550;
     if (t >= 1) { p.remove(); return; }
-    p.style.left    = (x + vx * speed * t * 12) + 'px';
-    p.style.top     = (y + vy * speed * t * 12) + 'px';
-    p.style.opacity = (1 - t) * 0.8 + '';
+    p.style.left    = (x + vx * speed * t * 10) + 'px';
+    p.style.top     = (y + vy * speed * t * 10) + 'px';
+    p.style.opacity = (1 - t) * 0.9 + '';
     requestAnimationFrame(anim);
   }
   requestAnimationFrame(anim);

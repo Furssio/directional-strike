@@ -9,7 +9,6 @@ EnemyRegistry.register({
   sprite: 'assets/enemies/golem/idle.png',
   size:      52,
   hpPct:     1.65,
-  hpPct: 1.20,
   speedMult: 0.44,
   points:    40,
   shoots:    false,

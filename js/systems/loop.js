@@ -14,11 +14,12 @@
 function startGame() {
   SFX.init();
 
-  player    = new Player(equippedAbilityId);
-  enemies   = [];
-  bullets   = [];
-  running   = true;
-  lastTick  = performance.now();
+  player      = new Player(equippedAbilityId);
+  enemies     = [];
+  bullets     = [];
+  running     = true;
+  isAttacking = false;
+  lastTick    = performance.now();
 
   document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
 
@@ -130,12 +131,12 @@ function tick() {
       wy =  nx * perp * 0.05;
     }
 
-    e.x += nx * e.speed + wx;
+   e.x += nx * e.speed + wx;
     e.y += ny * e.speed + wy;
     e.el.style.left = e.x + 'px';
     e.el.style.top  = e.y + 'px';
 
-   if (!e.underground) {
+   if (!e.underground && !e.def.customOpacity) {
       e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
     }
     if (e.def.onTick) e.def.onTick(e, cx, cy, attackRange);
@@ -144,7 +145,7 @@ function tick() {
 
       if (player.thorns && player.specialActive && player.ability.blocksBullets) {
         e.hit(Math.round(PLAYER_STATS.maxHp * 0.15));
-        e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
+        if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
         if (!e.isAlive()) {
           spawnParticles(e.x, e.y, player.color, e.isElite);
           e.el.remove();

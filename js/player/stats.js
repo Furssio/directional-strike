@@ -10,7 +10,7 @@
 const PLAYER_STATS = {
   emoji:      '🧑',
   color:      '#E24B4A',
-  rangePct:   0.26,
+  rangePct:   0.234,
   damageMult: 1.6,
   maxHp:      100,
 

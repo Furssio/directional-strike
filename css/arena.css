@@ -11,11 +11,11 @@
 #player{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:80px;height:80px;border-radius:50%;
-  background:#222;border:1.5px solid #888;
+  background:transparent;border:none;
   display:flex;align-items:center;justify-content:center;
-  font-size:28px;z-index:10;transition:border-color 0.1s,background 0.1s;
+  font-size:28px;z-index:10;
 }
-#player.special-active{border:2.5px solid #FFD700;background:#2a2200;}
+#player.special-active{border:2.5px solid #FFD700;background:rgba(42,34,0,0.5);}
 #special-ring{
   position:absolute;top:50%;left:50%;width:90px;height:90px;border-radius:50%;
   border:2px solid #FFD700;transform:translate(-50%,-50%) scale(0);opacity:0;
