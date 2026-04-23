@@ -149,13 +149,13 @@ const AdventureDirector = (() => {
 
       const isBoss  = this.isBoss();
       const boss    = this._bossConfig();
-      const effDt   = getEffectiveDt(dt);  // rallenta durante Bullet Time
+      
 
       
 
       // standard spawn cycle
       const state = this._getStateForCurrentWave();
-      spawnTimer -= effDt;
+      spawnTimer -= dt;
      if (spawnTimer <= 0) {
         spawnGroupForMap(state, wave, currentMap, isBoss);
         spawnTimer = this._getSpawnIntervalForCurrentWave(state);

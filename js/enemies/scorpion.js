@@ -36,8 +36,8 @@ EnemyRegistry.register({
 
     // sand particles while underground
     if (e.underground && e.el) {
-      e._particleTimer = (e._particleTimer || 0) + 16;
-      if (e._particleTimer >= 80) {
+      e._particleTimer = (e._particleTimer || 0) + 16 * player.speedMultiplier;
+      if (e._particleTimer >= 80 / player.speedMultiplier) {
         e._particleTimer = 0;
         spawnSandParticle(e.x, e.y);
       }

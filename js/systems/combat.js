@@ -49,19 +49,9 @@ function activateSpecial() {
 
   playerEl.classList.add('special-active');
   specialRing.classList.add('active');
-  btnSpecial.classList.add('active-special');
   specialWrap.classList.remove('ready');
 
   player.ability.onActivate(enemies);
-
-  setTimeout(() => {
-    player.specialActive = false;
-    playerEl.classList.remove('special-active');
-    specialRing.classList.remove('active');
-    btnSpecial.className = 'cbtn';
-
-    player.ability.onDeactivate(enemies);
-  }, player.ability.duration);
 }
 
 /* ── ATTACK ── */
@@ -77,11 +67,17 @@ function handleDir(dir) {
   const cy          = h / 2;
   const arenaSize   = Math.min(w, h);
   const attackRange = player.getAttackRange(arenaSize);
-  const isPiercing  = player.specialActive && player.ability.piercing;
+  const isPiercing  = (player.specialActive && player.ability.piercing) || player.slashActive;
 
-  const dirs = player.doubleAttack && !isPiercing
-    ? [dir, ...getAdjacentDirs(dir)]
-    : [dir];
+  let dirs = [dir];
+  if (player.doubleAttack && !isPiercing) {
+    dirs = [dir, ...getAdjacentDirs(dir)];
+  }
+  if (player.doubleStrikeActive) {
+    const opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
+    const opp = opposites[dir];
+    if (!dirs.includes(opp)) dirs.push(opp);
+  }
 
   let anyHit = false;
 

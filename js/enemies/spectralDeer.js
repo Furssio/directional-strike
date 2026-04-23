@@ -29,7 +29,7 @@ EnemyRegistry.register({
     }
 
     if (e._initCooldown > 0) {
-      e._initCooldown -= 16;
+      e._initCooldown -= 16 * player.speedMultiplier;
       if (e.el) e.el.style.opacity = '1';
       return;
     }
@@ -37,7 +37,7 @@ EnemyRegistry.register({
     if (e._fadeDir === 0) e._fadeDir = -1;
 
     const fadeSpeed = 0.0018; // opacity change per ms (~0.03 per frame)
-    e._fadePhase += e._fadeDir * fadeSpeed * 16;
+    e._fadePhase += e._fadeDir * fadeSpeed * 16 * player.speedMultiplier;
 
     // clamp
     if (e._fadePhase <= 0) {

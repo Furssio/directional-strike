@@ -44,6 +44,12 @@ const SCRIPTS = [
   'js/player/Player.js',
   'js/player/abilities/bulletTime.js',
   'js/player/abilities/rangeBoost.js',
+  'js/player/abilities/shield.js',
+  'js/player/abilities/fullHeal.js',
+  'js/player/abilities/explosion.js',
+  'js/player/abilities/oneHit.js',
+  'js/player/abilities/doubleStrike.js',
+  'js/player/abilities/slash.js',
 
   /* ── AUDIO ── */
   'js/audio.js',

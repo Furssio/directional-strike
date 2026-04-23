@@ -30,7 +30,7 @@ EnemyRegistry.register({
         if (e.el) e.el.classList.add('bear-charging');
       }
 
-      e._chargeTimer -= 16;
+      e._chargeTimer -= 16 * player.speedMultiplier;
 
       if (e._chargeTimer <= 0) {
         // attack — damage exceeds max hp

@@ -36,19 +36,19 @@ EnemyRegistry.register({
       const dx = cx - e.x;
       const dy = cy - e.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > 1) {
-        const spd = CONFIG.base.enemyBaseSpeed * 0.8;
+      if (dist > 3) {
+        const spd = CONFIG.base.enemyBaseSpeed * 0.8 * player.speedMultiplier;
         e.x += (dx / dist) * spd;
         e.y += (dy / dist) * spd;
-      }
-      if (e.el) {
-        e.el.style.left = e.x + 'px';
-        e.el.style.top  = e.y + 'px';
+        if (e.el) {
+          e.el.style.left = e.x + 'px';
+          e.el.style.top  = e.y + 'px';
+        }
       }
       return;
     }
 
-    e._jumpTimer -= 16;
+    e._jumpTimer -= 16 * player.speedMultiplier;
 
     if (e._jumpTimer <= 0 && !e._jumping) {
       e._jumping = true;

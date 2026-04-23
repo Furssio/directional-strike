@@ -1,30 +1,28 @@
 /* ═══════════════════════════════════════
-   BULLETTIME.JS
-   Bullet Time — slows everything in the
-   arena for a short duration.
-   Uses player.speedMultiplier so every
-   moving object is affected automatically.
+   ONEHIT.JS
+   One Hit — all enemies die in 1 hit
+   for 4 seconds.
 
    Used by: Player.js (via AbilityRegistry)
    Depends on: AbilityRegistry
    ═══════════════════════════════════════ */
 
 AbilityRegistry.register({
-  id:       'bullet_time',
-  name:     'Bullet Time',
-  desc:     'slows everything for 3s',
-  icon:     '🌀',
-  barColor: '#E24B4A',
-  duration: 3000,
+  id:       'one_hit',
+  name:     'One Hit',
+  desc:     'all enemies die in 1 hit for 4s',
+  icon:     '⚡',
+  barColor: '#FBBF24',
+  duration: 4000,
 
   piercing:      false,
   blocksBullets: false,
 
   onActivate() {
-    if (player) player.speedMultiplier = 0.25;
+    if (player) player.oneHitActive = true;
   },
 
   onDeactivate() {
-    if (player) player.speedMultiplier = 1.0;
+    if (player) player.oneHitActive = false;
   },
 });

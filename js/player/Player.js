@@ -47,7 +47,13 @@ class Player {
     this.stunChance        = 0;
     this.doubleAttack      = false;
     this.thorns            = false;
+// ── global speed multiplier (abilities like BulletTime set this) ──
+    this.speedMultiplier = 1.0;
 
+    this.rangePctMultiplier = 1.0;
+    this.oneHitActive = false;
+  this.doubleStrikeActive = false;
+  this.slashActive = false;
     // ── internal flag ──
     this._wasSpecialReady = false;
   }
@@ -67,13 +73,13 @@ class Player {
   }
 
   getAttackRange(arenaSize) {
-    return arenaSize * this.attackRangePct;
+    return arenaSize * this.attackRangePct * this.rangePctMultiplier;
   }
 
   getHitDamage() {
+    if (this.oneHitActive) return 99999;
     return Math.round(PLAYER_STATS.maxHp * CONFIG.base.hitDamagePct * this.damageMult);
   }
-
   resetCombo() {
     this.combo      = 0;
     this.comboTimer = 0;
@@ -114,6 +120,13 @@ class Player {
       if (this.specialTimer <= 0) {
         this.specialActive = false;
         this.specialTimer  = 0;
+        this.ability.onDeactivate(enemies);
+
+        // reset UI (was in combat.js setTimeout before)
+        const pe = document.getElementById('player');
+        if (pe) pe.classList.remove('special-active');
+        const sr = document.getElementById('special-ring');
+        if (sr) sr.classList.remove('active');
       }
     }
   }

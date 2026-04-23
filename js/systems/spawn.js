@@ -108,8 +108,7 @@ function spawnBullet(enemy) {
   const vx = dx / dist * enemy.bulletSpeed;
   const vy = dy / dist * enemy.bulletSpeed;
 
-  const slowMult = (player && player.specialActive) ? 0.25 : 1;
-  const b = new Bullet(enemy.x, enemy.y, vx * slowMult, vy * slowMult, enemy.bulletDamagePct);
+  const b = new Bullet(enemy.x, enemy.y, vx, vy, enemy.bulletDamagePct);
 // salva sempre velocità piena come base per onDeactivate
 b.vxBase = vx;
 b.vyBase = vy;

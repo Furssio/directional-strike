@@ -20,9 +20,3 @@ let isAttacking     = false;
 let equippedAbilityId = null;
 let ActiveDirector = null;
 
-function getEffectiveDt(dt) {
-  if (player && player.specialActive && !player.ability.piercing && !player.ability.blocksBullets) {
-    return dt * 0.25;
-  }
-  return dt;
-}

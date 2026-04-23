@@ -1,30 +1,28 @@
 /* ═══════════════════════════════════════
-   BULLETTIME.JS
-   Bullet Time — slows everything in the
-   arena for a short duration.
-   Uses player.speedMultiplier so every
-   moving object is affected automatically.
+   DOUBLESTRIKE.JS
+   Double Strike — each attack also hits
+   the opposite direction for 4 seconds.
 
    Used by: Player.js (via AbilityRegistry)
    Depends on: AbilityRegistry
    ═══════════════════════════════════════ */
 
 AbilityRegistry.register({
-  id:       'bullet_time',
-  name:     'Bullet Time',
-  desc:     'slows everything for 3s',
-  icon:     '🌀',
-  barColor: '#E24B4A',
-  duration: 3000,
+  id:       'double_strike',
+  name:     'Double Strike',
+  desc:     'attacks also hit the opposite side for 4s',
+  icon:     '⚔️',
+  barColor: '#A855F7',
+  duration: 4000,
 
   piercing:      false,
   blocksBullets: false,
 
   onActivate() {
-    if (player) player.speedMultiplier = 0.25;
+    if (player) player.doubleStrikeActive = true;
   },
 
   onDeactivate() {
-    if (player) player.speedMultiplier = 1.0;
+    if (player) player.doubleStrikeActive = false;
   },
 });

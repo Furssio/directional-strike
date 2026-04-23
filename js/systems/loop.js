@@ -113,6 +113,16 @@ function tick() {
   /* ── UPDATE ENEMIES ── */
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e    = enemies[i];
+
+    // cleanup: remove enemies that died outside of combat
+    // (e.g. crab emerging, self-destructing enemies)
+    if (!e.isAlive() && e._emerged) {
+      if (e.el && e.el.parentNode) e.el.remove();
+      enemies.splice(i, 1);
+      if (e.def.onDeath) e.def.onDeath(e);
+      continue;
+    }
+
     const dx   = cx - e.x;
     const dy   = cy - e.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -131,9 +141,10 @@ function tick() {
       wy =  nx * perp * 0.05;
     }
 
-   if (!e.def.customMovement) {
-      e.x += nx * e.speed + wx;
-      e.y += ny * e.speed + wy;
+  if (!e.def.customMovement) {
+      const sm = player.speedMultiplier;
+      e.x += (nx * e.speed + wx) * sm;
+      e.y += (ny * e.speed + wy) * sm;
       e.el.style.left = e.x + 'px';
       e.el.style.top  = e.y + 'px';
     }
@@ -183,8 +194,9 @@ function tick() {
   /* ── UPDATE BULLETS ── */
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
-    b.x += b.vx;
-    b.y += b.vy;
+    const sm = player.speedMultiplier;
+    b.x += b.vx * sm;
+    b.y += b.vy * sm;
     b.el.style.left = b.x + 'px';
     b.el.style.top  = b.y + 'px';
 

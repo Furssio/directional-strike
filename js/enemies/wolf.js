@@ -22,7 +22,7 @@ EnemyRegistry.register({
 
     if (e._wolfState === 'waiting') {
       e.speed = 0;
-      e._waitTimer -= 16;
+      e._waitTimer -= 16 * player.speedMultiplier;
       if (e._waitTimer <= 0) {
         e._wolfState = 'lunge';
         e.speed = e.baseSpeed * 2.5;

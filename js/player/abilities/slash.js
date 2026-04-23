@@ -1,30 +1,28 @@
 /* ═══════════════════════════════════════
-   BULLETTIME.JS
-   Bullet Time — slows everything in the
-   arena for a short duration.
-   Uses player.speedMultiplier so every
-   moving object is affected automatically.
+   SLASH.JS
+   Slash — each attack hits ALL enemies
+   in that direction for 4 seconds.
 
    Used by: Player.js (via AbilityRegistry)
    Depends on: AbilityRegistry
    ═══════════════════════════════════════ */
 
 AbilityRegistry.register({
-  id:       'bullet_time',
-  name:     'Bullet Time',
-  desc:     'slows everything for 3s',
-  icon:     '🌀',
-  barColor: '#E24B4A',
-  duration: 3000,
+  id:       'slash',
+  name:     'Slash',
+  desc:     'attacks hit all enemies in a line for 4s',
+  icon:     '🗡️',
+  barColor: '#EC4899',
+  duration: 4000,
 
   piercing:      false,
   blocksBullets: false,
 
   onActivate() {
-    if (player) player.speedMultiplier = 0.25;
+    if (player) player.slashActive = true;
   },
 
   onDeactivate() {
-    if (player) player.speedMultiplier = 1.0;
+    if (player) player.slashActive = false;
   },
 });

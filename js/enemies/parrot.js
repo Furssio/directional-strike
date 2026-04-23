@@ -12,7 +12,7 @@ EnemyRegistry.register({
   damagePct:       0.20,
   speedMult:       0.50,
   points:          20,
-  shoots:          true,
+  shoots:          false,
   bulletDamagePct: 0.15,
   bulletSpeed:     4.0,
   noHpBar:         true,
@@ -35,7 +35,7 @@ EnemyRegistry.register({
 
     // second shot after delay
     if (e._shotsFired === 1 && e._shotDelay > 0) {
-      e._shotDelay -= 16;
+      e._shotDelay -= 16 * player.speedMultiplier;
       if (e._shotDelay <= 0) {
         e._shotsFired = 2;
         spawnBullet(e);
