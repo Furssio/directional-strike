@@ -6,8 +6,10 @@ MapRegistry.register({
   background: 'assets/maps/map12_moon/background_01.png',
   stressTarget: 42,
   enemyPool: {
-    ravager: { fromWave: 1, weight: 7 },
-    crusher: { fromWave: 2, weight: 3 },
+    star:           { fromWave: 1, weight: 4 },
+    spectral_deer:  { fromWave: 1, weight: 3 },
+    thunder_hound:  { fromWave: 3, weight: 2 },
+    oni:            { fromWave: 5, weight: 2 },
   },
   boss: {
     name:           'Lunar Specter',

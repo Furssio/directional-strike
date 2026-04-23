@@ -6,8 +6,13 @@ MapRegistry.register({
   background: 'assets/maps/map10_sakura/background_01.png',
   stressTarget: 40,
   enemyPool: {
-    ravager: { fromWave: 1, weight: 7 },
-    crusher: { fromWave: 2, weight: 3 },
+    
+    enemyPool: {
+    kitsune:   { fromWave: 1, weight: 3 },
+    nara_deer: { fromWave: 1, weight: 3 },
+    frog:      { fromWave: 2, weight: 3 },
+    oni:       { fromWave: 1, weight: 3 },
+  },
   },
   boss: {
     name:           'Shadow Oni',

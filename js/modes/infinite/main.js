@@ -33,6 +33,11 @@ const SCRIPTS = [
   'js/enemies/thunderHound.js',
   'js/enemies/slimeLava.js',
   'js/enemies/golemLava.js',
+  'js/enemies/naraDeer.js',
+  'js/enemies/kitsune.js',
+  'js/enemies/oni.js',
+  'js/enemies/frog.js',
+  'js/enemies/star.js',
 
  /* ── PLAYER ── */
   'js/player/stats.js',

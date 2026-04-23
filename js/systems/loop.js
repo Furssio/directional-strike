@@ -131,10 +131,12 @@ function tick() {
       wy =  nx * perp * 0.05;
     }
 
-   e.x += nx * e.speed + wx;
-    e.y += ny * e.speed + wy;
-    e.el.style.left = e.x + 'px';
-    e.el.style.top  = e.y + 'px';
+   if (!e.def.customMovement) {
+      e.x += nx * e.speed + wx;
+      e.y += ny * e.speed + wy;
+      e.el.style.left = e.x + 'px';
+      e.el.style.top  = e.y + 'px';
+    }
 
    if (!e.underground && !e.def.customOpacity) {
       e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
