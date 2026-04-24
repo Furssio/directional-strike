@@ -54,7 +54,6 @@ function endGame() {
   clearInterval(gameLoop);
   ActiveDirector.stop();
 
-  enemies.forEach(e => e.setSlowed(false, 1));
   document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
   enemies = [];
   bullets = [];

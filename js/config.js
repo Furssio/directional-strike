@@ -43,7 +43,7 @@ const CONFIG = {
   ─────────────────────────────────────── */
   attack: {
     hitCooldownMs:  80,
-    missCooldownMs: 350,
+    missCooldownMs: 190,
   },
 
   /* ── DIFFICULTY ─────────────────────────
@@ -197,7 +197,7 @@ const CONFIG = {
                     overridable per map in map.js
   ─────────────────────────────────────── */
  adventure: {
-    wavesPerMap:    10,    // last wave is always the boss wave
+    wavesPerMap:    15,    // last wave is always the boss wave
     stressTarget:   25,    // default, each map can override
     bossPauseMs:    3000,  // pause before boss wave starts
     bossAnnounceMs: 2200,  // how long the BOSS popup stays on screen

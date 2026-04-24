@@ -14,7 +14,7 @@ EnemyRegistry.register({
   hpPct:       0.80,
   damagePct:   0.30,
   contactHits: 1,
-  speedMult: 0.48,
+  speedMult:   0.48,
   points:      8,
   shoots:      false,
   wobble:      { frequency: 1.8, amplitude: 18 },
@@ -28,46 +28,46 @@ EnemyRegistry.register({
     if (!childDef) return;
 
     const { w, h } = getArenaSize();
+    const perpX = (parent.dir === 'up' || parent.dir === 'down') ? 1 : 0;
+    const perpY = (parent.dir === 'left' || parent.dir === 'right') ? 1 : 0;
+    const offset = 18;
 
     for (let i = 0; i < 2; i++) {
-      setTimeout(() => {
-        if (!running) return;
+      if (!running) return;
 
-        const angle  = (i / 2) * Math.PI * 2;
-        const radius = 22 + Math.random() * 12;
-        const ox     = Math.cos(angle) * radius;
-        const oy     = Math.sin(angle) * radius;
+      const sign = i === 0 ? -1 : 1;
+      const sx   = parent.x + perpX * offset * sign;
+      const sy   = parent.y + perpY * offset * sign;
 
-        const child = new Enemy(childDef, parent.x + ox, parent.y + oy, parent.dir, 1, w, h);
+      const child = new Enemy(childDef, sx, sy, parent.dir, 1, w, h);
 
-        if (player.specialActive) player.ability.onActivate([child]);
+      if (player.specialActive) player.ability.onActivate([child]);
 
-        const el = document.createElement('div');
-        el.className        = 'enemy';
-        el.style.width      = child.size + 'px';
-        el.style.height     = child.size + 'px';
-        el.style.left       = (parent.x + ox) + 'px';
-        el.style.top        = (parent.y + oy) + 'px';
-        el.style.backgroundImage = `url(${childDef.sprite})`;
-        el.style.backgroundSize  = 'cover';
-        el.style.imageRendering  = 'pixelated';
+      const el = document.createElement('div');
+      el.className        = 'enemy';
+      el.style.width      = child.size + 'px';
+      el.style.height     = child.size + 'px';
+      el.style.left       = sx + 'px';
+      el.style.top        = sy + 'px';
+      el.style.backgroundImage = `url(${childDef.sprite})`;
+      el.style.backgroundSize  = 'cover';
+      el.style.imageRendering  = 'pixelated';
 
-        const rotMap = { down: 0, left: 90, up: 180, right: 270 };
-        el.style.transform = `translate(-50%,-50%) rotate(${rotMap[parent.dir]}deg)`;
+      const rotMap = { down: 0, left: 90, up: 180, right: 270 };
+      el.style.transform = `translate(-50%,-50%) rotate(${rotMap[parent.dir]}deg)`;
 
-        const hpWrap = document.createElement('div');
-        hpWrap.className = 'enemy-hp-wrap';
-        const hpFill = document.createElement('div');
-        hpFill.className   = 'enemy-hp-fill';
-        hpFill.style.width = '100%';
-        hpWrap.appendChild(hpFill);
-        el.appendChild(hpWrap);
+      const hpWrap = document.createElement('div');
+      hpWrap.className = 'enemy-hp-wrap';
+      const hpFill = document.createElement('div');
+      hpFill.className   = 'enemy-hp-fill';
+      hpFill.style.width = '100%';
+      hpWrap.appendChild(hpFill);
+      el.appendChild(hpWrap);
 
-        arena.appendChild(el);
-        child.el     = el;
-        child.hpFill = hpFill;
-        enemies.push(child);
-      }, i * 80);
+      arena.appendChild(el);
+      child.el     = el;
+      child.hpFill = hpFill;
+      enemies.push(child);
     }
   },
 });

@@ -6,24 +6,32 @@ MapRegistry.register({
   theme: 'dungeon',
   icon:  '🪨',
   background: 'assets/maps/map02_dungeon/background_01.png',
-  stressTarget: 28,
-speedIncreasePerLevel: 0.12,
- enemyPool: {
-    ravager:     { fromWave: 1, weight: 8 },
-    slime_large: { fromWave: 2, weight: 3 },
-    golem:       { fromWave: 6, weight: 2 },
+
+  stressTarget: 29,
+  stressRampPerWave: 1.8,
+  speedIncreasePerLevel: 0.04,
+  killsBase: 6,
+  killsScaling: 1.12,
+  minEnemiesAlive: 2,
+
+  enemyPool: {
+    ravager:     { fromWave: 1, weight: 7 },
+    slime_large: { fromWave: 1, weight: 5 },
+    golem:       { fromWave: 3, weight: 3 },
   },
 
- boss: {
-    name:          'The Stone Warden',
-    desc:          'The dungeon trembles under his steps',
-    icon:          '🗿',
+  boss: {
+    name:           'Slime Flood',
+    desc:           'The dungeon oozes from every wall',
+    icon:           '🟢',
     enemyPool: {
-      golem: { weight: 10 },
+      slime_large: { weight: 10 },
     },
-    killsToAdvance:  15,
-    speedMult:       1.3,
-    maxEnemies:      4,
+    killsToAdvance:  50,
+    speedMult:       0.8,
+    spawnIntervalMs: 450,
+    maxEnemies:      8,
+    stressTarget:    80,
   },
-  unlocksAbility: 'slow_field',
+  unlocksAbility: null,
 });

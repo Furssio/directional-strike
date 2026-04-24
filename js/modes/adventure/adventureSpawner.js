@@ -16,45 +16,64 @@
    ═══════════════════════════════════════ */
 
 // ultimo nemico spawnato per direzione — null = direzione libera
-const dirGateEnemy = { up: null, down: null, left: null, right: null };
+const dirGateEnemies = { up: [], down: [], left: [], right: [] };
 
 function resetAdventureSpawner() {
-  dirGateEnemy.up    = null;
-  dirGateEnemy.down  = null;
-  dirGateEnemy.left  = null;
-  dirGateEnemy.right = null;
+  dirGateEnemies.up    = [];
+  dirGateEnemies.down  = [];
+  dirGateEnemies.left  = [];
+  dirGateEnemies.right = [];
+  _advLastDirs = [];
 }
 
-/* ── IS DIR FREE ────────────────────────
-   Direzione libera se:
-   - nessun nemico registrato, oppure
-   - il nemico è morto, oppure
-   - il nemico ha superato la soglia
-─────────────────────────────────────── */
 function isDirFree(dir) {
-  const e = dirGateEnemy[dir];
-  if (!e) return true;
-  if (!e.isAlive()) { dirGateEnemy[dir] = null; return true; }
+  const list = dirGateEnemies[dir];
 
+  // clean dead enemies
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (!list[i].isAlive()) list.splice(i, 1);
+  }
+
+  // max 2 enemies per direction
+  if (list.length >= 2) return false;
+
+  // if no enemies on this line, it's free
+  if (list.length === 0) return true;
+
+  // 1 enemy on line — allow second only if first has passed the gate
   const { w, h } = getArenaSize();
   const cx       = w / 2;
   const cy       = h / 2;
-  const gate = Math.min(w, h) * 0.40;
-  const dist     = e.distToCenter(cx, cy);
+  const gate     = Math.min(w, h) * 0.40;
+  const dist     = list[0].distToCenter(cx, cy);
 
-  if (dist <= gate) { dirGateEnemy[dir] = null; return true; }
-  return false;
+  return dist <= gate;
 }
-
 /* ── PICK DIR ───────────────────────────
    Sceglie una direzione libera casuale.
    Se nessuna è libera, non spawna.
 ─────────────────────────────────────── */
+let _advLastDirs = [];
+
+function resetAdventureSpawnerHistory() {
+  _advLastDirs = [];
+}
+
 function pickDirAdventure() {
   const dirs = ['up', 'down', 'left', 'right'];
   const free = dirs.filter(d => isDirFree(d));
   if (free.length === 0) return null;
-  return free[Math.floor(Math.random() * free.length)];
+
+  // avoid repeating last 2 directions
+  let candidates = free.filter(d => !_advLastDirs.includes(d));
+  if (candidates.length === 0) candidates = free;
+
+  const pick = candidates[Math.floor(Math.random() * candidates.length)];
+
+  _advLastDirs.push(pick);
+  if (_advLastDirs.length > 2) _advLastDirs.shift();
+
+  return pick;
 }
 
 /* ── BUILD ENEMY POOL ───────────────────
@@ -94,15 +113,37 @@ function spawnGroupForMap(state, wave, map, isBoss) {
 
   if (enemies.length >= maxEnemies) return;
 
+  // don't spawn if potential kills from alive enemies cover remaining kills
+  const killsNeeded = AdventureDirector.getKillsNeeded();
+  const killsLeft = killsNeeded - AdventureDirector.getKills();
+  let potentialKills = 0;
+  for (const e of enemies) {
+    if (e.def.onDeath) potentialKills += 3;
+    else potentialKills += 1;
+  }
+  if (potentialKills >= killsLeft) return;
+
   const dir = pickDirAdventure();
   if (!dir) return;
 
-  const enemyName = pool[Math.floor(Math.random() * pool.length)];
+  // count enemies of each type on this direction
+  const typeCounts = {};
+  for (const e of enemies) {
+    if (e.dir === dir) {
+      typeCounts[e.name] = (typeCounts[e.name] || 0) + 1;
+    }
+  }
+
+  // filter pool: max 2 of same type per direction
+  const filtered = pool.filter(name => (typeCounts[name] || 0) < 2);
+  if (filtered.length === 0) return;
+
+  const enemyName = filtered[Math.floor(Math.random() * filtered.length)];
   const def       = EnemyRegistry.get(enemyName);
   if (!def) return;
 
-  spawnEnemyDirected(def, dir);
+ spawnEnemyDirected(def, dir);
 
-  // registra l'ultimo nemico spawnato da questa direzione
-  dirGateEnemy[dir] = enemies[enemies.length - 1];
+  // registra il nemico spawnato in questa direzione
+  dirGateEnemies[dir].push(enemies[enemies.length - 1]);
 }

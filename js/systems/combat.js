@@ -106,14 +106,17 @@ function handleDir(dir) {
     }
 
     // ── PARRY TORNADOES (parryable enemies) ──
+    // ── PARRY TORNADOES (parryable enemies) ──
     for (let i = enemies.length - 1; i >= 0; i--) {
-      const e = enemies[i];
-      if (!e.def.parryable || e.dir !== d) continue;
+        const e  = enemies[i];
+        if (!e.def.parryable) continue;
+        if (e.dir !== d) continue;
+        if (e.underground) continue;
 
-      const dx   = e.x - cx;
-      const dy   = e.y - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > attackRange) continue;
+        const dx   = e.x - cx;
+        const dy   = e.y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > attackRange) continue;
 
       anyHit = true;
       SFX.hit();
@@ -132,7 +135,7 @@ function handleDir(dir) {
         const dx   = e.x - cx;
         const dy   = e.y - cy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > attackRange) continue;
+        if (!player.slashActive && dist > attackRange) continue;
 
         anyHit = true;
         SFX.hit();

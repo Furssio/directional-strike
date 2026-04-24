@@ -78,6 +78,7 @@ class Player {
 
   getHitDamage() {
     if (this.oneHitActive) return 99999;
+    if (this.slashActive) return Math.round(PLAYER_STATS.maxHp * 1.0);
     return Math.round(PLAYER_STATS.maxHp * CONFIG.base.hitDamagePct * this.damageMult);
   }
   resetCombo() {

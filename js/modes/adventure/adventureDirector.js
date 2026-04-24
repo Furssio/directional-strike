@@ -45,7 +45,8 @@ const AdventureDirector = (() => {
 
       _lastSpawnDir = null;
       _spawnHistory = [];
-      _pendingBurst = null;
+      _pendingBurst   = null;
+      this._minSpawnCooldown = 0;
 
       resetAdventureSpawner();
       setArenaBackground(currentMap.background || null);
@@ -153,12 +154,39 @@ const AdventureDirector = (() => {
 
       
 
-      // standard spawn cycle
-      const state = this._getStateForCurrentWave();
-      spawnTimer -= dt;
-     if (spawnTimer <= 0) {
-        spawnGroupForMap(state, wave, currentMap, isBoss);
-        spawnTimer = this._getSpawnIntervalForCurrentWave(state);
+      
+      // minimum enemies guarantee — never empty screen
+      if (isBoss) {
+        // boss wave — raw spawn, no gate system
+        spawnTimer -= dt * player.speedMultiplier;
+        if (spawnTimer <= 0) {
+          this._spawnBossWave();
+          spawnTimer = boss.spawnIntervalMs || 400;
+        }
+     } else {
+        // minimum enemies guarantee — never empty screen
+        const minAlive = currentMap.minEnemiesAlive || 2;
+        let spawned = false;
+
+        if (enemies.length < minAlive) {
+          if (!this._minSpawnCooldown || this._minSpawnCooldown <= 0) {
+            spawnGroupForMap('fast', wave, currentMap, isBoss);
+            this._minSpawnCooldown = 600;
+            spawnTimer = this._getSpawnIntervalForCurrentWave('normal');
+            spawned = true;
+          } else {
+            this._minSpawnCooldown -= dt;
+          }
+        }
+
+        // standard spawn cycle — skip if min just spawned
+        if (!spawned) {
+          spawnTimer -= dt;
+          if (spawnTimer <= 0) {
+            spawnGroupForMap(this._getStateForCurrentWave(), wave, currentMap, isBoss);
+            spawnTimer = this._getSpawnIntervalForCurrentWave(this._getStateForCurrentWave());
+          }
+        }
       }
 
       
@@ -184,6 +212,47 @@ const AdventureDirector = (() => {
 
     _bossConfig() {
       return currentMap && currentMap.boss ? currentMap.boss : null;
+    },
+    _spawnBossWave() {
+      const boss = this._bossConfig();
+      if (!boss) return;
+
+      const killsNeeded = boss.killsToAdvance || 50;
+    const killsLeft = killsNeeded - killsThisWave;
+      if (killsLeft <= 0) return;
+
+      let potentialKills = 0;
+      for (const e of enemies) {
+        if (e.def.onDeath) potentialKills += 3;
+        else potentialKills += 1;
+      }
+
+     if (potentialKills >= killsLeft) return;
+
+      const cap = boss.maxEnemies || 8;
+      if (enemies.length >= cap) return;
+
+      // build pool
+      const pool = [];
+      for (const [name, cfg] of Object.entries(boss.enemyPool)) {
+        for (let i = 0; i < cfg.weight; i++) pool.push(name);
+      }
+      if (pool.length === 0) return;
+
+      // pick random direction — no gate, just avoid last used
+      const dirs = ['up', 'down', 'left', 'right'];
+      let candidates = dirs;
+      if (this._lastBossDir) {
+        candidates = dirs.filter(d => d !== this._lastBossDir);
+      }
+      const dir = candidates[Math.floor(Math.random() * candidates.length)];
+      this._lastBossDir = dir;
+
+      const enemyName = pool[Math.floor(Math.random() * pool.length)];
+      const def = EnemyRegistry.get(enemyName);
+      if (!def) return;
+
+      spawnEnemyDirected(def, dir);
     },
 
     _spawnBossPattern(boss) {
@@ -271,7 +340,10 @@ const AdventureDirector = (() => {
       if (this.isBoss() && boss && boss.stressTarget !== undefined) {
         return boss.stressTarget;
       }
-      return currentMap.stressTarget;
+      // gradual stress increase per wave
+      const base = currentMap.stressTarget;
+      const ramp = currentMap.stressRampPerWave || 1.5;
+      return Math.round(base + (wave - 1) * ramp);
     },
 
     isBoss()   { return wave === CONFIG.adventure.wavesPerMap; },
@@ -282,9 +354,11 @@ const AdventureDirector = (() => {
       if (this.isBoss() && boss && boss.killsToAdvance !== undefined) {
         return boss.killsToAdvance;
       }
+      if (currentMap && currentMap.killsBase) {
+        return Math.round(currentMap.killsBase * Math.pow(currentMap.killsScaling || 1.18, wave - 1));
+      }
       return killsToAdvance(wave);
     },
-
     getCurrentMap() { return currentMap; },
     isCompleted()   { return completed; },
     isBossPaused()  { return bossPaused; },

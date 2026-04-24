@@ -42,7 +42,14 @@ let speedMult = 1 + (ActiveDirector.getWave() - 1) * _speedIncrease;
     }
   }
 
-  const sMult = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
+  let sMult = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
+
+  // 40% chance for random speed variation
+  if (Math.random() < 0.40) {
+    const boosts = [1.25, 1.30, 1.35, 1.40, 1.50];
+    sMult *= boosts[Math.floor(Math.random() * boosts.length)];
+  }
+
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);
 
   if (player.specialActive) {
