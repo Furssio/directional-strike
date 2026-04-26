@@ -8,7 +8,7 @@
 EnemyRegistry.register({
   id:        'slime_lava',
   sprite:    'assets/enemies/slime_lava/idle.png',
-  size:      44,
+  size:      66,
   hpPct:     0.80,
   damagePct: 0.30,
   speedMult: 0.48,
@@ -85,7 +85,7 @@ EnemyRegistry.register({
 EnemyRegistry.register({
   id:        'slime_lava_small',
   sprite:    'assets/enemies/slime_lava/idle.png',
-  size:      30,
+  size:      45,
   hpPct:     0.45,
   damagePct: 0.18,
   speedMult: 0.42,

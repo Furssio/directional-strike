@@ -28,11 +28,16 @@ function spawnEnemyDirected(def, dir) {
   if (dir === 'left' || dir === 'right') y += (Math.random() - 0.5) * spread;
 
 const _map = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
-const _speedIncrease = (_map && _map.speedIncreasePerLevel)
-  ? _map.speedIncreasePerLevel
-  : CONFIG.difficulty.speedIncreasePerLevel;
+const _wave = ActiveDirector.getWave();
+const _isIntro = _map && _map.introWaves && _map.introWaves[_wave];
 
-let speedMult = 1 + (ActiveDirector.getWave() - 1) * _speedIncrease;
+let speedMult = 1;
+if (!_isIntro) {
+  const _speedIncrease = (_map && _map.speedIncreasePerLevel)
+    ? _map.speedIncreasePerLevel
+    : CONFIG.difficulty.speedIncreasePerLevel;
+  speedMult = 1 + (_wave - 1) * _speedIncrease;
+}
 
   // adventure mode boss can apply an extra speed multiplier
   if (typeof ActiveDirector.isBoss === 'function' && ActiveDirector.isBoss()) {
@@ -42,12 +47,21 @@ let speedMult = 1 + (ActiveDirector.getWave() - 1) * _speedIncrease;
     }
   }
 
-  let sMult = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
+ let sMult = Math.min(CONFIG.difficulty.maxSpeedMult, speedMult);
+
+  // per-map speed override for specific enemy types
+  const _mapOverrides = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
+  if (_mapOverrides && _mapOverrides.speedOverrides && _mapOverrides.speedOverrides[def.id]) {
+    sMult *= (_mapOverrides.speedOverrides[def.id] / def.speedMult);
+  }
+
+  
 
   // 40% chance for random speed variation
-  if (Math.random() < 0.40) {
-    const boosts = [1.25, 1.30, 1.35, 1.40, 1.50];
-    sMult *= boosts[Math.floor(Math.random() * boosts.length)];
+  const _svChance = (_map && _map.speedVariationChance !== undefined) ? _map.speedVariationChance : 0.40;
+  const _svBoosts = (_map && _map.speedVariationBoosts) ? _map.speedVariationBoosts : [1.25, 1.30, 1.35, 1.40, 1.50];
+  if (_svChance > 0 && Math.random() < _svChance) {
+    sMult *= _svBoosts[Math.floor(Math.random() * _svBoosts.length)];
   }
 
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);

@@ -8,10 +8,10 @@
 EnemyRegistry.register({
   id:        'wolf',
   sprite:    'assets/enemies/wolf/idle.png',
-  size:      42,
+  size:      63,
   hpPct:     0.65,
   damagePct: 0.30,
-  speedMult: 1.4,
+  speedMult: 1.10,
   points:    30,
   shoots:    false,
 
@@ -61,9 +61,9 @@ EnemyRegistry.register({
     e.speed = 0;
   },
 
-  calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 22;
-    if (distToCenter <= 160) return 12;
-    return 5;
+ calcStress(distToCenter) {
+    if (distToCenter <= 80)  return 12;
+    if (distToCenter <= 160) return 6;
+    return 2;
   },
 });

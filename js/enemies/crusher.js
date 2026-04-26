@@ -7,7 +7,7 @@ EnemyRegistry.register({
   id:              'crusher',
   emoji:           '👾',
   sprite: 'assets/enemies/crusher/idle.png',
-  size:            60,
+  size:            72,
   hpPct:           0.65,
   damagePct:       0.34,
   speedMult:       0.60,

@@ -80,6 +80,11 @@ function pickDirAdventure() {
    Returns enemy types for current wave.
 ─────────────────────────────────────── */
 function buildEnemyPoolForMap(wave, map, isBoss) {
+  // intro waves override — tutorial with specific enemies
+  if (!isBoss && map.introWaves && map.introWaves[wave]) {
+    return map.introWaves[wave].pool.slice();
+  }
+
   const poolSrc = (isBoss && map.boss && map.boss.enemyPool)
     ? map.boss.enemyPool
     : map.enemyPool;
@@ -107,23 +112,56 @@ function spawnGroupForMap(state, wave, map, isBoss) {
 
   const boss = (isBoss && map.boss) ? map.boss : null;
 
+  // intro waves: low cap for calm pacing
+  const isIntro = !isBoss && map.introWaves && map.introWaves[wave];
+
   const maxEnemies = (boss && boss.maxEnemies !== undefined)
     ? boss.maxEnemies
-    : Math.min(d.maxEnemiesCap, Math.floor(d.maxEnemiesBase + wave * d.maxEnemiesPerWave));
+    : isIntro
+      ? 3
+      : (map.maxEnemies !== undefined)
+        ? map.maxEnemies
+        : Math.min(d.maxEnemiesCap, Math.floor(d.maxEnemiesBase + wave * d.maxEnemiesPerWave));
 
   if (enemies.length >= maxEnemies) return;
 
-  // don't spawn if potential kills from alive enemies cover remaining kills
-  const killsNeeded = AdventureDirector.getKillsNeeded();
-  const killsLeft = killsNeeded - AdventureDirector.getKills();
-  let potentialKills = 0;
-  for (const e of enemies) {
-    if (e.def.onDeath) potentialKills += 3;
-    else potentialKills += 1;
+  // don't overspawn near end of wave — only check in last few waves
+  if (wave >= 12) {
+    const killsNeeded = AdventureDirector.getKillsNeeded();
+    const killsLeft = killsNeeded - AdventureDirector.getKills();
+    let potentialKills = 0;
+    for (const e of enemies) {
+      if (e.def.onDeath) potentialKills += 3;
+      else potentialKills += 1;
+    }
+    if (potentialKills >= killsLeft) return;
   }
-  if (potentialKills >= killsLeft) return;
 
-  const dir = pickDirAdventure();
+  // try gate-respecting direction first
+  let dir = pickDirAdventure();
+
+  // FALLBACK: if all dirs are gate-blocked and field is nearly empty,
+  // force a random free direction ignoring the gate threshold
+  // FALLBACK: if all dirs are gate-blocked and field is nearly empty,
+  // force a random free direction ignoring the gate threshold
+  if (!dir && enemies.length < (map.minEnemiesAlive || 2)) {
+    const dirs = ['up', 'down', 'left', 'right'];
+    // pick any direction that has < 2 alive enemies (ignore gate distance)
+    const fallback = dirs.filter(d => {
+      const list = dirGateEnemies[d];
+      let alive = 0;
+      for (const e of list) { if (e.isAlive()) alive++; }
+      return alive < 2;
+    });
+    if (fallback.length > 0) {
+      // anti-ripetizione: evita ultime 2 dir usate anche nel fallback
+      let fbCandidates = fallback.filter(d => !_advLastDirs.includes(d));
+      if (fbCandidates.length === 0) fbCandidates = fallback;
+      dir = fbCandidates[Math.floor(Math.random() * fbCandidates.length)];
+      _advLastDirs.push(dir);
+      if (_advLastDirs.length > 2) _advLastDirs.shift();
+    }
+  }
   if (!dir) return;
 
   // count enemies of each type on this direction
@@ -134,15 +172,29 @@ function spawnGroupForMap(state, wave, map, isBoss) {
     }
   }
 
-  // filter pool: max 2 of same type per direction
+ // filter pool: max 2 of same type per direction
   const filtered = pool.filter(name => (typeCounts[name] || 0) < 2);
   if (filtered.length === 0) return;
 
-  const enemyName = filtered[Math.floor(Math.random() * filtered.length)];
+  // filter by maxInField — limit total alive per type
+  let finalPool = filtered;
+  if (map.maxInField) {
+    const fieldCounts = {};
+    for (const e of enemies) {
+      fieldCounts[e.name] = (fieldCounts[e.name] || 0) + 1;
+    }
+    finalPool = filtered.filter(name => {
+      const cap = map.maxInField[name];
+      if (cap === undefined) return true;
+      return (fieldCounts[name] || 0) < cap;
+    });
+    if (finalPool.length === 0) return;
+  }
+ const enemyName = finalPool[Math.floor(Math.random() * finalPool.length)];
   const def       = EnemyRegistry.get(enemyName);
   if (!def) return;
 
- spawnEnemyDirected(def, dir);
+  spawnEnemyDirected(def, dir);
 
   // registra il nemico spawnato in questa direzione
   dirGateEnemies[dir].push(enemies[enemies.length - 1]);

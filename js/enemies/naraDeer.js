@@ -8,10 +8,10 @@
 EnemyRegistry.register({
   id:        'nara_deer',
   sprite:    'assets/enemies/nara_deer/idle.png',
-  size:      46,
+  size:      69,
   hpPct:     0.30,
   damagePct: 0.25,
-  speedMult: 0.85,
+  speedMult: 0.75,
   points:    20,
   shoots:    false,
   noHpBar:   true,
@@ -23,7 +23,7 @@ EnemyRegistry.register({
       e._fadeDir     = 0;
       e._switchCount = 0;
       e._switched    = false;
-      e._initCooldown = 800;
+      e._initCooldown = 800;  // ms before first flicker
     }
 
     if (e._initCooldown > 0) {
@@ -35,7 +35,8 @@ EnemyRegistry.register({
     if (e._fadeDir === 0) e._fadeDir = -1;
 
     const fadeSpeed = 0.0018;
-    e._fadePhase += e._fadeDir * fadeSpeed * 16 * player.speedMultiplier;
+    const speedRatio = e.speed / (CONFIG.base.enemyBaseSpeed * 0.85); // 0.85 = nara base speedMult
+    e._fadePhase += e._fadeDir * fadeSpeed * 16 * player.speedMultiplier * Math.max(1, speedRatio);
 
     if (e._fadePhase <= 0) {
       e._fadePhase = 0;

@@ -8,7 +8,7 @@
 EnemyRegistry.register({
   id:        'oni',
   sprite:    'assets/enemies/oni/idle.png',
-  size:      52,
+  size:      78,
   hpPct:     2.10,
   damagePct: 0.40,
   speedMult: 0.60,

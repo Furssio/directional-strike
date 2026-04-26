@@ -10,7 +10,7 @@ EnemyRegistry.register({
   id:          'slime_large',
   emoji:       '🟢',
   sprite: 'assets/enemies/slime/idle.png',
-  size:        48,
+  size:        72,
   hpPct:       0.80,
   damagePct:   0.30,
   contactHits: 1,

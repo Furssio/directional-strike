@@ -8,8 +8,8 @@
 EnemyRegistry.register({
   id:        'bear',
   sprite:    'assets/enemies/bear/idle.png',
-  size:      60,
-  hpPct:     2.10,
+  size:      72,
+  hpPct:     1.50,
   damagePct: 1.50,
   speedMult: 0.50,
   points:    50,
@@ -51,9 +51,9 @@ EnemyRegistry.register({
     }
   },
 
-  calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 35;
-    if (distToCenter <= 160) return 20;
-    return 10;
+ calcStress(distToCenter) {
+    if (distToCenter <= 80)  return 10;
+    if (distToCenter <= 160) return 5;
+    return 2;
   },
 });

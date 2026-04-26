@@ -8,7 +8,7 @@
 EnemyRegistry.register({
   id:        'turtle',
   sprite:    'assets/enemies/turtle/shell.png',
-  size:      44,
+  size:      66,
   hpPct:     2.10,
   damagePct: 0.30,
   speedMult: 2.0,

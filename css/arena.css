@@ -10,10 +10,14 @@
 }
 #player{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:80px;height:80px;border-radius:50%;
+  width:96px;height:96px;border-radius:0;
   background:transparent;border:none;
   display:flex;align-items:center;justify-content:center;
   font-size:28px;z-index:10;
+}
+@keyframes playerIdle{
+  from{background-position-x:0;}
+  to{background-position-x:-1152px;}
 }
 #player.special-active{border:2.5px solid #FFD700;background:rgba(42,34,0,0.5);}
 #special-ring{
@@ -24,7 +28,7 @@
 #special-ring.active{transform:translate(-50%,-50%) scale(1);opacity:0.6;}
 #attack-range{
   position:absolute;top:50%;left:50%;border-radius:50%;
-  border:1.5px dashed rgba(226,75,74,0.5);background:rgba(226,75,74,0.06);
+  border:3px solid rgba(226,75,74,0.7);background:rgba(226,75,74,0.08);
   transform:translate(-50%,-50%);pointer-events:none;z-index:4;
 }
 #flash{position:absolute;inset:0;border-radius:12px;background:rgba(226,75,74,0.22);opacity:0;pointer-events:none;z-index:20;}

@@ -9,7 +9,7 @@
 EnemyRegistry.register({
   id:        'crab',
   sprite:    'assets/enemies/crab/idle.png',
-  size:      34,
+  size:      41,
   hpPct:     0.01,
   damagePct: 0.18,
   speedMult: 1.4,
@@ -93,7 +93,7 @@ EnemyRegistry.register({
 EnemyRegistry.register({
   id:        'crab_small',
   sprite:    'assets/enemies/crab/idle.png',
-  size:      24,
+  size:      29,
   hpPct:     0.30,
   damagePct: 0.15,
   speedMult: 0.90,

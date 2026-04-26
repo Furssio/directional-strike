@@ -8,7 +8,7 @@
 EnemyRegistry.register({
   id:        'golem_lava',
   sprite:    'assets/enemies/golem_lava/idle.png',
-  size:      56,
+  size:      84,
   hpPct:     0.65,
   damagePct: 0.34,
   speedMult: 0.44,
@@ -88,7 +88,7 @@ EnemyRegistry.register({
 EnemyRegistry.register({
   id:        'golem_lava_small',
   sprite:    'assets/enemies/golem_lava/idle.png',
-  size:      38,
+  size:      57,
   hpPct:     0.30,
   damagePct: 0.25,
   speedMult: 0.55,

@@ -7,7 +7,7 @@
 EnemyRegistry.register({
   id:        'star',
   sprite:    'assets/enemies/star/idle.png',
-  size:      28,
+  size:      42,
   hpPct:     0.01,
   damagePct: 0.22,
   speedMult: 2.4,

@@ -1,17 +1,17 @@
 EnemyRegistry.register({
   id:        'scorpion',
   sprite:    'assets/enemies/scorpion/idle.png',
-  size:      32,
+  size:      48,
   hpPct:     0.30,
   damagePct: 0.15,
-  speedMult: 1.8,
+  speedMult: 1.00,
   points:    20,
   shoots:    false,
   noHpBar:   true,
 
   // while underground: not visible, not hittable
   underground:      true,
-  undergroundSpeed:  0.4,   // multiplier while underground (slow)
+  undergroundSpeed:  0.7,   // multiplier while underground (slow)
 
   onContact(player) {
     // poison: 5% hp per second for 3 seconds
@@ -45,8 +45,8 @@ EnemyRegistry.register({
   },
 
   calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 20;
-    if (distToCenter <= 160) return 10;
-    return 4;
+    if (distToCenter <= 80)  return 12;
+    if (distToCenter <= 160) return 6;
+    return 2;
   },
 });

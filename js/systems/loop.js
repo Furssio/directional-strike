@@ -31,9 +31,11 @@ function startGame() {
   levelEl.textContent = 'wave 1';
 
   playerEl.textContent   = '';
-  playerEl.style.backgroundImage = 'url(assets/characters/player.png)';
-  playerEl.style.backgroundSize  = 'cover';
+  playerEl.style.backgroundImage = 'url(assets/characters/player_idle.png)';
+  playerEl.style.backgroundSize  = '1152px 96px';
+  playerEl.style.backgroundRepeat = 'no-repeat';
   playerEl.style.imageRendering  = 'pixelated';
+  playerEl.style.animation       = 'playerIdle 1.2s steps(12) infinite';
   playerEl.className     = '';
   specialRing.className  = '';
   specialWrap.classList.remove('ready');

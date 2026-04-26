@@ -7,10 +7,10 @@
 EnemyRegistry.register({
   id:        'tornado',
   sprite:    'assets/enemies/tornado/idle.png',
-  size:      44,
+  size:      66,
   hpPct:     0.01,
   damagePct: 0.28,
-  speedMult: 2.2,
+  speedMult: 1.6,
   points:    15,
   shoots:    false,
   noHpBar:   true,

@@ -9,10 +9,10 @@
 EnemyRegistry.register({
   id:        'spectral_deer',
   sprite:    'assets/enemies/spectral_deer/idle.png',
-  size:      50,
+  size:      75,
   hpPct:     0.30,
   damagePct: 0.25,
-  speedMult: 1.00,
+  speedMult: 0.85,
   points:    20,
   shoots:    false,
   noHpBar:   true,
@@ -36,8 +36,9 @@ EnemyRegistry.register({
 
     if (e._fadeDir === 0) e._fadeDir = -1;
 
-    const fadeSpeed = 0.0018; // opacity change per ms (~0.03 per frame)
-    e._fadePhase += e._fadeDir * fadeSpeed * 16 * player.speedMultiplier;
+    const fadeSpeed = 0.0018;
+    const speedRatio = e.speed / (CONFIG.base.enemyBaseSpeed * 1.00); // 1.00 = base speedMult
+    e._fadePhase += e._fadeDir * fadeSpeed * 16 * player.speedMultiplier * Math.max(1, speedRatio);
 
     // clamp
     if (e._fadePhase <= 0) {
@@ -85,8 +86,8 @@ EnemyRegistry.register({
   },
 
   calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 15;
-    if (distToCenter <= 160) return 8;
-    return 3;
+    if (distToCenter <= 80)  return 6;
+    if (distToCenter <= 160) return 3;
+    return 1;
   },
 });

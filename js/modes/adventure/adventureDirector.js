@@ -71,7 +71,7 @@ const AdventureDirector = (() => {
     },
 
     nextWave() {
-      const maxWave = CONFIG.adventure.wavesPerMap;
+      const maxWave = this.getMaxWave();
       if (wave >= maxWave) {
         this.completeMap();
         return;
@@ -79,7 +79,8 @@ const AdventureDirector = (() => {
 
       wave++;
       killsThisWave = 0;
-
+      stress = 0;
+      resetAdventureSpawner();
       const isBoss = (wave === maxWave);
       if (isBoss) {
         this._startBossPause();
@@ -163,28 +164,33 @@ const AdventureDirector = (() => {
           this._spawnBossWave();
           spawnTimer = boss.spawnIntervalMs || 400;
         }
-     } else {
-        // minimum enemies guarantee — never empty screen
-        const minAlive = currentMap.minEnemiesAlive || 2;
-        let spawned = false;
+    } else {
+        const isIntro = currentMap.introWaves && currentMap.introWaves[wave];
 
-        if (enemies.length < minAlive) {
-          if (!this._minSpawnCooldown || this._minSpawnCooldown <= 0) {
-            spawnGroupForMap('fast', wave, currentMap, isBoss);
-            this._minSpawnCooldown = 600;
-            spawnTimer = this._getSpawnIntervalForCurrentWave('normal');
-            spawned = true;
-          } else {
-            this._minSpawnCooldown -= dt;
+        if (isIntro) {
+          // intro waves: fixed slow spawn, no stress, calm pacing
+          spawnTimer -= dt;
+          if (spawnTimer <= 0) {
+            spawnGroupForMap('normal', wave, currentMap, false);
+            spawnTimer = 1800;
           }
-        }
-
-        // standard spawn cycle — skip if min just spawned
-        if (!spawned) {
+        } else {
+          // standard spawn cycle — always ticking
           spawnTimer -= dt;
           if (spawnTimer <= 0) {
             spawnGroupForMap(this._getStateForCurrentWave(), wave, currentMap, isBoss);
             spawnTimer = this._getSpawnIntervalForCurrentWave(this._getStateForCurrentWave());
+          }
+
+          // minimum enemies guarantee — extra spawn if field too empty
+          const minAlive = currentMap.minEnemiesAlive || 2;
+          if (enemies.length < minAlive) {
+            if (!this._minSpawnCooldown || this._minSpawnCooldown <= 0) {
+              spawnGroupForMap('fast', wave, currentMap, isBoss);
+              this._minSpawnCooldown = 600;
+            } else {
+              this._minSpawnCooldown -= dt;
+            }
           }
         }
       }
@@ -331,7 +337,7 @@ const AdventureDirector = (() => {
     },
 
     getWave()        { return wave; },
-    getMaxWave()     { return CONFIG.adventure.wavesPerMap; },
+    getMaxWave()     { return (currentMap && currentMap.wavesPerMap) || CONFIG.adventure.wavesPerMap; },
     getStress()      { return Math.round(stress); },
 
     getTarget() {
@@ -340,13 +346,19 @@ const AdventureDirector = (() => {
       if (this.isBoss() && boss && boss.stressTarget !== undefined) {
         return boss.stressTarget;
       }
-      // gradual stress increase per wave
+      // intro waves: low fixed stress target
+      if (currentMap.introWaves && currentMap.introWaves[wave]) {
+        return 12;
+      }
+      // gradual stress increase — count only waves after intro
       const base = currentMap.stressTarget;
       const ramp = currentMap.stressRampPerWave || 1.5;
-      return Math.round(base + (wave - 1) * ramp);
+      const introCount = currentMap.introWaves ? Object.keys(currentMap.introWaves).length : 0;
+      const normalWave = wave - introCount;
+      return Math.round(base + Math.max(0, normalWave - 1) * ramp);
     },
 
-    isBoss()   { return wave === CONFIG.adventure.wavesPerMap; },
+    isBoss()   { return wave === this.getMaxWave(); },
     getKills() { return killsThisWave; },
 
     getKillsNeeded() {
@@ -354,8 +366,14 @@ const AdventureDirector = (() => {
       if (this.isBoss() && boss && boss.killsToAdvance !== undefined) {
         return boss.killsToAdvance;
       }
-      if (currentMap && currentMap.killsBase) {
-        return Math.round(currentMap.killsBase * Math.pow(currentMap.killsScaling || 1.18, wave - 1));
+      // intro waves have fixed kill count
+      if (currentMap && currentMap.introWaves && currentMap.introWaves[wave]) {
+        return currentMap.introWaves[wave].kills;
+      }
+     if (currentMap && currentMap.killsBase) {
+        const introCount = currentMap.introWaves ? Object.keys(currentMap.introWaves).length : 0;
+        const normalWave = Math.max(1, wave - introCount);
+        return Math.round(currentMap.killsBase * Math.pow(currentMap.killsScaling || 1.18, normalWave - 1));
       }
       return killsToAdvance(wave);
     },
