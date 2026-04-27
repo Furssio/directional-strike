@@ -86,6 +86,7 @@ function tick() {
   lastTick  = now;
 
   player.tickSpecial(dt);
+  updateProgress();
   // poison tick
   if (player.poisonEffects && player.poisonEffects.length > 0) {
     for (let i = player.poisonEffects.length - 1; i >= 0; i--) {

@@ -90,7 +90,8 @@ const Director = (() => {
     isBoss()         { return _isBossWave; },
     getKills()       { return killsThisWave; },
     getKillsNeeded() { return killsToAdvance(wave); },
-
+    getWaveTimeLeft() { return 0; },
+    getWaveDuration() { return 0; },
   };
 
 })();

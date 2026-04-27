@@ -62,9 +62,25 @@ function updateSpecialBar() {
 }
 
 function updateProgress() {
+  // adventure mode: timer bar (drains left to right)
+  if (ActiveDirector.getWaveDuration && ActiveDirector.getWaveDuration() > 0) {
+    const left = ActiveDirector.getWaveTimeLeft();
+    const total = ActiveDirector.getWaveDuration();
+    const pct = Math.max(0, left / total);
+    progressBar.style.width = Math.round(pct * 100) + '%';
+
+    // color: green > yellow > red as time runs out
+    if (pct > 0.5)      progressBar.style.background = '#44cc44';
+    else if (pct > 0.25) progressBar.style.background = '#ddaa22';
+    else                 progressBar.style.background = '#ee4444';
+    return;
+  }
+
+  // infinite mode: kills progress
   const needed = ActiveDirector.getKillsNeeded();
   const pct    = Math.min(ActiveDirector.getKills() / needed, 1);
   progressBar.style.width = Math.round(pct * 100) + '%';
+  progressBar.style.background = '#666';
 }
 
 function updateWaveDisplay(wave, isBoss) {

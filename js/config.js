@@ -197,9 +197,13 @@ const CONFIG = {
                     overridable per map in map.js
   ─────────────────────────────────────── */
  adventure: {
-    wavesPerMap:    15,    // last wave is always the boss wave
+    wavesPerMap:    10,    // last wave is always the boss wave
     stressTarget:   25,    // default, each map can override
     bossPauseMs:    3000,  // pause before boss wave starts
     bossAnnounceMs: 2200,  // how long the BOSS popup stays on screen
+    waveTimers: [0, 30, 30, 0, 35, 40, 0, 45, 50, 0, 60],
+    // index = wave number
+    // 0 = choice wave (no combat, handled separately)
+    // wave 10 = boss (60s but uses kills, not timer)
   },
 };

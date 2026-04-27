@@ -84,6 +84,12 @@ function activateSpecial() {
 
 function handleDir(dir) {
   if (!running || choosingAbility || isAttacking) return;
+
+  // upgrade choice — selecting with direction
+  if (typeof isChoosingUpgrade === 'function' && isChoosingUpgrade()) {
+    selectUpgrade(dir);
+    return;
+  }
   isAttacking = true;
   // cooldown will be set at the end of the function based on hit/miss
 

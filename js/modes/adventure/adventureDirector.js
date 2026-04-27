@@ -19,6 +19,8 @@ const AdventureDirector = (() => {
   let killsThisWave = 0;
   let active        = false;
   let completed     = false;
+  let waveTimeLeft  = 0;
+  let waveDuration  = 0;
   let bossPaused    = false;
   let bossPauseT    = 0;
   let _lastSpawnDir   = null;
@@ -42,6 +44,10 @@ const AdventureDirector = (() => {
       bossPaused    = false;
       bossPauseT    = 0;
       active        = true;
+      const timers = CONFIG.adventure.waveTimers;
+      const rawTimer = timers[1] !== undefined ? timers[1] : 30;
+      waveDuration = rawTimer * 1000;
+      waveTimeLeft = waveDuration;
 
       _lastSpawnDir = null;
       _spawnHistory = [];
@@ -49,6 +55,7 @@ const AdventureDirector = (() => {
       this._minSpawnCooldown = 0;
 
       resetAdventureSpawner();
+      if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
       setArenaBackground(currentMap.background || null);
       return true;
     },
@@ -65,8 +72,10 @@ const AdventureDirector = (() => {
     onKill() {
       stress = stressOnKill(stress);
       killsThisWave++;
-      if (killsThisWave >= this.getKillsNeeded()) {
-        this.nextWave();
+
+      // boss wave still uses kills to advance
+      if (this.isBoss() && killsThisWave >= this.getKillsNeeded()) {
+        this.completeMap();
       }
     },
 
@@ -77,10 +86,23 @@ const AdventureDirector = (() => {
         return;
       }
 
-      wave++;
+     wave++;
       killsThisWave = 0;
       stress = 0;
       resetAdventureSpawner();
+
+      // set timer for new wave
+      const timers = CONFIG.adventure.waveTimers;
+      const rawTimer = timers[wave] !== undefined ? timers[wave] : 45;
+      waveDuration = rawTimer * 1000;
+      waveTimeLeft = waveDuration;
+      // choice wave (timer = 0 means upgrade choice)
+      if (waveDuration === 0) {
+        active = false; // pause game
+        if (typeof startUpgradeChoice === 'function') startUpgradeChoice();
+        if (typeof updateWaveDisplay === 'function') updateWaveDisplay(wave, false);
+        return;
+      }
       const isBoss = (wave === maxWave);
       if (isBoss) {
         this._startBossPause();
@@ -141,7 +163,20 @@ const AdventureDirector = (() => {
         }
         return;
       }
-
+// wave timer countdown (not for boss wave)
+      if (!this.isBoss()) {
+        waveTimeLeft -= dt;
+        if (waveTimeLeft <= 0) {
+          waveTimeLeft = 0;
+          // clear remaining enemies
+          enemies.forEach(e => { if (e.el) e.el.remove(); });
+          enemies.length = 0;
+          bullets.forEach(b => { if (b.el) b.el.remove(); });
+          bullets.length = 0;
+          this.nextWave();
+          return;
+        }
+      }
       const { w, h } = getArenaSize();
       const cx = w / 2;
       const cy = h / 2;
@@ -380,7 +415,12 @@ const AdventureDirector = (() => {
     getCurrentMap() { return currentMap; },
     isCompleted()   { return completed; },
     isBossPaused()  { return bossPaused; },
-
+    getWaveTimeLeft() { return waveTimeLeft; },
+    getWaveDuration() { return waveDuration; },
+    resumeAfterChoice() {
+      active = true;
+      this.nextWave();
+    },
     restart() {
       if (!currentMap) return false;
       return this.init(currentMap.id);
