@@ -34,6 +34,7 @@ function registerKill(e) {
 
   showScorePop(e.x, e.y, pts);
   scoreEl.textContent = player.score;
+  onComboKill(e.x, e.y, pts);
   updateComboDisplay();
   updateSpecialBar();
   updateProgress();
@@ -49,7 +50,8 @@ function activateSpecial() {
 
   playerEl.classList.add('special-active');
   specialRing.classList.add('active');
-  specialWrap.classList.remove('ready');
+  const barSpecialEl = document.getElementById('bar-special');
+  if (barSpecialEl) barSpecialEl.classList.remove('bar-ready');
 
   player.ability.onActivate(enemies);
 }

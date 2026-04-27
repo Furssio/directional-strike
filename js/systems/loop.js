@@ -36,9 +36,11 @@ function startGame() {
   playerEl.style.backgroundRepeat = 'no-repeat';
   playerEl.style.imageRendering  = 'pixelated';
   playerEl.style.animation       = 'playerIdle 1.2s steps(12) infinite';
-  playerEl.className     = '';
+ playerEl.className     = '';
   specialRing.className  = '';
-  specialWrap.classList.remove('ready');
+  const _barSpecial = document.getElementById('bar-special');
+  if (_barSpecial) _barSpecial.classList.remove('bar-ready');
+  playerEl.classList.remove('special-ready');
 
   showScreen(sGame);
   setTimeout(updateRangeCircle, 50);

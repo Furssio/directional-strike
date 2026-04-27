@@ -24,3 +24,26 @@
 
 @keyframes btnSpecialPulse{from{box-shadow:0 0 4px #FFD70066;}to{box-shadow:0 0 14px #FFD700cc;}}
 @keyframes specialPulse{from{box-shadow:0 0 4px #FFD70066;}to{box-shadow:0 0 12px #FFD700aa;}}
+/* ── PIXEL BAR ANIMATIONS ── */
+@keyframes hpPulse{
+  from{filter:brightness(1);}
+  to{filter:brightness(1.3);}
+}
+@keyframes specialGlow{
+  from{filter:brightness(1);box-shadow:inset 0 0 4px rgba(100,150,255,0.3);}
+  to{filter:brightness(1.4);box-shadow:inset 0 0 8px rgba(100,150,255,0.6);}
+}
+@keyframes healPulse{
+  0%{filter:brightness(1);}
+  30%{filter:brightness(2.5) saturate(0.5);}
+  100%{filter:brightness(1);}
+}
+@keyframes playerGlow{
+  from{filter:drop-shadow(0 0 4px rgba(80,120,255,0.4));}
+  to{filter:drop-shadow(0 0 12px rgba(80,120,255,0.8)) drop-shadow(0 0 20px rgba(80,120,255,0.3));}
+}
+@keyframes scoreBurst{
+  0%{opacity:1;transform:translate(-50%,0) scale(1);}
+  50%{transform:translate(-50%,-15px) scale(1.3);}
+  100%{opacity:0;transform:translate(-50%,-35px) scale(0.8);}
+}

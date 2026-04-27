@@ -32,10 +32,11 @@ function updateMenuBest() {
 
 function showScorePop(x, y, pts) {
   const pop = document.createElement('div');
-  pop.className   = 'score-pop';
+  const inCombo = player && player.combo >= CONFIG.combo.minKills;
+  pop.className = 'score-pop' + (inCombo ? ' combo-pop' : '');
   pop.textContent = '+' + pts;
   pop.style.left  = x + 'px';
   pop.style.top   = (y - 10) + 'px';
   arena.appendChild(pop);
-  setTimeout(() => pop.remove(), 750);
+  setTimeout(() => pop.remove(), 850);
 }

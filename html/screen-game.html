@@ -5,10 +5,7 @@
       <div id="combo-display"></div>
       <div id="level-display">wave 1</div>
     </div>
-    <div id="player-hp-wrap"><div id="player-hp-bar" style="width:100%"></div></div>
     <div id="combo-timer-wrap"><div id="combo-timer-bar"></div></div>
-    <div id="special-label">special 0%</div>
-    <div id="special-wrap"><div id="special-bar"></div></div>
     <div id="progress-wrap"><div id="progress-bar"></div></div>
   </div>
   <div id="arena">
@@ -17,5 +14,31 @@
     <div id="level-up-pop"></div>
     <div id="boss-announce" class="hidden"></div>
     <div id="special-ring"></div>
+
+    <!-- ── PIXEL BARS (attached, above player) ── -->
+    <div id="player-bars">
+      <div id="bar-hp" class="pixel-bar">
+        <div class="pixel-bar-border">
+          <div class="pixel-bar-bg">
+            <div id="player-hp-bar" class="pixel-bar-fill hp-fill"></div>
+            <div class="pixel-bar-shine"></div>
+          </div>
+        </div>
+        <div class="pixel-bar-icon">❤️</div>
+      </div>
+      <div id="bar-special" class="pixel-bar">
+        <div class="pixel-bar-border">
+          <div class="pixel-bar-bg">
+            <div id="special-bar" class="pixel-bar-fill special-fill"></div>
+            <div class="pixel-bar-shine"></div>
+          </div>
+        </div>
+        <div class="pixel-bar-icon" id="special-icon">⚡</div>
+      </div>
+    </div>
+
+    
+
     <div id="player">🧑</div>
   </div>
+</div>
