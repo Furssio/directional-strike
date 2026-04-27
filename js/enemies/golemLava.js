@@ -12,7 +12,7 @@ EnemyRegistry.register({
   hpPct:     0.65,
   damagePct: 0.34,
   speedMult: 0.44,
-  points:    15,
+  points:    1476,
   shoots:    false,
 
   onDeath(parent) {
@@ -92,7 +92,7 @@ EnemyRegistry.register({
   hpPct:     0.30,
   damagePct: 0.25,
   speedMult: 0.55,
-  points:    8,
+  points:    800,
   shoots:    false,
 
   calcStress(distToCenter) {

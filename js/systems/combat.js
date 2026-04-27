@@ -7,7 +7,31 @@
    Depends on: state.js, dom.js, config.js,
                audio.js, hud.js, juice.js
    ═══════════════════════════════════════ */
+function showSlashEffect(dir) {
+  const { w, h } = getArenaSize();
+  const cx = w / 2;
+  const cy = h / 2;
 
+  const el = document.createElement('div');
+  el.className = 'slash-effect';
+
+  // offset from center based on direction
+  const dist = 89;
+  let x = cx, y = cy;
+  let rot = 0;
+
+  if (dir === 'right') { x += dist; rot = 0; }
+  if (dir === 'left')  { x -= dist; rot = 180; }
+  if (dir === 'up')    { y -= dist; rot = -90; }
+  if (dir === 'down')  { y += dist; rot = 90; }
+
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  el.style.transform = `translate(-50%,-50%) rotate(${rot}deg)`;
+
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 260);
+}
 /* ── KILL ── */
 
 // sostituisci registerKill con questa versione
@@ -81,6 +105,7 @@ function handleDir(dir) {
     if (!dirs.includes(opp)) dirs.push(opp);
   }
 
+  showSlashEffect(dir);
   let anyHit = false;
 
  for (const d of dirs) {

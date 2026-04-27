@@ -1,3 +1,4 @@
+
 /* ═══════════════════════════════════════
    HUD.JS
    Pixel bar system — HP and Special bars
@@ -69,7 +70,6 @@ function updateProgress() {
 function updateWaveDisplay(wave, isBoss) {
   levelEl.textContent = isBoss ? 'BOSS' : 'wave ' + wave;
 
-  // wave color: 1-4 green, 5-8 yellow, 9-10 red
   if (wave <= 4)      levelEl.style.color = '#44cc44';
   else if (wave <= 8) levelEl.style.color = '#ddaa22';
   else                levelEl.style.color = '#ee4444';
@@ -84,73 +84,106 @@ function updateWaveDisplay(wave, isBoss) {
   lvlPop.style.opacity = '1';
   setTimeout(() => lvlPop.style.opacity = '0', 1200);
 }
-let _comboScore = 0;
+
+/* ── COMBO FLOAT SYSTEM ── */
+
 let _comboKills = 0;
-let _activeComboFloat = null;
+let _comboTarget = 0;
+let _comboAnimating = false;
+let _comboFadeTimer = null;
+let _comboEl = null;
 
 function getComboColor(kills) {
-  if (kills >= 20) return 'c-rainbow';
-  if (kills >= 15) return 'c-purple';
-  if (kills >= 11) return 'c-red';
-  if (kills >= 8)  return 'c-orange';
-  if (kills >= 5)  return 'c-yellow';
-  if (kills >= 3)  return 'c-blue';
+  if (kills >= 50) return 'c-rainbow';
+  if (kills >= 40) return 'c-purple';
+  if (kills >= 30) return 'c-red';
+  if (kills >= 20) return 'c-orange';
+  if (kills >= 12) return 'c-yellow';
+  if (kills >= 6)  return 'c-blue';
   return 'c-white';
 }
 
 function getComboTier(kills) {
-  if (kills >= 20) return 't7';
-  if (kills >= 15) return 't6';
-  if (kills >= 11) return 't5';
-  if (kills >= 8)  return 't4';
-  if (kills >= 5)  return 't3';
-  if (kills >= 3)  return 't2';
+  if (kills >= 50) return 't7';
+  if (kills >= 40) return 't6';
+  if (kills >= 30) return 't5';
+  if (kills >= 20) return 't4';
+  if (kills >= 12) return 't3';
+  if (kills >= 6)  return 't2';
   return '';
 }
 
-function spawnComboFloat(x, y, pts, mult, kills) {
-  // remove previous float
-  if (_activeComboFloat && _activeComboFloat.parentNode) {
-    _activeComboFloat.remove();
+function _getComboEl() {
+  if (_comboEl) return _comboEl;
+  _comboEl = document.createElement('div');
+  _comboEl.className = 'combo-float';
+  _comboEl.innerHTML =
+    '<div class="combo-float-pts"></div>' +
+    '<div class="combo-float-mult"></div>';
+  arena.appendChild(_comboEl);
+  return _comboEl;
+}
+
+function _animateComboCounter(from, to, el, duration) {
+  const start = performance.now();
+  _comboAnimating = true;
+
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    const current = Math.round(from + (to - from) * ease);
+    el.textContent = current.toLocaleString();
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      _comboAnimating = false;
+    }
   }
-
-  const el = document.createElement('div');
-  const colorClass = getComboColor(kills);
-  const tierClass  = getComboTier(kills);
-  el.className = 'combo-float ' + colorClass;
-
-  // diagonal offset — slightly to the right and up
-  const offsetX = 15 + Math.random() * 10;
-  const offsetY = -10;
-
-  el.style.left = (x + offsetX) + 'px';
-  el.style.top  = (y + offsetY) + 'px';
-
-  el.innerHTML =
-    '<div class="combo-float-pts ' + tierClass + '">' + pts + '</div>' +
-    '<div class="combo-float-mult">x' + mult.toFixed(1) + '</div>';
-
-  arena.appendChild(el);
-  _activeComboFloat = el;
-
-  setTimeout(() => {
-    if (el.parentNode) el.remove();
-    if (_activeComboFloat === el) _activeComboFloat = null;
-  }, 1800);
+  requestAnimationFrame(step);
 }
 
 function onComboKill(x, y, pts) {
   if (player.combo < CONFIG.combo.minKills) {
-    _comboScore = 0;
     _comboKills = 0;
+    _comboTarget = 0;
     return;
   }
 
   _comboKills++;
-  _comboScore += pts;
+  const oldTarget = _comboTarget;
+  _comboTarget += pts;
   const mult = player.getComboMult();
 
-  spawnComboFloat(x, y, _comboScore, mult, _comboKills);
+  const el = _getComboEl();
+  const ptsEl = el.querySelector('.combo-float-pts');
+  const multEl = el.querySelector('.combo-float-mult');
+
+  const colorClass = getComboColor(_comboKills);
+  const tierClass = getComboTier(_comboKills);
+  el.className = 'combo-float visible ' + colorClass;
+  ptsEl.className = 'combo-float-pts ' + tierClass;
+  multEl.textContent = 'x' + mult.toFixed(1);
+
+  _animateComboCounter(oldTarget, _comboTarget, ptsEl, 400);
+
+  clearTimeout(_comboFadeTimer);
+  _comboFadeTimer = setTimeout(() => {
+    el.classList.remove('visible');
+    el.classList.add('fading');
+    setTimeout(() => {
+      el.classList.remove('fading');
+    }, 600);
+  }, 2000);
+}
+
+function resetComboFloat() {
+  _comboKills = 0;
+  _comboTarget = 0;
+  if (_comboEl) {
+    _comboEl.classList.remove('visible');
+    _comboEl.classList.remove('fading');
+  }
+  clearTimeout(_comboFadeTimer);
 }
 
 function updateComboDisplay() {
@@ -167,10 +200,7 @@ function updateComboDisplay() {
   } else {
     comboEl.style.opacity        = '0';
     comboTimerWrap.style.opacity = '0';
-
-    // combo ended — reset
-    _comboScore = 0;
-    _comboKills = 0;
+    resetComboFloat();
   }
 }
 

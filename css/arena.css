@@ -125,15 +125,15 @@
   transform:translate(-50%,-50%);pointer-events:none;z-index:4;
 }
 #flash{position:absolute;inset:0;border-radius:12px;background:rgba(226,75,74,0.22);opacity:0;pointer-events:none;z-index:20;}
-#level-up-pop{position:absolute;top:35%;left:50%;transform:translateX(-50%);font-size:10px;color:#FFD700;opacity:0;pointer-events:none;z-index:25;white-space:nowrap;transition:opacity 0.15s;text-shadow:0 0 8px rgba(255,215,0,0.5),2px 2px 0 #000;}
-.score-pop{position:absolute;font-size:10px;pointer-events:none;z-index:26;color:#FFD700;text-shadow:0 0 4px rgba(255,215,0,0.5),1px 1px 0 #000;animation:scoreBurst 0.8s ease-out forwards;}
-.score-pop.combo-pop{font-size:13px;color:#ff6644;text-shadow:0 0 8px rgba(255,100,60,0.6),1px 1px 0 #000;}
+#level-up-pop{position:absolute;top:22%;left:50%;transform:translateX(-50%);font-size:18px;color:#FFD700;opacity:0;pointer-events:none;z-index:25;white-space:nowrap;transition:opacity 0.15s;text-shadow:0 0 12px rgba(255,215,0,0.6),3px 3px 0 #000;}
+.score-pop{position:absolute;font-size:8px;pointer-events:none;z-index:26;text-shadow:0 0 4px rgba(255,255,255,0.4),1px 1px 0 #000;animation:scoreBurst 0.8s ease-out forwards;}
+.score-pop.combo-pop{font-size:9px;text-shadow:0 0 6px rgba(255,255,255,0.5),1px 1px 0 #000;}
 .particle{position:absolute;border-radius:50%;pointer-events:none;z-index:30;transform:translate(-50%,-50%);}
 .enemy{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;}
 .enemy.slowed{filter:hue-rotate(180deg) brightness(0.8);}
 .enemy-hp-wrap{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:80%;height:3px;background:rgba(0,0,0,0.4);border-radius:2px;}
 .enemy-hp-fill{height:100%;background:#D85A30;border-radius:2px;transition:width 0.1s;}
-.bullet{position:absolute;width:10px;height:10px;border-radius:50%;background:transparent;transform:translate(-50%,-50%);z-index:7;}
+.bullet{position:absolute;width:22px;height:22px;border-radius:50%;background:transparent;transform:translate(-50%,-50%);z-index:7;}
 #boss-announce{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.7);background:rgba(20,0,0,0.92);border:2px solid #E24B4A;border-radius:12px;padding:18px 28px;text-align:center;z-index:50;pointer-events:none;opacity:0;transition:opacity 0.35s ease-out,transform 0.35s ease-out;min-width:220px;}
 #boss-announce.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
 #boss-announce.hidden{display:none;}
@@ -174,12 +174,17 @@
 /* ── COMBO FLOATING COUNTER ── */
 .combo-float{
   position:absolute;
+  left:27%;top:35%;
   z-index:28;pointer-events:none;
-  text-align:center;
-  animation:comboFloat 1.8s ease-out forwards;
+  text-align:left;
+  transform:rotate(-15deg);
+  transform-origin:center center;
+  opacity:0;transition:opacity 0.2s;
 }
+.combo-float.visible{opacity:1;}
+.combo-float.fading{opacity:0;transition:opacity 0.6s;}
 .combo-float-pts{
-  font-size:16px;
+  font-size:11px;
   color:#fff;
   text-shadow:2px 2px 0 #000,0 0 6px rgba(255,255,255,0.4);
   animation:comboTremble 0.08s linear infinite;
@@ -191,12 +196,12 @@
   margin-top:1px;
 }
 /* size tiers — grows with combo */
-.combo-float-pts.t2{font-size:19px;}
-.combo-float-pts.t3{font-size:22px;}
-.combo-float-pts.t4{font-size:25px;}
-.combo-float-pts.t5{font-size:28px;}
-.combo-float-pts.t6{font-size:32px;}
-.combo-float-pts.t7{font-size:36px;}
+.combo-float-pts.t2{font-size:12px;}
+.combo-float-pts.t3{font-size:13px;}
+.combo-float-pts.t4{font-size:14px;}
+.combo-float-pts.t5{font-size:15px;}
+.combo-float-pts.t6{font-size:16px;}
+.combo-float-pts.t7{font-size:17px;}
 
 /* color tiers */
 .combo-float.c-white .combo-float-pts{color:#fff;text-shadow:2px 2px 0 #000,0 0 6px rgba(255,255,255,0.4);}
@@ -210,17 +215,11 @@
   text-shadow:2px 2px 0 #000,0 0 16px rgba(255,255,255,0.6);
 }
 
-@keyframes comboFloat{
-  0%{opacity:1;transform:translate(-50%,0);}
-  70%{opacity:1;}
-  100%{opacity:0;transform:translate(-50%,-50px);}
-}
+
 @keyframes comboTremble{
   0%{transform:translate(0,0);}
-  25%{transform:translate(-1px,1px);}
-  50%{transform:translate(1px,-1px);}
-  75%{transform:translate(-1px,-1px);}
-  100%{transform:translate(1px,0);}
+  50%{transform:translate(0.5px,-0.5px);}
+  100%{transform:translate(-0.5px,0);}
 }
 @keyframes rainbowCycle{
   0%{color:#ff2222;}
@@ -230,4 +229,27 @@
   66%{color:#44aaff;}
   83%{color:#cc44ff;}
   100%{color:#ff2222;}
+}
+/* ── SLASH EFFECT ── */
+.slash-effect{
+  position:absolute;
+  width:64px;height:47px;
+  background-image:url('../assets/effects/slash.png');
+  background-size:192px 141px;
+  image-rendering:pixelated;
+  pointer-events:none;
+  z-index:15;
+  animation:slashAnim 0.25s steps(1) forwards;
+}
+@keyframes slashAnim{
+  0%   {background-position:0 0;}
+  11%  {background-position:-64px 0;}
+  22%  {background-position:-128px 0;}
+  33%  {background-position:0 -47px;}
+  44%  {background-position:-64px -47px;}
+  55%  {background-position:-128px -47px;}
+  66%  {background-position:0 -94px;}
+  77%  {background-position:-64px -94px;}
+  88%  {background-position:-128px -94px;}
+  100% {opacity:0;}
 }

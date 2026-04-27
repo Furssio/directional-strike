@@ -10,7 +10,7 @@ EnemyRegistry.register({
   size:      78,
   hpPct:     1.00,
   speedMult: 0.60,
-  points:    40,
+  points:    2500,
   shoots:    false,
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 35;

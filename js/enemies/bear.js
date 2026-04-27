@@ -11,7 +11,7 @@ EnemyRegistry.register({
   size:      72,
   hpPct:     1.50,
   damagePct: 1.50,
-  speedMult: 0.50,
+  speedMult: 4538,
   points:    50,
   shoots:    false,
 

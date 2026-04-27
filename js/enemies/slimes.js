@@ -15,7 +15,7 @@ EnemyRegistry.register({
   damagePct:   0.30,
   contactHits: 1,
   speedMult:   0.48,
-  points:      8,
+  points:      855,
   shoots:      false,
   wobble:      { frequency: 1.8, amplitude: 18 },
   calcStress(distToCenter) {
@@ -81,7 +81,7 @@ EnemyRegistry.register({
   damagePct:   0.18,
   contactHits: 1,
   speedMult:   0.42,
-  points:      3,
+  points:      300,
   shoots:      false,
   wobble:      { frequency: 2.8, amplitude: 10 },
   calcStress(distToCenter) {

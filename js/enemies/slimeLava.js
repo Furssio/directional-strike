@@ -12,7 +12,7 @@ EnemyRegistry.register({
   hpPct:     0.80,
   damagePct: 0.30,
   speedMult: 0.48,
-  points:    8,
+  points:    799,
   shoots:    false,
   wobble:    { frequency: 1.8, amplitude: 18 },
 
@@ -118,7 +118,7 @@ function _spawnLavaSpit(enemy) {
     hpPct:     0.01,
     damagePct: 0.20,
     speedMult: 2.5,
-    points:    5,
+    points:    500,
     shoots:    false,
     noHpBar:   true,
     parryable: true,

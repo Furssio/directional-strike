@@ -11,7 +11,7 @@ EnemyRegistry.register({
   hpPct:     0.30,
   damagePct: 0.34,
   speedMult: 1.3,
-  points:    10,
+  points:    899,
   shoots:    false,
   calcStress(distToCenter) {
     return 0; // handled as group in calculator

@@ -5,7 +5,7 @@ EnemyRegistry.register({
   hpPct:     0.30,
   damagePct: 0.15,
   speedMult: 1.00,
-  points:    20,
+  points:    799,
   shoots:    false,
   noHpBar:   true,
 
