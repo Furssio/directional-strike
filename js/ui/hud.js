@@ -258,3 +258,37 @@ function updateRangeCircle() {
   rangeEl.style.borderColor = `rgba(${hexToRgb(player.color)}, 0.5)`;
   rangeEl.style.background  = `rgba(${hexToRgb(player.color)}, 0.05)`;
 }
+/* ── ACTION POP (MISS, PARRY, DOUBLE KILL etc.) ── */
+
+function showActionPop(dir, text, color) {
+  const { w, h } = getArenaSize();
+  const cx = w / 2;
+  const cy = h / 2;
+
+  // position based on direction
+  const dist = 70;
+  let x = cx, y = cy;
+  if (dir === 'up')    y -= dist;
+  if (dir === 'down')  y += dist;
+  if (dir === 'left')  x -= dist;
+  if (dir === 'right') x += dist;
+
+  const pop = document.createElement('div');
+  pop.className = 'action-pop';
+  pop.textContent = text;
+  pop.style.left  = x + 'px';
+  pop.style.top   = y + 'px';
+  pop.style.color = color;
+  arena.appendChild(pop);
+  setTimeout(() => pop.remove(), 800);
+}
+
+/* ── COMBO BUMP EFFECT ── */
+
+function triggerComboBump() {
+  const el = _getComboEl();
+  el.classList.remove('combo-bump');
+  void el.offsetWidth;
+  el.classList.add('combo-bump');
+  setTimeout(() => el.classList.remove('combo-bump'), 400);
+}

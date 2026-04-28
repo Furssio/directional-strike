@@ -7,6 +7,7 @@
    Depends on: state.js, dom.js, config.js,
                audio.js, hud.js, juice.js
    ═══════════════════════════════════════ */
+
 function showSlashEffect(dir) {
   const { w, h } = getArenaSize();
   const cx = w / 2;
@@ -15,7 +16,6 @@ function showSlashEffect(dir) {
   const el = document.createElement('div');
   el.className = 'slash-effect';
 
-  // offset from center based on direction
   const dist = 89;
   let x = cx, y = cy;
   let rot = 0;
@@ -32,11 +32,10 @@ function showSlashEffect(dir) {
   arena.appendChild(el);
   setTimeout(() => el.remove(), 260);
 }
+
 /* ── KILL ── */
 
-// sostituisci registerKill con questa versione
-
-function registerKill(e) {
+function registerKill(e, multiKill) {
 
   if (e.def.onDeath) {
     e.def.onDeath(e);
@@ -48,8 +47,9 @@ function registerKill(e) {
 
   SFX.kill();
 
-  const mult = player.getComboMult();
-  const pts  = Math.round(e.points * mult);
+  const mkMult = multiKill && multiKill >= 2 ? multiKill : 1;
+  const mult   = player.getComboMult() * mkMult;
+  const pts    = Math.round(e.points * mult);
 
   player.score += pts;
   player.kills += 1;
@@ -91,7 +91,6 @@ function handleDir(dir) {
     return;
   }
   isAttacking = true;
-  // cooldown will be set at the end of the function based on hit/miss
 
   const hitDmg      = player.getHitDamage();
   const { w, h }    = getArenaSize();
@@ -116,18 +115,12 @@ function handleDir(dir) {
 
   // check orb collection
   if (typeof OrbSystem !== 'undefined') {
-    const { w, h }    = getArenaSize();
-    const arenaSize   = Math.min(w, h);
-    const attackRange = player.getAttackRange(arenaSize);
-    OrbSystem.checkCollect(dir, attackRange);
+    if (OrbSystem.checkCollect(dir, attackRange)) anyHit = true;
   }
 
- for (const d of dirs) {
+  for (const d of dirs) {
 
-    /* ── PARRY BULLETS ──
-       Destroy any bullet coming from direction d
-       within attack range. Each directional strike
-       can intercept incoming bullets. */
+    /* ── PARRY BULLETS ── */
     for (let bi = bullets.length - 1; bi >= 0; bi--) {
       const b = bullets[bi];
       if (!b.owner || b.owner.dir !== d) continue;
@@ -137,37 +130,40 @@ function handleDir(dir) {
       const bdist = Math.sqrt(bdx * bdx + bdy * bdy);
       if (bdist > attackRange) continue;
 
-      // hit!
       anyHit = true;
       SFX.hit();
       spawnParticles(b.x, b.y, '#378ADD', false);
+      showActionPop(d, 'PARRY', '#44ddff');
       b.el.remove();
       if (b.owner) b.owner.hasBullet = false;
       bullets.splice(bi, 1);
     }
 
-    // ── PARRY TORNADOES (parryable enemies) ──
-    // ── PARRY TORNADOES (parryable enemies) ──
+    /* ── PARRY TORNADOES (parryable enemies) ── */
     for (let i = enemies.length - 1; i >= 0; i--) {
-        const e  = enemies[i];
-        if (!e.def.parryable) continue;
-        if (e.dir !== d) continue;
-        if (e.underground) continue;
+      const e  = enemies[i];
+      if (!e.def.parryable) continue;
+      if (e.dir !== d) continue;
+      if (e.underground) continue;
 
-        const dx   = e.x - cx;
-        const dy   = e.y - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > attackRange) continue;
+      const dx   = e.x - cx;
+      const dy   = e.y - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > attackRange) continue;
 
       anyHit = true;
       SFX.hit();
       spawnParticles(e.x, e.y, '#aaaaff', false);
+      showActionPop(d, 'PARRY', '#44ddff');
       e.el.remove();
       enemies.splice(i, 1);
       registerKill(e);
     }
 
-   if (isPiercing) {
+    /* ── HIT ENEMIES ── */
+    if (isPiercing) {
+      let _killsThisSwing = 0;
+
       for (let i = enemies.length - 1; i >= 0; i--) {
         const e  = enemies[i];
         if (e.dir !== d) continue;
@@ -187,14 +183,26 @@ function handleDir(dir) {
         if (e.def.onHit && e.isAlive()) e.def.onHit(e);
 
         if (!e.isAlive()) {
+          _killsThisSwing++;
           spawnParticles(e.x, e.y, player.color, e.isElite);
           e.el.remove();
           enemies.splice(i, 1);
-          registerKill(e);
+          registerKill(e, _killsThisSwing);
         }
       }
 
-    }  else {
+      if (_killsThisSwing >= 2) {
+        const labels = { 2: 'DOUBLE KILL', 3: 'TRIPLE KILL', 4: 'MEGA KILL' };
+        const label  = labels[_killsThisSwing] || 'ULTRA KILL';
+        const colors = { 2: '#ffdd44', 3: '#ff8844', 4: '#ff44ff' };
+        const color  = colors[_killsThisSwing] || '#ff44ff';
+        showActionPop(d, label, color);
+        triggerComboBump();
+      }
+
+    } else {
+      let _killsThisSwing = 0;
+
       for (let i = enemies.length - 1; i >= 0; i--) {
         const e  = enemies[i];
         if (e.dir !== d) continue;
@@ -218,16 +226,31 @@ function handleDir(dir) {
         }
 
         if (!e.isAlive()) {
+          _killsThisSwing++;
           spawnParticles(e.x, e.y, player.color, e.isElite);
           e.el.remove();
           enemies.splice(i, 1);
-          registerKill(e);
+          registerKill(e, _killsThisSwing);
         }
+      }
+
+      if (_killsThisSwing >= 2) {
+        const labels = { 2: 'DOUBLE KILL', 3: 'TRIPLE KILL', 4: 'MEGA KILL' };
+        const label  = labels[_killsThisSwing] || 'ULTRA KILL';
+        const colors = { 2: '#ffdd44', 3: '#ff8844', 4: '#ff44ff' };
+        const color  = colors[_killsThisSwing] || '#ff44ff';
+        showActionPop(d, label, color);
+        triggerComboBump();
       }
     }
   }
 
-  if (!anyHit) SFX.miss();
+  if (!anyHit) {
+    SFX.miss();
+    showActionPop(dir, 'MISS', '#ff4444');
+    player.resetCombo();
+    updateComboDisplay();
+  }
 
   // dynamic cooldown: shorter on hit, longer on miss
   const cd = anyHit

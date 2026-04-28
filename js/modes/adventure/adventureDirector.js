@@ -26,6 +26,8 @@ const AdventureDirector = (() => {
   let waveElapsed   = 0;
   let bossPaused    = false;
   let bossPauseT    = 0;
+  let draining      = false;
+  let drainPauseMs  = 0;
 
   /* ── INPUT TRACKER ──────────────────
      Counts player actions to detect idle.
@@ -196,6 +198,8 @@ const AdventureDirector = (() => {
       bossPaused    = false;
       bossPauseT    = 0;
       waveElapsed   = 0;
+      draining      = false;
+      drainPauseMs  = 0;
       active        = true;
       _inputTimes   = [];
       _burstQueue   = [];
@@ -245,6 +249,8 @@ const AdventureDirector = (() => {
       killsThisWave = 0;
       waveElapsed   = 0;
       spawnTimer    = 0;
+      draining      = false;
+      drainPauseMs  = 0;
       resetAdventureSpawner();
 
       // set timer for new wave
@@ -332,19 +338,27 @@ const AdventureDirector = (() => {
 
 // tick orb system
       if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
-      
+
       // wave timer countdown (not for boss)
       if (!isBoss) {
+        if (draining) {
+          // waiting for remaining enemies to die
+          if (enemies.length === 0 && bullets.length === 0) {
+            drainPauseMs -= dt;
+            if (drainPauseMs <= 0) {
+              draining = false;
+              this.nextWave();
+            }
+          }
+          return; // no spawning during drain
+        }
+
         waveElapsed  += dt;
         waveTimeLeft -= dt;
         if (waveTimeLeft <= 0) {
           waveTimeLeft = 0;
-          // clear remaining enemies
-          enemies.forEach(e => { if (e.el) e.el.remove(); });
-          enemies.length = 0;
-          bullets.forEach(b => { if (b.el) b.el.remove(); });
-          bullets.length = 0;
-          this.nextWave();
+          draining     = true;
+          drainPauseMs = 500; // half second pause after clearing
           return;
         }
       }

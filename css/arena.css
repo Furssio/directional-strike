@@ -271,6 +271,43 @@
 .upgrade-option-desc{font-size:6px;color:#aaa;line-height:1.6;}
 .upgrade-option-cost{font-size:5px;color:#ff8866;margin-top:2px;}
 
+/* ── UPGRADE CHOICE — IMPROVED ── */
+#upgrade-choice.active {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+#upgrade-choice .upgrade-option {
+  animation: upgradeSlideIn 0.4s ease-out both;
+}
+
+@keyframes upgradeSlideIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes upgradeTitleIn {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.upgrade-chosen {
+  animation: upgradeChosen 0.3s ease-out forwards !important;
+}
+
+@keyframes upgradeChosen {
+  0%   { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+  50%  { transform: translate(-50%, -50%) scale(1.15); filter: brightness(1.5); }
+  100% { transform: translate(-50%, -50%) scale(1.05); filter: brightness(1.2); }
+}
+
+.key-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: #ffffff;
+  margin-top: 6px;
+  text-shadow: 1px 1px 0 #000;
+  opacity: 0.8;
+}
 /* positions */
 .upgrade-option.dir-up{top:8%;left:50%;transform:translateX(-50%);}
 .upgrade-option.dir-down{bottom:8%;left:50%;transform:translateX(-50%);}

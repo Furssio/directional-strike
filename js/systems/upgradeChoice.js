@@ -1,8 +1,9 @@
 /* ═══════════════════════════════════════
    UPGRADECHOICE.JS
-   Handles the upgrade choice screen at
-   waves 3, 6, 9. Player picks by attacking
-   in a direction.
+   Upgrade choice screen at waves 3, 6, 9.
+   Player picks by attacking in a direction.
+   Animated entrance + 3-2-1 countdown
+   before next wave starts.
 
    Used by: adventureDirector.js, combat.js
    Depends on: dom.js, state.js
@@ -26,6 +27,7 @@ const UPGRADE_POOL = [
 let _choosingUpgrade = false;
 let _currentChoices = [null, null, null, null]; // up, down, left, right
 let _usedUpgrades = [];
+let _countdownActive = false;
 
 function isChoosingUpgrade() {
   return _choosingUpgrade;
@@ -38,12 +40,10 @@ function startUpgradeChoice() {
   const available = UPGRADE_POOL.filter(u => !_usedUpgrades.includes(u.id));
   const shuffled = available.sort(() => Math.random() - 0.5);
   const picks = shuffled.slice(0, 4);
-
-  // pad if less than 4 available (shouldn't happen with 12 pool and 3 choices)
   while (picks.length < 4) picks.push(UPGRADE_POOL[Math.floor(Math.random() * UPGRADE_POOL.length)]);
 
   const dirs = ['up', 'down', 'left', 'right'];
-  const arrows = { up: '↑', down: '↓', left: '←', right: '→' };
+  const keyHints = { up: '↑', down: '↓', left: '←', right: '→' };
 
   for (let i = 0; i < 4; i++) {
     _currentChoices[i] = picks[i];
@@ -53,14 +53,37 @@ function startUpgradeChoice() {
       '<div class="upgrade-option-name">' + picks[i].name + '</div>' +
       '<div class="upgrade-option-desc">' + picks[i].desc + '</div>' +
       '<div class="upgrade-option-cost">' + picks[i].cost + '</div>' +
-      '<div class="key-hint">' + arrows[dirs[i]] + '</div>';
+      '<div class="key-hint">' + keyHints[dirs[i]] + '</div>';
+    el.style.animationDelay = (i * 100) + 'ms';
   }
 
-  document.getElementById('upgrade-choice').classList.add('active');
+  // show overlay with title
+  const overlay = document.getElementById('upgrade-choice');
+  overlay.classList.add('active');
+
+  // show wave complete + choose title
+  let titleEl = document.getElementById('upgrade-title');
+  if (!titleEl) {
+    titleEl = document.createElement('div');
+    titleEl.id = 'upgrade-title';
+    titleEl.style.cssText =
+      'position:absolute;top:12%;left:50%;transform:translateX(-50%);' +
+      'text-align:center;z-index:60;pointer-events:none;' +
+      'font-family:"Press Start 2P",monospace;';
+    overlay.appendChild(titleEl);
+  }
+  const waveNum = AdventureDirector.getWave();
+  titleEl.innerHTML =
+    '<div style="font-size:16px;color:#44ff66;margin-bottom:8px;' +
+    'text-shadow:2px 2px 0 #000;">WAVE ' + waveNum + ' COMPLETE</div>' +
+    '<div style="font-size:10px;color:#ffffff;' +
+    'text-shadow:1px 1px 0 #000;">CHOOSE YOUR UPGRADE</div>';
+  titleEl.style.opacity = '0';
+  titleEl.style.animation = 'upgradeTitleIn 0.5s ease-out forwards';
 }
 
 function selectUpgrade(dir) {
-  if (!_choosingUpgrade) return false;
+  if (!_choosingUpgrade || _countdownActive) return false;
 
   const dirIndex = { up: 0, down: 1, left: 2, right: 3 };
   const choice = _currentChoices[dirIndex[dir]];
@@ -70,20 +93,80 @@ function selectUpgrade(dir) {
   choice.apply(player);
   _usedUpgrades.push(choice.id);
 
-  // hide overlay
-  document.getElementById('upgrade-choice').classList.remove('active');
+  SFX.abilityPick();
+
+  // highlight chosen, fade others
+  const dirs = ['up', 'down', 'left', 'right'];
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('upgrade-' + dirs[i]);
+    if (dirs[i] === dir) {
+      el.classList.add('upgrade-chosen');
+    } else {
+      el.style.opacity = '0.2';
+    }
+  }
+
+  // start countdown
+  _countdownActive = true;
   _choosingUpgrade = false;
 
-  // resume game — advance to next wave
-  AdventureDirector.resumeAfterChoice();
+  _showCountdown(3, () => {
+    // hide overlay
+    document.getElementById('upgrade-choice').classList.remove('active');
+    const titleEl = document.getElementById('upgrade-title');
+    if (titleEl) titleEl.style.animation = '';
 
-  SFX.abilityPick();
+    // reset styles
+    for (let i = 0; i < 4; i++) {
+      const el = document.getElementById('upgrade-' + dirs[i]);
+      el.classList.remove('upgrade-chosen');
+      el.style.opacity = '';
+      el.style.animationDelay = '';
+    }
+
+    _countdownActive = false;
+    AdventureDirector.resumeAfterChoice();
+  });
+
   return true;
+}
+
+function _showCountdown(from, callback) {
+  let countEl = document.getElementById('countdown-display');
+  if (!countEl) {
+    countEl = document.createElement('div');
+    countEl.id = 'countdown-display';
+    countEl.style.cssText =
+      'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
+      'font-family:"Press Start 2P",monospace;font-size:32px;color:#ffffff;' +
+      'text-shadow:3px 3px 0 #000;z-index:70;pointer-events:none;';
+    arena.appendChild(countEl);
+  }
+
+  let count = from;
+  const delayMs = 280; // fast countdown, not real seconds
+
+  function showNext() {
+    if (count <= 0) {
+      countEl.style.display = 'none';
+      callback();
+      return;
+    }
+    countEl.style.display = 'block';
+    countEl.textContent = count;
+    countEl.style.animation = 'none';
+    void countEl.offsetWidth;
+    countEl.style.animation = 'countdownPop ' + delayMs + 'ms ease-out forwards';
+    count--;
+    setTimeout(showNext, delayMs);
+  }
+  showNext();
 }
 
 function resetUpgradeChoices() {
   _usedUpgrades = [];
   _currentChoices = [null, null, null, null];
   _choosingUpgrade = false;
+  _countdownActive = false;
   document.getElementById('upgrade-choice').classList.remove('active');
 }

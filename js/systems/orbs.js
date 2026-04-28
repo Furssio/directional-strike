@@ -125,24 +125,27 @@ const OrbSystem = (() => {
     }
 
     // apply effect
-    if (orb.type === 'heal') {
+   if (orb.type === 'heal') {
       const healAmt = Math.round(player.maxHp * HEAL_PERCENT);
       player.hp = Math.min(player.maxHp, player.hp + healAmt);
       updateHpBar();
       _showPlayerEffect('heal');
       SFX.specialReady();
+      _showOrbLabel('HEAL +' + Math.round(HEAL_PERCENT * 100) + '%', '#44ff66');
     }
 
     if (orb.type === 'attack') {
       _attackBuffMs = ATTACK_DURATION;
       _showPlayerEffect('attack');
       SFX.special();
+      _showOrbLabel('ATK BOOST x2', '#ff4444');
     }
 
     if (orb.type === 'defense') {
       _defenseBuffMs = DEFENSE_DURATION;
       _showPlayerEffect('defense');
       SFX.special();
+      _showOrbLabel('DEF BOOST x2', '#4488ff');
     }
 
     // cleanup
@@ -178,6 +181,21 @@ const OrbSystem = (() => {
     }
   }
 
+  function _showOrbLabel(text, color) {
+    const { w, h } = getArenaSize();
+    const pop = document.createElement('div');
+    pop.className = 'orb-label-pop';
+    pop.textContent = text;
+    pop.style.cssText =
+      'position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);' +
+      'font-family:"Press Start 2P",monospace;font-size:12px;' +
+      'color:' + color + ';z-index:60;pointer-events:none;' +
+      'text-shadow:2px 2px 0 #000,-1px -1px 0 #000;' +
+      'animation:orbLabelPop 1.2s ease-out forwards;';
+    arena.appendChild(pop);
+    setTimeout(() => pop.remove(), 1200);
+  }
+  
   return {
 
     /* ── TICK ── */
