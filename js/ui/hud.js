@@ -62,19 +62,33 @@ function updateSpecialBar() {
 }
 
 function updateProgress() {
-  // adventure mode: timer bar (drains left to right)
+  // adventure mode: countdown timer
   if (ActiveDirector.getWaveDuration && ActiveDirector.getWaveDuration() > 0) {
     const left = ActiveDirector.getWaveTimeLeft();
-    const total = ActiveDirector.getWaveDuration();
-    const pct = Math.max(0, left / total);
-    progressBar.style.width = Math.round(pct * 100) + '%';
+    const secs = Math.ceil(Math.max(0, left) / 1000);
+    const mins = Math.floor(secs / 60);
+    const s    = secs % 60;
+    const timeStr = mins + ':' + (s < 10 ? '0' : '') + s;
 
-    // color: green > yellow > red as time runs out
-    if (pct > 0.5)      progressBar.style.background = '#44cc44';
-    else if (pct > 0.25) progressBar.style.background = '#ddaa22';
-    else                 progressBar.style.background = '#ee4444';
+    // update timer display
+    if (!_timerEl) _createTimerEl();
+    _timerEl.textContent = timeStr;
+
+    // color: white > yellow > red as time runs out
+    const pct = left / ActiveDirector.getWaveDuration();
+    if (pct > 0.5)      _timerEl.style.color = '#ffffff';
+    else if (pct > 0.25) _timerEl.style.color = '#ddaa22';
+    else                 _timerEl.style.color = '#ee4444';
+
+    _timerEl.style.display = 'block';
+
+    // hide old progress bar
+    progressBar.style.width = '0%';
     return;
   }
+
+  // hide timer in infinite mode
+  if (_timerEl) _timerEl.style.display = 'none';
 
   // infinite mode: kills progress
   const needed = ActiveDirector.getKillsNeeded();
@@ -83,6 +97,19 @@ function updateProgress() {
   progressBar.style.background = '#666';
 }
 
+/* ── TIMER ELEMENT ── */
+let _timerEl = null;
+
+function _createTimerEl() {
+  _timerEl = document.createElement('div');
+  _timerEl.id = 'wave-timer';
+  _timerEl.style.cssText =
+    'position:absolute;top:8px;left:50%;transform:translateX(-50%);' +
+    'font-family:"Press Start 2P",monospace;font-size:14px;color:#fff;' +
+    'z-index:50;text-shadow:2px 2px 0 #000, -1px -1px 0 #000;' +
+    'pointer-events:none;';
+  arena.appendChild(_timerEl);
+}
 function updateWaveDisplay(wave, isBoss) {
   levelEl.textContent = isBoss ? 'BOSS' : 'wave ' + wave;
 

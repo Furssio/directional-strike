@@ -60,7 +60,9 @@ class Player {
 
   takeDamage(pct) {
     if (this.specialActive && this.ability.blocksBullets) return;
-    this.hp = Math.max(0, this.hp - Math.round(this.maxHp * pct));
+    let dmgPct = pct;
+    if (typeof OrbSystem !== 'undefined' && OrbSystem.hasDefenseBuff()) dmgPct *= 0.5;
+    this.hp = Math.max(0, this.hp - Math.round(this.maxHp * dmgPct));
     this.resetCombo();
   }
 
@@ -79,7 +81,9 @@ class Player {
   getHitDamage() {
     if (this.oneHitActive) return 99999;
     if (this.slashActive) return Math.round(PLAYER_STATS.maxHp * 1.0);
-    return Math.round(PLAYER_STATS.maxHp * CONFIG.base.hitDamagePct * this.damageMult);
+    let dmg = Math.round(PLAYER_STATS.maxHp * CONFIG.base.hitDamagePct * this.damageMult);
+    if (typeof OrbSystem !== 'undefined' && OrbSystem.hasAttackBuff()) dmg *= 2;
+    return dmg;
   }
   resetCombo() {
     this.combo      = 0;

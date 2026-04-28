@@ -114,6 +114,14 @@ function handleDir(dir) {
   showSlashEffect(dir);
   let anyHit = false;
 
+  // check orb collection
+  if (typeof OrbSystem !== 'undefined') {
+    const { w, h }    = getArenaSize();
+    const arenaSize   = Math.min(w, h);
+    const attackRange = player.getAttackRange(arenaSize);
+    OrbSystem.checkCollect(dir, attackRange);
+  }
+
  for (const d of dirs) {
 
     /* ── PARRY BULLETS ──
@@ -186,11 +194,9 @@ function handleDir(dir) {
         }
       }
 
-    } else {
-      let best     = null;
-      let bestDist = Infinity;
-
-      for (const e of enemies) {
+    }  else {
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e  = enemies[i];
         if (e.dir !== d) continue;
         if (e.underground) continue;
 
@@ -198,27 +204,24 @@ function handleDir(dir) {
         const dy   = e.y - cy;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist > attackRange) continue;
-        if (dist < bestDist) { bestDist = dist; best = e; }
-      }
 
-      if (best) {
         anyHit = true;
         SFX.hit();
-        best.flashHit();
-        best.hit(hitDmg);
-        if (best.hpFill) best.hpFill.style.width = Math.round(best.hpPercent() * 100) + '%';
+        e.flashHit();
+        e.hit(hitDmg);
+        if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
 
-        if (best.def.onHit && best.isAlive()) best.def.onHit(best);
+        if (e.def.onHit && e.isAlive()) e.def.onHit(e);
 
         if (player.stunChance > 0 && Math.random() < player.stunChance) {
-          best.stun(1000);
+          e.stun(1000);
         }
 
-        if (!best.isAlive()) {
-          spawnParticles(best.x, best.y, player.color, best.isElite);
-          best.el.remove();
-          enemies.splice(enemies.indexOf(best), 1);
-          registerKill(best);
+        if (!e.isAlive()) {
+          spawnParticles(e.x, e.y, player.color, e.isElite);
+          e.el.remove();
+          enemies.splice(i, 1);
+          registerKill(e);
         }
       }
     }

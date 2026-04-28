@@ -62,25 +62,31 @@ btnMute.addEventListener('click', () => {
 ['up', 'down', 'left', 'right'].forEach(dir => {
   const btn = document.getElementById('btn-' + dir);
   if (btn) {
-    btn.addEventListener('click', () => handleDir(dir));
+    btn.addEventListener('click', () => {
+      handleDir(dir);
+      if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
+    });
     btn.addEventListener('touchstart', e => {
       e.preventDefault();
       handleDir(dir);
+      if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
     }, { passive: false });
   }
 });
-
 /* ── SPECIAL ── */
 
 const specialBtn = document.getElementById('btn-special');
 if (specialBtn) {
-  specialBtn.addEventListener('mousedown', activateSpecial);
+  specialBtn.addEventListener('mousedown', () => {
+    activateSpecial();
+    if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
+  });
   specialBtn.addEventListener('touchstart', e => {
     e.preventDefault();
     activateSpecial();
+    if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   }, { passive: false });
 }
-
 /* ── KEYBOARD ── */
 
 document.addEventListener('keydown', e => {
@@ -104,6 +110,7 @@ document.addEventListener('keydown', e => {
     if (btn) btn.classList.add('pressed');
     setTimeout(() => { if (btn) btn.classList.remove('pressed'); }, 120);
     handleDir(map[e.key]);
+    if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   }
 });
 

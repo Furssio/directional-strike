@@ -34,18 +34,22 @@ function isDirFree(dir) {
     if (!list[i].isAlive()) list.splice(i, 1);
   }
 
-  // max 2 enemies per direction
-  if (list.length >= 2) return false;
+  // max enemies per direction (configurable per map)
+  const map = ActiveDirector.getCurrentMap ? ActiveDirector.getCurrentMap() : null;
+  const maxPerDir = (map && map.maxPerDirection) || 4;
+  if (list.length >= maxPerDir) return false;
 
   // if no enemies on this line, it's free
   if (list.length === 0) return true;
 
-  // 1 enemy on line — allow second only if first has passed the gate
+  // allow next spawn only if the LAST spawned enemy
+  // has passed the gate threshold
   const { w, h } = getArenaSize();
   const cx       = w / 2;
   const cy       = h / 2;
   const gate     = Math.min(w, h) * 0.40;
-  const dist     = list[0].distToCenter(cx, cy);
+  const last     = list[list.length - 1];
+  const dist     = last.distToCenter(cx, cy);
 
   return dist <= gate;
 }

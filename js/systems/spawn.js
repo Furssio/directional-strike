@@ -59,7 +59,7 @@ if (!_isIntro) {
 
   // 40% chance for random speed variation
   const _svChance = (_map && _map.speedVariationChance !== undefined) ? _map.speedVariationChance : 0.40;
-  const _svBoosts = (_map && _map.speedVariationBoosts) ? _map.speedVariationBoosts : [1.25, 1.30, 1.35, 1.40, 1.50];
+  const _svBoosts = (_map && _map.speedVariationBoosts) ? _map.speedVariationBoosts : [1.05, 1.08, 1.10, 1.12, 1.15];
   if (_svChance > 0 && Math.random() < _svChance) {
     sMult *= _svBoosts[Math.floor(Math.random() * _svBoosts.length)];
   }
