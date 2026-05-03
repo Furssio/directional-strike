@@ -182,6 +182,19 @@ function handleDir(dir) {
 
         if (e.def.onHit && e.isAlive()) e.def.onHit(e);
 
+        // frost touch — permanent freeze
+        if (e.isAlive() && player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
+          e.frozen = true;
+          e.speed = 0;
+          if (e.el) e.el.classList.add('frozen');
+          showActionPop(d, 'FREEZE!', '#44ddff');
+        }
+
+        // critical hit pop
+        if (player._lastHitWasCrit) {
+          showActionPop(d, 'CRIT!', '#ff4444');
+        }
+
         if (!e.isAlive()) {
           _killsThisSwing++;
           spawnParticles(e.x, e.y, player.color, e.isElite);
@@ -221,8 +234,22 @@ function handleDir(dir) {
 
         if (e.def.onHit && e.isAlive()) e.def.onHit(e);
 
+        // stun chance (base ability)
         if (player.stunChance > 0 && Math.random() < player.stunChance) {
           e.stun(1000);
+        }
+
+        // frost touch — permanent freeze
+        if (player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
+          e.frozen = true;
+          e.speed = 0;
+          if (e.el) e.el.classList.add('frozen');
+          showActionPop(d, 'FREEZE!', '#44ddff');
+        }
+
+        // critical hit pop
+        if (player._lastHitWasCrit) {
+          showActionPop(d, 'CRIT!', '#ff4444');
         }
 
         if (!e.isAlive()) {

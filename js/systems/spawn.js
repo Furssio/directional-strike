@@ -78,17 +78,38 @@ el.style.left     = x + 'px';
 el.style.top      = y + 'px';
 
 if (enemy.def.sprite) {
-  el.style.backgroundImage = `url(${enemy.def.sprite})`;
-  el.style.backgroundSize  = 'cover';
-  el.style.imageRendering  = 'pixelated';
+  el.style.backgroundImage  = `url(${enemy.def.sprite})`;
+  el.style.imageRendering   = 'pixelated';
+
+ if (enemy.def.spriteFrames && enemy.def.spriteFrames > 1) {
+    const fw = enemy.def.spriteFrameW || enemy.size;
+    const fh = enemy.def.spriteFrameH || enemy.size;
+    const frames = enemy.def.spriteFrames;
+    // scale sprite to fit enemy.size
+    const scale = enemy.size / fh;
+    const scaledW = Math.round(fw * frames * scale);
+    const scaledH = enemy.size;
+    el.style.backgroundSize = `${scaledW}px ${scaledH}px`;
+    el.style.backgroundRepeat = 'no-repeat';
+    const dur = enemy.def.spriteSpeed || 0.8;
+    const animName = `eIdle_${enemy.def.id}_${enemy.size}`;
+    if (!document.getElementById('anim-' + animName)) {
+      const style = document.createElement('style');
+      style.id = 'anim-' + animName;
+      style.textContent = `@keyframes ${animName}{from{background-position-x:0}to{background-position-x:-${scaledW}px}}`;
+      document.head.appendChild(style);
+    }
+    el.style.animation = `${animName} ${dur}s steps(${frames}) infinite`;
+  } else {
+    el.style.backgroundSize = 'cover';
+  }
 } else {
   el.style.fontSize = Math.round(enemy.size * 0.5) + 'px';
   el.textContent    = enemy.emoji;
 }
 
 // rotazione in base alla direzione
-const rotMap = { down: 0, left: 90, up: 180, right: 270 };
-el.style.transform = `translate(-50%,-50%) rotate(${rotMap[dir]}deg)`;
+el.style.transform = 'translate(-50%,-50%)';
 
  if (!enemy.def.noHpBar) {
     const hpWrap = document.createElement('div');

@@ -3,115 +3,141 @@
    Upgrade choice screen at waves 3, 6, 9.
    Player picks by attacking in a direction.
 
-   Pool: 12 upgrades, each with random
-   variants (different % values).
-   All upgrades are pure buffs — no costs.
+   TIER CHAIN SYSTEM:
+   - 13 base upgrades, each with tiers I→II→III
+     (Extra Slot has only I→II)
+   - Picking tier I unlocks tier II in the pool
+   - Picking tier II unlocks tier III
+   - Total: 36 unique upgrades
 
    Used by: adventureDirector.js, combat.js
    Depends on: dom.js, state.js, Player.js
    ═══════════════════════════════════════ */
 
-/* ── UPGRADE DEFINITIONS ──────────────
-   Each upgrade has:
-   - id:       unique base id (used once per map)
-   - icon:     emoji displayed in the card
-   - name:     display name
-   - variants: array of { desc, apply(player) }
-               one variant is picked at random
+/* ── UPGRADE CHAINS ───────────────────
+   Each chain has:
+   - id:    base id (e.g. 'critical_hit')
+   - icon:  emoji displayed in card
+   - tiers: array of { name, desc, apply(p) }
+            index 0 = tier I, 1 = II, 2 = III
    ───────────────────────────────────── */
 
-const UPGRADE_POOL = [
+const UPGRADE_CHAINS = [
 
-  { id: 'vitality', icon: '❤️', name: 'Vitality',
-    variants: [
-      { desc: '+20% max HP',  apply(p) { const bonus = Math.round(p.maxHp * 0.20); p.maxHp += bonus; p.hp += bonus; updateHpBar(); } },
-      { desc: '+10% max HP',  apply(p) { const bonus = Math.round(p.maxHp * 0.10); p.maxHp += bonus; p.hp += bonus; updateHpBar(); } },
-      { desc: '+5% max HP',   apply(p) { const bonus = Math.round(p.maxHp * 0.05); p.maxHp += bonus; p.hp += bonus; updateHpBar(); } },
-    ],
-  },
+  { id: 'vitality', icon: '❤️', tiers: [
+    { name: 'Vitality I',   desc: '+10% max HP',
+      apply(p) { const b = Math.round(p.maxHp * 0.10); p.maxHp += b; p.hp += b; updateHpBar(); } },
+    { name: 'Vitality II',  desc: '+20% max HP',
+      apply(p) { const b = Math.round(p.maxHp * 0.20); p.maxHp += b; p.hp += b; updateHpBar(); } },
+    { name: 'Vitality III', desc: '+30% max HP',
+      apply(p) { const b = Math.round(p.maxHp * 0.30); p.maxHp += b; p.hp += b; updateHpBar(); } },
+  ]},
 
-  { id: 'iron_skin', icon: '🛡️', name: 'Iron Skin',
-    variants: [
-      { desc: '-20% damage taken', apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.80; } },
-      { desc: '-10% damage taken', apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.90; } },
-      { desc: '-5% damage taken',  apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.95; } },
-    ],
-  },
+  { id: 'iron_skin', icon: '🛡️', tiers: [
+    { name: 'Iron Skin I',   desc: '-10% damage taken',
+      apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.90; } },
+    { name: 'Iron Skin II',  desc: '-20% damage taken',
+      apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.80; } },
+    { name: 'Iron Skin III', desc: '-30% damage taken',
+      apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.70; } },
+  ]},
 
-  { id: 'long_reach', icon: '📡', name: 'Long Reach',
-    variants: [
-      { desc: '+5% range',  apply(p) { p.attackRangePct *= 1.05; updateRangeCircle(); } },
-      { desc: '+3% range',  apply(p) { p.attackRangePct *= 1.03; updateRangeCircle(); } },
-      { desc: '+2% range',  apply(p) { p.attackRangePct *= 1.02; updateRangeCircle(); } },
-    ],
-  },
+  { id: 'long_reach', icon: '📡', tiers: [
+    { name: 'Long Reach I',   desc: '+3% attack range',
+      apply(p) { p.attackRangePct *= 1.03; updateRangeCircle(); } },
+    { name: 'Long Reach II',  desc: '+5% attack range',
+      apply(p) { p.attackRangePct *= 1.05; updateRangeCircle(); } },
+    { name: 'Long Reach III', desc: '+8% attack range',
+      apply(p) { p.attackRangePct *= 1.08; updateRangeCircle(); } },
+  ]},
 
-  { id: 'sharp_blade', icon: '🗡️', name: 'Sharp Blade',
-    variants: [
-      { desc: '+20% attack',  apply(p) { p.damageMult *= 1.20; } },
-      { desc: '+10% attack',  apply(p) { p.damageMult *= 1.10; } },
-      { desc: '+5% attack',   apply(p) { p.damageMult *= 1.05; } },
-    ],
-  },
+  { id: 'sharp_blade', icon: '🗡️', tiers: [
+    { name: 'Sharp Blade I',   desc: '+10% attack power',
+      apply(p) { p.damageMult *= 1.10; } },
+    { name: 'Sharp Blade II',  desc: '+20% attack power',
+      apply(p) { p.damageMult *= 1.20; } },
+    { name: 'Sharp Blade III', desc: '+30% attack power',
+      apply(p) { p.damageMult *= 1.30; } },
+  ]},
 
-  { id: 'extra_slot', icon: '⚡', name: 'Extra Slot',
-    variants: [
-      { desc: '+1 ability slot', apply(p) { p._maxSlots = Math.min(3, (p._maxSlots || 1) + 1); } },
-    ],
-  },
+  { id: 'critical_hit', icon: '💥', tiers: [
+    { name: 'Critical Hit I',   desc: '15% chance for 2x damage',
+      apply(p) { p._critChance = 0.15; } },
+    { name: 'Critical Hit II',  desc: '30% chance for 2x damage',
+      apply(p) { p._critChance = 0.30; } },
+    { name: 'Critical Hit III', desc: '45% chance for 2x damage',
+      apply(p) { p._critChance = 0.45; } },
+  ]},
 
-  { id: 'ability_boost', icon: '⏱️', name: 'Ability Boost',
-    variants: [
-      { desc: '+30% ability duration', apply(p) { p._abilityDurationMult = (p._abilityDurationMult || 1) * 1.30; } },
-      { desc: '+20% ability duration', apply(p) { p._abilityDurationMult = (p._abilityDurationMult || 1) * 1.20; } },
-      { desc: '+10% ability duration', apply(p) { p._abilityDurationMult = (p._abilityDurationMult || 1) * 1.10; } },
-    ],
-  },
+  { id: 'frost_touch', icon: '❄️', tiers: [
+    { name: 'Frost Touch I',   desc: '15% chance to freeze enemy',
+      apply(p) { p._frostChance = 0.15; } },
+    { name: 'Frost Touch II',  desc: '30% chance to freeze enemy',
+      apply(p) { p._frostChance = 0.30; } },
+    { name: 'Frost Touch III', desc: '45% chance to freeze enemy',
+      apply(p) { p._frostChance = 0.45; } },
+  ]},
 
-  { id: 'vampiric', icon: '🩸', name: 'Vampiric',
-    variants: [
-      { desc: 'heal 2% HP every 5 kills', apply(p) { p._vampKillInterval = 5; p._vampHealPct = 0.02; p._vampKillCount = 0; } },
-      { desc: 'heal 1% HP every 3 kills',  apply(p) { p._vampKillInterval = 3; p._vampHealPct = 0.01; p._vampKillCount = 0; } },
-    ],
-  },
+  { id: 'lucky_shield', icon: '🍀', tiers: [
+    { name: 'Lucky Shield I',   desc: '15% chance to block a hit',
+      apply(p) { p._luckyBlockChance = 0.15; } },
+    { name: 'Lucky Shield II',  desc: '30% chance to block a hit',
+      apply(p) { p._luckyBlockChance = 0.30; } },
+    { name: 'Lucky Shield III', desc: '40% chance to block a hit',
+      apply(p) { p._luckyBlockChance = 0.40; } },
+  ]},
 
-  { id: 'frost_touch', icon: '❄️', name: 'Frost Touch',
-    variants: [
-      { desc: '20% chance to freeze',  apply(p) { p._frostChance = Math.min(1, (p._frostChance || 0) + 0.20); } },
-      { desc: '15% chance to freeze',  apply(p) { p._frostChance = Math.min(1, (p._frostChance || 0) + 0.15); } },
-      { desc: '10% chance to freeze',  apply(p) { p._frostChance = Math.min(1, (p._frostChance || 0) + 0.10); } },
-    ],
-  },
+  { id: 'vampiric', icon: '🩸', tiers: [
+    { name: 'Vampiric I',   desc: 'heal 2% HP every 5 kills',
+      apply(p) { p._vampKillInterval = 5; p._vampHealPct = 0.02; p._vampKillCount = 0; } },
+    { name: 'Vampiric II',  desc: 'heal 3% HP every 4 kills',
+      apply(p) { p._vampKillInterval = 4; p._vampHealPct = 0.03; p._vampKillCount = 0; } },
+    { name: 'Vampiric III', desc: 'heal 4% HP every 3 kills',
+      apply(p) { p._vampKillInterval = 3; p._vampHealPct = 0.04; p._vampKillCount = 0; } },
+  ]},
 
-  { id: 'critical_hit', icon: '💥', name: 'Critical Hit',
-    variants: [
-      { desc: '20% chance for 2x damage', apply(p) { p._critChance = Math.min(1, (p._critChance || 0) + 0.20); } },
-      { desc: '15% chance for 2x damage', apply(p) { p._critChance = Math.min(1, (p._critChance || 0) + 0.15); } },
-      { desc: '10% chance for 2x damage', apply(p) { p._critChance = Math.min(1, (p._critChance || 0) + 0.10); } },
-    ],
-  },
+  { id: 'ability_boost', icon: '⏱️', tiers: [
+    { name: 'Ability Boost I',   desc: '+20% ability duration',
+      apply(p) { p._abilityDurationMult = 1.20; } },
+    { name: 'Ability Boost II',  desc: '+40% ability duration',
+      apply(p) { p._abilityDurationMult = 1.40; } },
+    { name: 'Ability Boost III', desc: '+60% ability duration',
+      apply(p) { p._abilityDurationMult = 1.60; } },
+  ]},
 
-  { id: 'berserker', icon: '🔥', name: 'Berserker',
-    variants: [
-      { desc: 'below 30% HP: +40% attack', apply(p) { p._berserkerThreshold = 0.30; p._berserkerAtkBonus = 0.40; } },
-      { desc: 'below 40% HP: +25% defense', apply(p) { p._berserkerThreshold = 0.40; p._berserkerDefBonus = 0.25; } },
-    ],
-  },
+  { id: 'orb_hunter', icon: '🔮', tiers: [
+    { name: 'Orb Hunter I',   desc: '+10% orb spawn chance',
+      apply(p) { p._orbChanceBonus = 0.10; } },
+    { name: 'Orb Hunter II',  desc: '+20% orb spawn chance',
+      apply(p) { p._orbChanceBonus = 0.20; } },
+    { name: 'Orb Hunter III', desc: '+30% orb spawn chance',
+      apply(p) { p._orbChanceBonus = 0.30; } },
+  ]},
 
-  { id: 'lucky_shield', icon: '🍀', name: 'Lucky Shield',
-    variants: [
-      { desc: '20% chance to block a hit', apply(p) { p._luckyBlockChance = Math.min(1, (p._luckyBlockChance || 0) + 0.20); } },
-      { desc: '15% chance to block a hit', apply(p) { p._luckyBlockChance = Math.min(1, (p._luckyBlockChance || 0) + 0.15); } },
-      { desc: '10% chance to block a hit', apply(p) { p._luckyBlockChance = Math.min(1, (p._luckyBlockChance || 0) + 0.10); } },
-    ],
-  },
+  { id: 'berserker_atk', icon: '🔥', tiers: [
+    { name: 'Berserker ATK I',   desc: 'below 30% HP: +30% attack',
+      apply(p) { p._berserkerAtkThreshold = 0.30; p._berserkerAtkBonus = 0.30; } },
+    { name: 'Berserker ATK II',  desc: 'below 30% HP: +50% attack',
+      apply(p) { p._berserkerAtkThreshold = 0.30; p._berserkerAtkBonus = 0.50; } },
+    { name: 'Berserker ATK III', desc: 'below 30% HP: +75% attack',
+      apply(p) { p._berserkerAtkThreshold = 0.30; p._berserkerAtkBonus = 0.75; } },
+  ]},
 
-  { id: 'orb_hunter', icon: '🔮', name: 'Orb Hunter',
-    variants: [
-      { desc: '+50% orb chance', apply(p) { p._orbChanceMult = (p._orbChanceMult || 1) * 1.50; } },
-      { desc: '+30% orb chance', apply(p) { p._orbChanceMult = (p._orbChanceMult || 1) * 1.30; } },
-    ],
-  },
+  { id: 'berserker_def', icon: '🔥', tiers: [
+    { name: 'Berserker DEF I',   desc: 'below 30% HP: -20% damage',
+      apply(p) { p._berserkerDefThreshold = 0.30; p._berserkerDefBonus = 0.20; } },
+    { name: 'Berserker DEF II',  desc: 'below 30% HP: -35% damage',
+      apply(p) { p._berserkerDefThreshold = 0.30; p._berserkerDefBonus = 0.35; } },
+    { name: 'Berserker DEF III', desc: 'below 30% HP: -50% damage',
+      apply(p) { p._berserkerDefThreshold = 0.30; p._berserkerDefBonus = 0.50; } },
+  ]},
+
+  { id: 'extra_slot', icon: '⚡', tiers: [
+    { name: 'Extra Slot I',  desc: '+1 special charge (max 2)',
+      apply(p) { p._maxSpecialSlots = 2; } },
+    { name: 'Extra Slot II', desc: '+1 special charge (max 3)',
+      apply(p) { p._maxSpecialSlots = 3; } },
+  ]},
 
 ];
 
@@ -120,7 +146,7 @@ const UPGRADE_POOL = [
 
 let _choosingUpgrade = false;
 let _currentChoices  = [null, null, null, null];
-let _usedUpgrades    = [];
+let _pickedTiers     = {};   // { chainId: tierIndex } — tracks highest tier picked
 let _countdownActive = false;
 let _inputBlocked    = false;
 
@@ -129,43 +155,87 @@ function isChoosingUpgrade() {
 }
 
 
+/* ── BUILD AVAILABLE POOL ──────────── */
+
+function _buildAvailablePool() {
+  const available = [];
+
+  for (const chain of UPGRADE_CHAINS) {
+    const pickedTier = _pickedTiers[chain.id]; // undefined, 0, 1, or 2
+
+    if (pickedTier === undefined) {
+      // never picked this chain — offer tier I (index 0)
+      available.push({ chain, tierIndex: 0 });
+    } else {
+      // picked some tier — offer the next one if it exists
+      const nextTier = pickedTier + 1;
+      if (nextTier < chain.tiers.length) {
+        available.push({ chain, tierIndex: nextTier });
+      }
+      // if already at max tier, this chain is done — skip
+    }
+  }
+
+  return available;
+}
+
+
 /* ── START CHOICE SCREEN ───────────── */
 
 function startUpgradeChoice() {
   _choosingUpgrade = true;
 
-  // pick 4 random upgrades not yet used (by base id)
-  const available = UPGRADE_POOL.filter(u => !_usedUpgrades.includes(u.id));
-  const shuffled  = available.sort(() => Math.random() - 0.5);
-  const picks     = shuffled.slice(0, 4);
+  // build pool of available upgrades
+  const pool = _buildAvailablePool();
 
-  // fallback: if less than 4 available, fill with random from full pool
-  while (picks.length < 4) {
-    picks.push(UPGRADE_POOL[Math.floor(Math.random() * UPGRADE_POOL.length)]);
+  // shuffle and pick 4
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  const picks    = shuffled.slice(0, 4);
+
+  // fallback: if less than 4 available, fill with random from pool
+  while (picks.length < 4 && pool.length > 0) {
+    picks.push(pool[Math.floor(Math.random() * pool.length)]);
   }
 
-  // for each pick, select a random variant
-  const resolved = picks.map(u => {
-    const v = u.variants[Math.floor(Math.random() * u.variants.length)];
-    return { id: u.id, icon: u.icon, name: u.name, desc: v.desc, apply: v.apply };
+  // resolve each pick into a display object
+  const resolved = picks.map(p => {
+    const tier = p.chain.tiers[p.tierIndex];
+    return {
+      chainId:   p.chain.id,
+      tierIndex: p.tierIndex,
+      icon:      p.chain.icon,
+      name:      tier.name,
+      desc:      tier.desc,
+      apply:     tier.apply,
+    };
   });
 
   const dirs     = ['up', 'down', 'left', 'right'];
   const keyHints = { up: '↑', down: '↓', left: '←', right: '→' };
 
   for (let i = 0; i < 4; i++) {
-    _currentChoices[i] = resolved[i];
+    _currentChoices[i] = resolved[i] || null;
     const el = document.getElementById('upgrade-' + dirs[i]);
+
+    if (!resolved[i]) {
+      el.innerHTML = '';
+      continue;
+    }
+
+    const r = resolved[i];
+    // tier badge color: I = white, II = yellow, III = orange
+    const tierNum    = r.tierIndex + 1;
+    const tierColors = ['#ffffff', '#ffdd44', '#ff8844'];
+    const tierColor  = tierColors[r.tierIndex] || '#ffffff';
 
     el.innerHTML =
       '<div class="upgrade-card">' +
-        '<div class="upgrade-card-icon">' + resolved[i].icon + '</div>' +
-        '<div class="upgrade-card-name">' + resolved[i].name + '</div>' +
-        '<div class="upgrade-card-desc">' + resolved[i].desc + '</div>' +
+        '<div class="upgrade-card-icon">' + r.icon + '</div>' +
+        '<div class="upgrade-card-name" style="color:' + tierColor + '">' + r.name + '</div>' +
+        '<div class="upgrade-card-desc">' + r.desc + '</div>' +
         '<div class="upgrade-card-key">' + keyHints[dirs[i]] + '</div>' +
       '</div>';
 
-    // stagger entrance animation
     el.style.animationDelay = (i * 80) + 'ms';
   }
 
@@ -188,7 +258,7 @@ function startUpgradeChoice() {
   titleEl.style.animation = 'upgradeTitleIn 0.6s ease-out forwards';
 
   // arrow hint at bottom
- let hintEl = document.getElementById('upgrade-arrow-hint');
+  let hintEl = document.getElementById('upgrade-arrow-hint');
   if (!hintEl) {
     hintEl = document.createElement('div');
     hintEl.id = 'upgrade-arrow-hint';
@@ -196,7 +266,7 @@ function startUpgradeChoice() {
     overlay.appendChild(hintEl);
   }
 
-  // block input for 1.5s so player can read the options
+  // block input for 1.5s so player can read
   _inputBlocked = true;
   hintEl.style.visibility = 'hidden';
   setTimeout(() => {
@@ -217,7 +287,9 @@ function selectUpgrade(dir) {
 
   // apply upgrade to player
   choice.apply(player);
-  _usedUpgrades.push(choice.id);
+
+  // track picked tier for chain progression
+  _pickedTiers[choice.chainId] = choice.tierIndex;
 
   SFX.abilityPick();
 
@@ -241,12 +313,10 @@ function selectUpgrade(dir) {
   _choosingUpgrade = false;
 
   _showCountdown(3, () => {
-    // hide overlay
     document.getElementById('upgrade-choice').classList.remove('active');
     const titleEl = document.getElementById('upgrade-title');
     if (titleEl) titleEl.style.animation = '';
 
-    // reset styles
     for (let i = 0; i < 4; i++) {
       const el = document.getElementById('upgrade-' + dirs[i]);
       el.classList.remove('upgrade-chosen', 'upgrade-faded');
@@ -297,7 +367,7 @@ function _showCountdown(from, callback) {
 /* ── RESET ─────────────────────────── */
 
 function resetUpgradeChoices() {
-  _usedUpgrades    = [];
+  _pickedTiers     = {};
   _currentChoices  = [null, null, null, null];
   _choosingUpgrade = false;
   _countdownActive = false;

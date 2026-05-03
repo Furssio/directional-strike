@@ -1,28 +1,84 @@
 <div id="screen-menu">
-  <div id="menu-card">
-    <div class="arrows-preview">← ↑ → ↓</div>
-    <h1>Directional Strike</h1>
-    <div class="subtitle">choose a mode</div>
-    <div class="mode-grid">
-      <div class="mode-card" id="btn-infinite" style="display:none;">
-        <div class="mode-icon">⚡</div>
-        <div class="mode-title">infinite</div>
-        <div class="mode-desc">survive as long as possible</div>
-      </div>
-      <div class="mode-card" id="btn-adventure">
-        <div class="mode-icon">⚔️</div>
-        <div class="mode-title">adventure</div>
-        <div class="mode-desc">complete maps and unlock abilities</div>
-      </div>
+  <div id="menu-bg">
+    <!-- diagonal cut decorations -->
+    <div class="menu-cut menu-cut-1"></div>
+    <div class="menu-cut menu-cut-2"></div>
+    <div class="menu-cut menu-cut-3"></div>
+  </div>
+
+  <div id="menu-content">
+
+    <!-- ── TITLE ── -->
+    <div id="menu-title-block">
+      <div id="menu-title-sub">⚔️ PIXEL ARENA</div>
+      <h1 id="menu-title">DIRECTIONAL<br>STRIKE</h1>
+      <div id="menu-title-line"></div>
     </div>
-    <button class="game-btn manage-btn" id="btn-abilities">🎯 manage abilities</button>
-    <div class="legend">
-      <span>👹 1hit</span>
-      <span>👾 2hit+shots</span>
-      <span>🗿 3hit</span>
-      <span>⚡ Space=special</span>
+
+    <!-- ── MODE CARDS ── -->
+    <div id="menu-modes">
+
+      <div class="menu-mode-card" id="btn-adventure">
+        <div class="menu-mode-img">
+          <!-- PLACEHOLDER: immagine campo diviso in 4 mappe con character al centro -->
+          <div class="placeholder-img">🗺️ ADVENTURE ART</div>
+        </div>
+        <div class="menu-mode-info">
+          <div class="menu-mode-title">PLAY</div>
+          <div class="menu-mode-desc">complete maps · unlock abilities</div>
+        </div>
+        <div class="menu-mode-arrow">▶</div>
+      </div>
+
+      <div class="menu-mode-card menu-mode-locked" id="btn-challenge">
+        <div class="menu-mode-img">
+          <!-- PLACEHOLDER: immagine mappa challenge mode -->
+          <div class="placeholder-img">⚡ CHALLENGE ART</div>
+        </div>
+        <div class="menu-mode-info">
+          <div class="menu-mode-title">CHALLENGE</div>
+          <div class="menu-mode-desc">endless · difficulty scales</div>
+        </div>
+        <div class="menu-mode-arrow">🔒</div>
+      </div>
+
     </div>
-    <div class="best-score" id="menu-best"></div>
-    <button class="game-btn" id="btn-mute">🔊 audio on</button>
+
+    <!-- ── BOTTOM BAR ── -->
+    <div id="menu-bottom">
+
+      <div id="menu-audio-row">
+        <button class="menu-icon-btn" id="btn-sfx" title="Sound Effects">
+          <!-- PLACEHOLDER: icona speaker pixel -->
+          <span class="menu-btn-icon">🔊</span>
+          <span class="menu-btn-label">SFX</span>
+        </button>
+        <button class="menu-icon-btn" id="btn-music" title="Music">
+          <!-- PLACEHOLDER: icona nota musicale pixel -->
+          <span class="menu-btn-icon">🎵</span>
+          <span class="menu-btn-label">MUSIC</span>
+        </button>
+      </div>
+
+      <button class="menu-text-btn" id="btn-abilities">
+        <!-- PLACEHOLDER: icona spada/scudo pixel -->
+        <span class="menu-btn-icon">⚔️</span>
+        ABILITIES
+      </button>
+
+      <button class="menu-text-btn" id="btn-howtoplay">
+        <!-- PLACEHOLDER: icona punto interrogativo pixel -->
+        <span class="menu-btn-icon">❓</span>
+        HOW TO PLAY
+      </button>
+
+    </div>
+
+    <!-- ── INFINITE (hidden, dev) ── -->
+    <div id="btn-infinite" style="display:none;"></div>
+
+    <!-- ── BEST SCORE ── -->
+    <div id="menu-best"></div>
+
   </div>
 </div>

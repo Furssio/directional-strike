@@ -22,6 +22,15 @@ document.getElementById('btn-adventure').addEventListener('click', () => {
   });
 });
 
+// challenge mode — locked for now
+document.getElementById('btn-challenge').addEventListener('click', () => {
+  // TODO: unlock after adventure complete
+});
+
+// how to play — placeholder
+document.getElementById('btn-howtoplay').addEventListener('click', () => {
+  // TODO: show how to play screen
+});
 document.getElementById('btn-abilities').addEventListener('click', () => {
   buildAbilityScreen();
   showScreen(sAbility);
@@ -51,10 +60,21 @@ document.getElementById('btn-map-back').addEventListener('click', () => showScre
 
 /* ── AUDIO ── */
 
-btnMute.addEventListener('click', () => {
+// SFX toggle
+document.getElementById('btn-sfx').addEventListener('click', () => {
   SFX.init();
   CONFIG.audio.enabled = !CONFIG.audio.enabled;
-  btnMute.textContent  = CONFIG.audio.enabled ? '🔊 audio on' : '🔇 audio off';
+  document.getElementById('btn-sfx').classList.toggle('muted', !CONFIG.audio.enabled);
+  document.getElementById('btn-sfx').querySelector('.menu-btn-icon').textContent =
+    CONFIG.audio.enabled ? '🔊' : '🔇';
+});
+
+// Music toggle — placeholder for now
+document.getElementById('btn-music').addEventListener('click', () => {
+  const btn = document.getElementById('btn-music');
+  btn.classList.toggle('muted');
+  btn.querySelector('.menu-btn-icon').textContent =
+    btn.classList.contains('muted') ? '🔇' : '🎵';
 });
 
 /* ── DIRECTIONAL BUTTONS ── */
@@ -145,3 +165,4 @@ document.addEventListener('keydown', e => {
 });
 
 updateMenuBest();
+// btnMute removed — audio controls now in menu bottom bar (btn-sfx, btn-music)

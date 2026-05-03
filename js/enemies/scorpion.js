@@ -1,7 +1,7 @@
 EnemyRegistry.register({
   id:        'scorpion',
   sprite:    'assets/enemies/scorpion/idle.png',
-  size:      48,
+  size:      32,
   hpPct:     0.30,
   damagePct: 0.15,
   speedMult: 1.00,

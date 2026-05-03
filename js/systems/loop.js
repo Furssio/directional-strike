@@ -145,7 +145,7 @@ function tick() {
       wy =  nx * perp * 0.05;
     }
 
-  if (!e.def.customMovement) {
+  if (!e.def.customMovement && !e.frozen) {
       const sm = player.speedMultiplier;
       e.x += (nx * e.speed + wx) * sm;
       e.y += (ny * e.speed + wy) * sm;

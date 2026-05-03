@@ -266,11 +266,17 @@ const OrbSystem = (() => {
       const ac = _attackChance();
       const dc = _defenseChance();
 
-      if (roll < hc) {
+     // orb hunter flat bonus — increases all chances equally
+      const orbBonus = (player && player._orbChanceBonus) ? player._orbChanceBonus : 0;
+      const hcB = hc + orbBonus;
+      const acB = ac + orbBonus;
+      const dcB = dc + orbBonus;
+
+      if (roll < hcB) {
         _spawnOrb('heal');
-      } else if (roll < hc + ac) {
+      } else if (roll < hcB + acB) {
         _spawnOrb('attack');
-      } else if (roll < hc + ac + dc) {
+      } else if (roll < hcB + acB + dcB) {
         _spawnOrb('defense');
       }
     },

@@ -9,15 +9,18 @@
 EnemyRegistry.register({
   id:          'slime_large',
   emoji:       '🟢',
-  sprite: 'assets/enemies/slime/idle.png',
-  size:        72,
+  sprite:        'assets/enemies/slime/idle.png',
+  spriteFrames:  12,
+  spriteFrameW:  96,
+  spriteFrameH:  96,
+  spriteSpeed:   0.9,
+  size:          96,
   hpPct:       0.80,
   damagePct:   0.30,
   contactHits: 1,
   speedMult:   0.48,
   points:      855,
   shoots:      false,
-  wobble:      { frequency: 1.8, amplitude: 18 },
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 28;
     if (distToCenter <= 160) return 20;
@@ -49,12 +52,31 @@ EnemyRegistry.register({
       el.style.height     = child.size + 'px';
       el.style.left       = sx + 'px';
       el.style.top        = sy + 'px';
-      el.style.backgroundImage = `url(${childDef.sprite})`;
-      el.style.backgroundSize  = 'cover';
+     el.style.backgroundImage = `url(${childDef.sprite})`;
       el.style.imageRendering  = 'pixelated';
 
-      const rotMap = { down: 0, left: 90, up: 180, right: 270 };
-      el.style.transform = `translate(-50%,-50%) rotate(${rotMap[parent.dir]}deg)`;
+      if (childDef.spriteFrames && childDef.spriteFrames > 1) {
+        const fw = childDef.spriteFrameW || child.size;
+        const fh = childDef.spriteFrameH || child.size;
+        const frames = childDef.spriteFrames;
+        const scale = child.size / fh;
+        const scaledW = Math.round(fw * frames * scale);
+        el.style.backgroundSize = `${scaledW}px ${child.size}px`;
+        el.style.backgroundRepeat = 'no-repeat';
+        const dur = childDef.spriteSpeed || 0.8;
+        const animName = `eIdle_${childDef.id}_${child.size}`;
+        if (!document.getElementById('anim-' + animName)) {
+          const s = document.createElement('style');
+          s.id = 'anim-' + animName;
+          s.textContent = `@keyframes ${animName}{from{background-position-x:0}to{background-position-x:-${scaledW}px}}`;
+          document.head.appendChild(s);
+        }
+        el.style.animation = `${animName} ${dur}s steps(${frames}) infinite`;
+      } else {
+        el.style.backgroundSize = 'cover';
+      }
+
+      el.style.transform = 'translate(-50%,-50%)';
 
       const hpWrap = document.createElement('div');
       hpWrap.className = 'enemy-hp-wrap';
@@ -75,15 +97,18 @@ EnemyRegistry.register({
 EnemyRegistry.register({
   id:          'slime_medium',
   emoji:       '🟢',
-  sprite: 'assets/enemies/slime/idle.png',
-  size:        32,
+  sprite:        'assets/enemies/slime/idle.png',
+  spriteFrames:  12,
+  spriteFrameW:  96,
+  spriteFrameH:  96,
+  spriteSpeed:   0.7,
+  size:          48,
   hpPct:       0.45,
   damagePct:   0.18,
   contactHits: 1,
   speedMult:   0.42,
   points:      300,
   shoots:      false,
-  wobble:      { frequency: 2.8, amplitude: 10 },
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 12;
     if (distToCenter <= 160) return 6;

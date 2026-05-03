@@ -1,0 +1,50 @@
+/* ══════════════════════════════════════
+   MENU ANIMATIONS — Persona 3 style
+   Slide-ins, diagonal cuts, glows.
+   ══════════════════════════════════════ */
+
+/* ── DIAGONAL CUT MOTION ── */
+@keyframes cutSlide1 {
+  0%   { transform: rotate(-12deg) translateX(-10%); }
+  100% { transform: rotate(-12deg) translateX(10%); }
+}
+@keyframes cutSlide2 {
+  0%   { transform: rotate(8deg) translateX(5%); }
+  100% { transform: rotate(8deg) translateX(-5%); }
+}
+
+/* ── TITLE ENTRANCE ── */
+@keyframes titleSlideIn {
+  0%   { opacity: 0; transform: translateX(-30px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes titleSubSlide {
+  0%   { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes lineGrow {
+  0%   { width: 0; opacity: 0; }
+  100% { width: 80px; opacity: 1; }
+}
+
+/* ── MODES ENTRANCE ── */
+@keyframes modesSlideIn {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── BOTTOM ENTRANCE ── */
+@keyframes bottomSlideIn {
+  0%   { opacity: 0; transform: translateY(15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── GLOW PULSE ON PLAY CARD ── */
+#btn-adventure {
+  animation: modesSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both,
+             playCardPulse 3s ease-in-out 1.5s infinite alternate;
+}
+@keyframes playCardPulse {
+  0%   { box-shadow: 0 0 0 transparent; }
+  100% { box-shadow: 0 0 20px rgba(0, 200, 255, 0.12), inset 0 0 30px rgba(0, 200, 255, 0.03); }
+}

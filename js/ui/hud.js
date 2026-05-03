@@ -33,14 +33,21 @@ function updateHpBar() {
 }
 
 function updateSpecialBar() {
-  const pct     = player.specialCharge;
   const ab      = player.ability;
   const isReady = player.isSpecialReady();
   const barEl   = document.getElementById('bar-special');
+  const maxSlots = player._maxSpecialSlots || 1;
+
+  // normalize charge to 0-100% visual range
+  const maxCharge = maxSlots * 100;
+  const visualPct = Math.min(100, (player.specialCharge / maxCharge) * 100);
 
   specialBar.classList.add('charge-tick');
-  specialBar.style.width = pct + '%';
+  specialBar.style.width = visualPct + '%';
   setTimeout(() => specialBar.classList.remove('charge-tick'), 200);
+
+  // render slot divider lines
+  _renderSlotDividers(maxSlots);
 
   const iconEl = document.getElementById('special-icon');
   if (iconEl) iconEl.textContent = ab.icon;
@@ -291,4 +298,31 @@ function triggerComboBump() {
   void el.offsetWidth;
   el.classList.add('combo-bump');
   setTimeout(() => el.classList.remove('combo-bump'), 400);
+}
+/* ── EXTRA SLOT DIVIDERS ── */
+let _slotDividerCount = 0;
+
+function _renderSlotDividers(maxSlots) {
+  if (maxSlots === _slotDividerCount) return; // already rendered
+  _slotDividerCount = maxSlots;
+
+  // remove old dividers
+  document.querySelectorAll('.slot-divider').forEach(el => el.remove());
+
+  if (maxSlots <= 1) return;
+
+  const barBg = document.querySelector('#bar-special .pixel-bar-bg');
+  if (!barBg) return;
+
+  for (let i = 1; i < maxSlots; i++) {
+    const pct = (i / maxSlots) * 100;
+    const div = document.createElement('div');
+    div.className = 'slot-divider';
+    div.style.cssText =
+      'position:absolute;top:0;bottom:0;width:2px;' +
+      'left:' + pct + '%;' +
+      'background:#ffffff;opacity:0.6;z-index:2;' +
+      'box-shadow:0 0 3px rgba(255,255,255,0.4);';
+    barBg.appendChild(div);
+  }
 }
