@@ -1,189 +1,124 @@
-#screen-map-select { width: 100%; }
-
-#map-select-wrapper {
-  max-width: 620px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 1.5rem 0;
-}
-
-#map-select-wrapper h2 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 4px;
-  letter-spacing: 1px;
-  transition: opacity 0.2s;
-}
-
-#carousel-map-sub {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 20px;
-  min-height: 18px;
-  transition: opacity 0.2s;
-}
-
-/* ── CAROUSEL ── */
-#carousel-container {
+/* ══════════════════════════════════════
+   ABILITY PICKER — mini carousel
+   ══════════════════════════════════════ */
+#ability-picker {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  position: relative;
-  height: 340px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-#carousel-track {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  position: relative;
-  height: 100%;
-}
-
-/* ── FRECCE ── */
-#carousel-prev,
-#carousel-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
+.ability-arrow {
   background: none;
   border: none;
-  color: #fff;
-  font-size: 52px;
+  color: var(--c-text-dim);
+  font-size: 24px;
   cursor: pointer;
-  padding: 0 10px;
-  opacity: 0.6;
-  transition: opacity 0.15s;
-  line-height: 1;
+  padding: 4px 8px;
+  font-family: 'Press Start 2P', monospace;
+  transition: color 0.15s;
 }
-#carousel-prev { left: 0; }
-#carousel-next { right: 0; }
-#carousel-prev:hover,
-#carousel-next:hover { opacity: 1; }
 
-/* ── CARD MAPPA ── */
-.map-slide {
+.ability-arrow:hover {
+  color: var(--c-text);
+}
+
+#ability-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(17, 17, 34, 0.5);
+  border-radius: 6px;
+  padding: 6px 14px;
+  min-width: 160px;
+  justify-content: center;
+}
+
+#ability-pick-icon {
+  font-size: 20px;
+}
+
+#ability-pick-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--c-text);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+/* ══════════════════════════════════════
+   DEMO ARENA IN MAP SELECT
+   ══════════════════════════════════════ */
+#mapselect-demo {
   position: absolute;
-  border-radius: 16px;
-  overflow: hidden;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 45%;
   background-size: cover;
   background-position: center;
   image-rendering: pixelated;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.6) 50%, black 80%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.6) 50%, black 80%);
 }
 
-/* centro */
-.map-slide.pos-center {
-  width: 300px;
-  height: 300px;
+#mapselect-demo .demo-player-instance {
+  position: absolute;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  filter: brightness(0.85);
+  transform: translate(-50%, -50%);
+  width: 96px;
+  height: 96px;
+  background-image: url('../../assets/characters/player_idle.png');
+  background-size: 1152px 96px;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: playerIdle 1.2s steps(12) infinite;
+  z-index: 10;
 }
 
-/* laterali visibili */
-.map-slide.pos-left {
-  width: 185px;
-  height: 185px;
-  left: 50%;
-  transform: translateX(calc(-50% - 240px));
-  z-index: 3;
-  filter: brightness(0.35);
-}
-.map-slide.pos-right {
-  width: 185px;
-  height: 185px;
-  left: 50%;
-  transform: translateX(calc(-50% + 240px));
-  z-index: 3;
-  filter: brightness(0.35);
+/* reuse demo classes */
+#mapselect-demo .demo-enemy,
+#mapselect-demo .demo-slash,
+#mapselect-demo .demo-particle,
+#mapselect-demo .demo-score-pop {
+  position: absolute;
 }
 
-/* fuori schermo */
-.map-slide.pos-far-left {
-  width: 120px;
-  height: 120px;
-  left: 50%;
-  transform: translateX(calc(-50% - 340px));
-  z-index: 1;
-  filter: brightness(0.2);
-  opacity: 0;
-}
-.map-slide.pos-far-right {
-  width: 120px;
-  height: 120px;
-  left: 50%;
-  transform: translateX(calc(-50% + 340px));
-  z-index: 1;
-  filter: brightness(0.2);
-  opacity: 0;
-}
-
-/* bordo boss */
-.map-slide.is-boss {
-  border: 3px solid #E24B4A;
-  box-shadow: 0 8px 32px rgba(226,75,74,0.35);
-}
-
-/* locked — ancora più scuro */
-.map-slide.is-locked {
-  filter: brightness(0.18) !important;
-  cursor: default;
-}
-
-/* ── BOTTOM ── */
-#carousel-bottom {
-  margin-top: 24px;
+#mapselect-demo .demo-enemy {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  z-index: 5;
 }
 
-#carousel-completed {
-  font-size: 12px;
-  font-weight: 700;
-  color: #22C55E;
-  letter-spacing: 2px;
-  min-height: 16px;
+#mapselect-demo .demo-slash {
+  width: 64px;
+  height: 47px;
+  background-image: url('../../assets/effects/slash.png');
+  background-size: 192px 141px;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 15;
+  animation: slashAnim 0.25s steps(1) forwards;
 }
 
-#btn-map-play {
-  padding: 12px 48px;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 10px;
-  border: 2px solid #fff;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-  letter-spacing: 2px;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.08s;
-}
-#btn-map-play:hover:not(:disabled) {
-  background: #fff;
-  color: #111;
-  transform: scale(1.04);
-}
-#btn-map-play:disabled {
-  border-color: #444;
-  color: #444;
-  cursor: default;
+#mapselect-demo .demo-particle {
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 30;
+  transform: translate(-50%, -50%);
 }
 
-#btn-map-back {
-  background: none;
-  border: none;
-  color: #666;
-  font-size: 12px;
-  cursor: pointer;
-  padding: 4px;
+#mapselect-demo .demo-score-pop {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--c-text);
+  pointer-events: none;
+  z-index: 26;
+  text-shadow: 0 0 4px rgba(255,255,255,0.4), 1px 1px 0 #000;
+  animation: scoreBurst 0.8s ease-out forwards;
 }
-#btn-map-back:hover { color: #aaa; }

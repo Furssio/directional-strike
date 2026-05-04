@@ -1,6 +1,26 @@
+/* ── PALETTE (change these 7 values to retheme) ── */
+:root {
+  --c-bg:       #1a1a2e;
+  --c-bg-light: #25253e;
+  --c-accent:   #51eefc;
+  --c-accent2:  #1269cc;
+  --c-soft:     #6d9ac7;
+  --c-text:     #ffffff;
+  --c-text-dim: #8888aa;
+  --c-dark:     #111122;
+}
+
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;}
-body{background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Press Start 2P',monospace;}
-#G{width:100%;max-width:620px;padding:1rem;}
+body{background:#000 url('../assets/ui/menu_bg.png') center center / cover no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Press Start 2P',monospace;overflow:hidden;}
+#G{width:100%;max-width:620px;padding:0;}
+
+#screen-menu,#screen-game,#screen-over{width:100%;}
+#screen-game,#screen-over,#screen-ability,#screen-map-select,#screen-map-complete{display:none;}
+
+button.game-btn{padding:10px 24px;font-size:8px;font-family:'Press Start 2P',monospace;border-radius:8px;border:1px solid #555;background:#222;color:#fff;cursor:pointer;}
+button.game-btn:hover{background:#333;}
+.subtitle{font-size:8px;color:#aaa;margin-bottom:24px;}
+.btn-row{display:flex;gap:10px;justify-content:center;}
 
 #screen-menu,#screen-game,#screen-over{width:100%;}
 #screen-game,#screen-over,#screen-ability,#screen-map-select,#screen-map-complete{display:none;}

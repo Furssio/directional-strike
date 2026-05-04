@@ -1,50 +1,82 @@
 /* ══════════════════════════════════════
-   MENU ANIMATIONS — Persona 3 style
-   Slide-ins, diagonal cuts, glows.
+   MENU ANIMATIONS — floating + entrance
    ══════════════════════════════════════ */
 
-/* ── DIAGONAL CUT MOTION ── */
-@keyframes cutSlide1 {
-  0%   { transform: rotate(-12deg) translateX(-10%); }
-  100% { transform: rotate(-12deg) translateX(10%); }
-}
-@keyframes cutSlide2 {
-  0%   { transform: rotate(8deg) translateX(5%); }
-  100% { transform: rotate(8deg) translateX(-5%); }
+/* ── TITLE — float ── */
+#menu-title {
+  animation: titleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both,
+             menuFloat 3s ease-in-out 1s infinite alternate;
 }
 
-/* ── TITLE ENTRANCE ── */
-@keyframes titleSlideIn {
-  0%   { opacity: 0; transform: translateX(-30px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
-@keyframes titleSubSlide {
-  0%   { opacity: 0; transform: translateX(-20px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
-@keyframes lineGrow {
-  0%   { width: 0; opacity: 0; }
-  100% { width: 80px; opacity: 1; }
-}
-
-/* ── MODES ENTRANCE ── */
-@keyframes modesSlideIn {
-  0%   { opacity: 0; transform: translateY(20px); }
+@keyframes titleIn {
+  0%   { opacity: 0; transform: translateY(-12px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* ── BOTTOM ENTRANCE ── */
-@keyframes bottomSlideIn {
-  0%   { opacity: 0; transform: translateY(15px); }
-  100% { opacity: 1; transform: translateY(0); }
+@keyframes menuFloat {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-5px); }
 }
 
-/* ── GLOW PULSE ON PLAY CARD ── */
-#btn-adventure {
-  animation: modesSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both,
-             playCardPulse 3s ease-in-out 1.5s infinite alternate;
+/* ── CARDS — float with offset ── */
+.mode-play {
+  animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both,
+             cardFloat 3.5s ease-in-out 1.2s infinite alternate;
 }
-@keyframes playCardPulse {
-  0%   { box-shadow: 0 0 0 transparent; }
-  100% { box-shadow: 0 0 20px rgba(0, 200, 255, 0.12), inset 0 0 30px rgba(0, 200, 255, 0.03); }
+
+.mode-challenge {
+  animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both,
+             cardFloat 3.5s ease-in-out 1.8s infinite alternate;
+}
+
+@keyframes cardIn {
+  0%   { opacity: 0; transform: translateY(15px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes cardFloat {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+/* ── PLAYER — idle + entrance ── */
+#menu-player {
+  animation: playerIn 0.8s ease-out 0.5s both,
+             playerIdle 1.2s steps(12) infinite;
+}
+
+@keyframes playerIn {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes playerIdle {
+  from { background-position-x: 0; }
+  to   { background-position-x: -1152px; }
+}
+
+/* ── SPLASH TEXT — rotate wobble ── */
+#menu-splash.visible {
+  animation: splashIn 0.3s ease-out both,
+             splashWobble 2s ease-in-out infinite alternate;
+}
+
+@keyframes splashIn {
+  0%   { opacity: 0; transform: rotate(-8deg) scale(0.8); }
+  100% { opacity: 1; transform: rotate(-4deg) scale(1); }
+}
+
+@keyframes splashWobble {
+  0%   { transform: rotate(-4deg) scale(1); }
+  100% { transform: rotate(-2deg) scale(1.05); }
+}
+
+/* ── BOTTOM — entrance ── */
+#menu-bottom {
+  animation: bottomIn 0.4s ease-out 0.5s both;
+}
+
+@keyframes bottomIn {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }

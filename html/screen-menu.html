@@ -1,78 +1,59 @@
 <div id="screen-menu">
 
-  <!-- ── DEMO ARENA (background gameplay) ── -->
-  <div id="demo-arena">
-    <div id="demo-player"></div>
-  </div>
+  <!-- ── DARKEN OVERLAY ── -->
+  <div id="menu-overlay"></div>
 
-  <!-- ── MENU OVERLAY ── -->
+  <!-- ── PLAYER DECORATIVO ── -->
+  <div id="menu-player"></div>
+
+  <!-- ── SPLASH TEXT (angolo alto destra) ── -->
+  <div id="menu-splash"></div>
+
+  <!-- ── MENU CONTENT ── -->
   <div id="menu-content">
 
-    <!-- ── TITLE ── -->
     <div id="menu-title-block">
-      <div id="menu-title-sub">⚔️ PIXEL ARENA</div>
       <h1 id="menu-title">DIRECTIONAL<br>STRIKE</h1>
-      <div id="menu-title-line"></div>
     </div>
 
-    <!-- ── MODE CARDS ── -->
     <div id="menu-modes">
 
-      <div class="menu-mode-card" id="btn-adventure">
-        <div class="menu-mode-img">
-          <div class="placeholder-img">🗺️ ADVENTURE ART</div>
+      <button class="mode-card mode-play" id="btn-adventure">
+        <div class="mode-card-img">
+          <span class="mode-card-icon">⚔️</span>
         </div>
-        <div class="menu-mode-info">
-          <div class="menu-mode-title">PLAY</div>
-          <div class="menu-mode-desc">complete maps · unlock abilities</div>
-        </div>
-        <div class="menu-mode-arrow">▶</div>
-      </div>
+        <div class="mode-card-name">PLAY</div>
+        <div class="mode-card-tooltip">Explore 13 maps<br>Defeat bosses<br>Unlock abilities</div>
+      </button>
 
-      <div class="menu-mode-card menu-mode-locked" id="btn-challenge">
-        <div class="menu-mode-img">
-          <div class="placeholder-img">⚡ CHALLENGE ART</div>
+      <button class="mode-card mode-challenge" id="btn-challenge">
+        <div class="mode-card-img">
+          <span class="mode-card-icon">💀</span>
         </div>
-        <div class="menu-mode-info">
-          <div class="menu-mode-title">CHALLENGE</div>
-          <div class="menu-mode-desc">endless · difficulty scales</div>
-        </div>
-        <div class="menu-mode-arrow">🔒</div>
-      </div>
+        <div class="mode-card-name">CHALLENGE</div>
+        <div class="mode-card-tooltip">Endless waves<br>Play Adventure first!<br>Test your skills</div>
+        <div class="mode-lock">🔒</div>
+      </button>
 
     </div>
 
-    <!-- ── BOTTOM BAR ── -->
     <div id="menu-bottom">
-
-      <div id="menu-audio-row">
-        <button class="menu-icon-btn" id="btn-sfx" title="Sound Effects">
-          <span class="menu-btn-icon">🔊</span>
-          <span class="menu-btn-label">SFX</span>
-        </button>
-        <button class="menu-icon-btn" id="btn-music" title="Music">
-          <span class="menu-btn-icon">🎵</span>
-          <span class="menu-btn-label">MUSIC</span>
-        </button>
-      </div>
-
-      <button class="menu-text-btn" id="btn-abilities">
-        <span class="menu-btn-icon">⚔️</span>
-        ABILITIES
+      <button class="menu-sm-btn" id="btn-sfx" title="Sound Effects">
+        <span class="menu-btn-icon">🔊</span>
+        <span class="menu-btn-label">SFX</span>
       </button>
-
-      <button class="menu-text-btn" id="btn-howtoplay">
+      <button class="menu-sm-btn" id="btn-music" title="Music">
+        <span class="menu-btn-icon">🎵</span>
+        <span class="menu-btn-label">MUSIC</span>
+      </button>
+      <button class="menu-sm-btn" id="btn-howtoplay" title="How to Play">
         <span class="menu-btn-icon">❓</span>
-        HOW TO PLAY
+        <span class="menu-btn-label">INFO</span>
       </button>
-
     </div>
-
-    <!-- ── INFINITE (hidden, dev) ── -->
-    <div id="btn-infinite" style="display:none;"></div>
-
-    <!-- ── BEST SCORE ── -->
-    <div id="menu-best"></div>
 
   </div>
+
+  <div id="btn-infinite" style="display:none;"></div>
+
 </div>

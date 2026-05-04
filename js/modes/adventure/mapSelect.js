@@ -21,7 +21,6 @@ function buildMapSelectScreen() {
   _carouselMaps  = MapRegistry.all();
   _carouselIndex = 0;
 
-  // parti dalla prima mappa non completata, o la prima
   const firstUnfinished = _carouselMaps.findIndex(m =>
     Progress.isMapUnlocked(m.id) && !Progress.isMapCompleted(m.id)
   );
@@ -30,6 +29,14 @@ function buildMapSelectScreen() {
   _buildCarouselTrack();
   _renderCarousel();
   _bindCarouselButtons();
+  _buildAbilityPicker();
+
+  // start demo in map select
+  const map = _carouselMaps[_carouselIndex];
+  if (map && map.background) {
+    DemoMode.start('mapselect-demo', { autoRotate: false });
+    DemoMode.setMap(map.background);
+  }
 }
 
 /* ── CREA LE SLIDE ── */
@@ -89,14 +96,28 @@ function _renderCarousel() {
     isBoss ? '⚔️ BOSS FIGHT' : `level ${map.order}`;
 
   // completed
+  // completed
   const completed = Progress.isMapCompleted(map.id);
   document.getElementById('carousel-completed').textContent =
-    completed ? 'COMPLETED' : '';
+    completed ? '✓ COMPLETED' : '';
+
+  // best score
+  const bestEl = document.getElementById('carousel-best');
+  if (bestEl) {
+    const key  = 'ds_best_' + map.id;
+    const best = localStorage.getItem(key);
+    bestEl.textContent = (completed && best) ? 'BEST: ' + best + ' pts' : '';
+  }
 
   // play button
   const unlocked = Progress.isMapUnlocked(map.id);
   const btn      = document.getElementById('btn-map-play');
   btn.disabled   = !unlocked;
+
+  // sync demo map
+  if (map.background) {
+    DemoMode.setMap(map.background);
+  }
 }
 
 /* ── BIND BOTTONI ── */
@@ -120,9 +141,9 @@ function _shiftCarousel(dir) {
 function onMapSelected(mapId) {
   selectedMapId = mapId;
   SFX.abilityPick();
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
   startAdventureMap(mapId);
 }
-
 /* ── SHOW BOSS ANNOUNCE ────────────────
    Called by AdventureDirector when wave 10
    starts. Shows a centered popup with the
@@ -199,4 +220,39 @@ function _returnToMapSelect() {
   const sMapComplete = document.getElementById('screen-map-complete');
   sMapComplete.style.display = 'none';
   showScreen(sMapSelect);
+}
+/* ═══════════════════════════════════════
+   ABILITY PICKER — mini carousel
+   ═══════════════════════════════════════ */
+
+let _abilityList  = [];
+let _abilityIndex = 0;
+
+function _buildAbilityPicker() {
+  _abilityList = AbilityRegistry.all();
+  const equipped = getEquippedAbility();
+  _abilityIndex = Math.max(0, _abilityList.findIndex(a => a.id === equipped));
+  _renderAbilityPicker();
+
+  document.getElementById('ability-prev').onclick = () => {
+    _abilityIndex = (_abilityIndex - 1 + _abilityList.length) % _abilityList.length;
+    _applyAbilityPick();
+  };
+  document.getElementById('ability-next').onclick = () => {
+    _abilityIndex = (_abilityIndex + 1) % _abilityList.length;
+    _applyAbilityPick();
+  };
+}
+
+function _applyAbilityPick() {
+  const ab = _abilityList[_abilityIndex];
+  saveEquippedAbility(ab.id);
+  _renderAbilityPicker();
+}
+
+function _renderAbilityPicker() {
+  const ab = _abilityList[_abilityIndex];
+  if (!ab) return;
+  document.getElementById('ability-pick-icon').textContent = ab.icon;
+  document.getElementById('ability-pick-name').textContent = ab.name;
 }

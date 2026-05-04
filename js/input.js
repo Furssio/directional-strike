@@ -11,13 +11,13 @@
 /* ── MENU NAVIGATION ── */
 
 document.getElementById('btn-infinite').addEventListener('click', () => {
-  DemoMode.stop();
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
   equippedAbilityId = getEquippedAbility();
   ActiveDirector = Director;
   startGame();
 });
 document.getElementById('btn-adventure').addEventListener('click', () => {
-  DemoMode.stop();
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
   loadAdventureMode(() => {
     buildMapSelectScreen();
     showScreen(sMapSelect);
@@ -28,20 +28,46 @@ document.getElementById('btn-adventure').addEventListener('click', () => {
 document.getElementById('btn-challenge').addEventListener('click', () => {
   // TODO: unlock after adventure complete
 });
+// splash text on challenge hover
+const _challengeCard = document.getElementById('btn-challenge');
+const _splashEl = document.getElementById('menu-splash');
+const _splashTexts = [
+  'For experienced\nwarriors only!',
+  'Beat Adventure\nmode first!',
+  'Think you are\nready? 💀',
+  'Endless chaos\nawaits...',
+  'No mercy.\nNo checkpoints.',
+];
 
+if (_challengeCard && _splashEl) {
+  _challengeCard.addEventListener('mouseenter', () => {
+    const txt = _splashTexts[Math.floor(Math.random() * _splashTexts.length)];
+    _splashEl.textContent = txt;
+    _splashEl.classList.add('visible');
+  });
+  _challengeCard.addEventListener('mouseleave', () => {
+    _splashEl.classList.remove('visible');
+  });
+}
 // how to play — placeholder
 document.getElementById('btn-howtoplay').addEventListener('click', () => {
   // TODO: show how to play screen
 });
-document.getElementById('btn-abilities').addEventListener('click', () => {
-  DemoMode.stop();
-  buildAbilityScreen();
-  showScreen(sAbility);
-});
-document.getElementById('btn-ability-back').addEventListener('click', () => {
-  showScreen(sMenu);
-  DemoMode.start();
-});
+const _btnAbilities = document.getElementById('btn-abilities');
+if (_btnAbilities) {
+  _btnAbilities.addEventListener('click', () => {
+    if (typeof DemoMode !== 'undefined') DemoMode.stop();
+    buildAbilityScreen();
+    showScreen(sAbility);
+  });
+}
+const _btnAbilityBack = document.getElementById('btn-ability-back');
+if (_btnAbilityBack) {
+  _btnAbilityBack.addEventListener('click', () => {
+    showScreen(sMenu);
+    if (typeof DemoMode !== 'undefined') DemoMode.start();
+  });
+}
 
 document.getElementById('btn-restart').addEventListener('click', () => {
   equippedAbilityId = getEquippedAbility();
@@ -60,12 +86,12 @@ document.getElementById('btn-restart').addEventListener('click', () => {
 document.getElementById('btn-home').addEventListener('click', () => {
   updateMenuBest();
   showScreen(sMenu);
-  DemoMode.start();
+  if (typeof DemoMode !== 'undefined') DemoMode.start();
 });
 
 document.getElementById('btn-map-back').addEventListener('click', () => {
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
   showScreen(sMenu);
-  DemoMode.start();
 });
 
 /* ── AUDIO ── */
@@ -175,5 +201,4 @@ document.addEventListener('keydown', e => {
 });
 
 updateMenuBest();
-DemoMode.start();
 // btnMute removed — audio controls now in menu bottom bar (btn-sfx, btn-music)
