@@ -8,7 +8,11 @@
 EnemyRegistry.register({
   id:        'wolf',
   sprite:    'assets/enemies/wolf/idle.png',
-  size:      63,
+  spriteFrames:  12,
+  spriteFrameW:  84,
+  spriteFrameH:  84,
+  spriteSpeed:   1.0,
+  size:          84,
   hpPct:     0.65,
   damagePct: 0.30,
   speedMult: 1.10,

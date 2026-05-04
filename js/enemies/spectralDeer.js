@@ -9,7 +9,11 @@
 EnemyRegistry.register({
   id:        'spectral_deer',
   sprite:    'assets/enemies/spectral_deer/idle.png',
-  size:      75,
+  spriteFrames:  12,
+  spriteFrameW:  100,
+  spriteFrameH:  100,
+  spriteSpeed:   1.0,
+  size:          100,
   hpPct:     0.30,
   damagePct: 0.25,
   speedMult: 0.85,

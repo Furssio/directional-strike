@@ -8,7 +8,11 @@
 EnemyRegistry.register({
   id:        'bear',
   sprite:    'assets/enemies/bear/idle.png',
-  size:      72,
+  spriteFrames:  12,
+  spriteFrameW:  100,
+  spriteFrameH:  100,
+  spriteSpeed:   1.0,
+  size:          100,
   hpPct:     1.50,
   damagePct: 1.50,
   speedMult: 4538,

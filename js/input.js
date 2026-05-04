@@ -11,11 +11,13 @@
 /* ── MENU NAVIGATION ── */
 
 document.getElementById('btn-infinite').addEventListener('click', () => {
+  DemoMode.stop();
   equippedAbilityId = getEquippedAbility();
   ActiveDirector = Director;
   startGame();
 });
 document.getElementById('btn-adventure').addEventListener('click', () => {
+  DemoMode.stop();
   loadAdventureMode(() => {
     buildMapSelectScreen();
     showScreen(sMapSelect);
@@ -32,10 +34,14 @@ document.getElementById('btn-howtoplay').addEventListener('click', () => {
   // TODO: show how to play screen
 });
 document.getElementById('btn-abilities').addEventListener('click', () => {
+  DemoMode.stop();
   buildAbilityScreen();
   showScreen(sAbility);
 });
-document.getElementById('btn-ability-back').addEventListener('click', () => showScreen(sMenu));
+document.getElementById('btn-ability-back').addEventListener('click', () => {
+  showScreen(sMenu);
+  DemoMode.start();
+});
 
 document.getElementById('btn-restart').addEventListener('click', () => {
   equippedAbilityId = getEquippedAbility();
@@ -54,9 +60,13 @@ document.getElementById('btn-restart').addEventListener('click', () => {
 document.getElementById('btn-home').addEventListener('click', () => {
   updateMenuBest();
   showScreen(sMenu);
+  DemoMode.start();
 });
 
-document.getElementById('btn-map-back').addEventListener('click', () => showScreen(sMenu));
+document.getElementById('btn-map-back').addEventListener('click', () => {
+  showScreen(sMenu);
+  DemoMode.start();
+});
 
 /* ── AUDIO ── */
 
@@ -165,4 +175,5 @@ document.addEventListener('keydown', e => {
 });
 
 updateMenuBest();
+DemoMode.start();
 // btnMute removed — audio controls now in menu bottom bar (btn-sfx, btn-music)

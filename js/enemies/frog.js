@@ -8,7 +8,11 @@
 EnemyRegistry.register({
   id:        'frog',
   sprite:    'assets/enemies/frog/idle.png',
-  size:      51,
+  spriteFrames:  12,
+  spriteFrameW:  68,
+  spriteFrameH:  68,
+  spriteSpeed:   1.0,
+  size:          68,
   hpPct:     0.30,
   damagePct: 0.22,
   speedMult: 0.0,

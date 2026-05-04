@@ -7,7 +7,11 @@
 EnemyRegistry.register({
   id:              'parrot',
   sprite:          'assets/enemies/parrot/idle.png',
-  size:            54,
+  spriteFrames:  8,
+  spriteFrameW:  72,
+  spriteFrameH:  72,
+  spriteSpeed:   1.0,
+  size:          72,
   hpPct:           0.30,
   damagePct:       0.20,
   speedMult:       0.50,

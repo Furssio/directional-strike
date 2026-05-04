@@ -8,7 +8,11 @@
 EnemyRegistry.register({
   id:        'kitsune',
   sprite:    'assets/enemies/kitsune/idle.png',
-  size:      57,
+ spriteFrames:  12,
+  spriteFrameW:  76,
+  spriteFrameH:  76,
+  spriteSpeed:   1.0,
+  size:          76,
   hpPct:     0.30,
   damagePct: 0.30,
   speedMult: 0.55,

@@ -8,7 +8,11 @@
 EnemyRegistry.register({
   id:        'thunder_hound',
   sprite:    'assets/enemies/thunder_hound/idle.png',
-  size:      66,
+  spriteFrames:  12,
+  spriteFrameW:  120,
+  spriteFrameH:  120,
+  spriteSpeed:   1.0,
+  size:          120,
   hpPct:     9.00,
   damagePct: 0.28,
   speedMult: 1.6,

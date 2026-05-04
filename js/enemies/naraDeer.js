@@ -8,7 +8,11 @@
 EnemyRegistry.register({
   id:        'nara_deer',
   sprite:    'assets/enemies/nara_deer/idle.png',
-  size:      69,
+  spriteFrames:  12,
+  spriteFrameW:  92,
+  spriteFrameH:  92,
+  spriteSpeed:   1.0,
+  size:          92,
   hpPct:     0.30,
   damagePct: 0.25,
   speedMult: 0.75,

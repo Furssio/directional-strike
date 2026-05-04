@@ -77,6 +77,7 @@ const SCRIPTS = [
   'js/systems/loop.js',
   'js/systems/upgradeChoice.js',
   'js/systems/orbs.js',
+  'js/systems/demoMode.js',
 
   /* ── INPUT ── */
   'js/input.js',

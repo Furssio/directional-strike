@@ -1,0 +1,98 @@
+/* ══════════════════════════════════════
+   DEMO MODE — menu background gameplay
+   Isolated arena with bot player.
+   ══════════════════════════════════════ */
+
+/* ── DEMO ARENA ── */
+#demo-arena {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
+  background-color: rgba(0,0,0,0.45);
+  image-rendering: pixelated;
+  overflow: hidden;
+  border-radius: 12px;
+  opacity: 0.6;
+  z-index: 0;
+  transition: background-image 0.8s ease-in-out;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+}
+
+/* ── DEMO PLAYER ── */
+#demo-player {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 96px;
+  height: 96px;
+  background-image: url('../assets/characters/player_idle.png');
+  background-size: 1152px 96px;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: playerIdle 1.2s steps(12) infinite;
+  z-index: 10;
+}
+
+/* ── DEMO ENEMIES ── */
+#demo-arena .demo-enemy {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+/* ── DEMO SLASH ── */
+#demo-arena .demo-slash {
+  position: absolute;
+  width: 64px;
+  height: 47px;
+  background-image: url('../assets/effects/slash.png');
+  background-size: 192px 141px;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 15;
+  animation: slashAnim 0.25s steps(1) forwards;
+}
+
+/* ── DEMO PARTICLES ── */
+#demo-arena .demo-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 30;
+  transform: translate(-50%, -50%);
+}
+
+/* ── DEMO SCORE POP ── */
+#demo-arena .demo-score-pop {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #FFD700;
+  pointer-events: none;
+  z-index: 26;
+  text-shadow: 0 0 4px rgba(255,255,255,0.4), 1px 1px 0 #000;
+  animation: scoreBurst 0.8s ease-out forwards;
+}
+
+/* ── MAP TRANSITION ── */
+#demo-arena.map-fade {
+  animation: demoMapFade 0.8s ease-in-out;
+}
+
+@keyframes demoMapFade {
+  0%   { opacity: 0.6; }
+  40%  { opacity: 0.2; }
+  60%  { opacity: 0.2; }
+  100% { opacity: 0.6; }
+}
