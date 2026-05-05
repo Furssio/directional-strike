@@ -119,11 +119,13 @@ document.getElementById('btn-music').addEventListener('click', () => {
   const btn = document.getElementById('btn-' + dir);
   if (btn) {
     btn.addEventListener('click', () => {
+      if (paused) return;
       handleDir(dir);
       if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
     });
     btn.addEventListener('touchstart', e => {
       e.preventDefault();
+      if (paused) return;
       handleDir(dir);
       if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
     }, { passive: false });
@@ -134,11 +136,13 @@ document.getElementById('btn-music').addEventListener('click', () => {
 const specialBtn = document.getElementById('btn-special');
 if (specialBtn) {
   specialBtn.addEventListener('mousedown', () => {
+    if (paused) return;
     activateSpecial();
     if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   });
   specialBtn.addEventListener('touchstart', e => {
     e.preventDefault();
+    if (paused) return;
     activateSpecial();
     if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   }, { passive: false });
@@ -146,9 +150,17 @@ if (specialBtn) {
 /* ── KEYBOARD ── */
 
 document.addEventListener('keydown', e => {
-  // Space = special
-  if (e.code === 'Space') {
+  // P = pause
+  if (e.code === 'KeyP') {
     e.preventDefault();
+    togglePause();
+    return;
+  }
+
+  // Space = special
+ if (e.code === 'Space') {
+    e.preventDefault();
+    if (paused) return;
     activateSpecial();
     return;
   }
@@ -162,6 +174,7 @@ document.addEventListener('keydown', e => {
 
   if (map[e.key]) {
     e.preventDefault();
+    if (paused) return;
     const btn = document.getElementById('btn-' + map[e.key]);
     if (btn) btn.classList.add('pressed');
     setTimeout(() => { if (btn) btn.classList.remove('pressed'); }, 120);

@@ -1,6 +1,7 @@
 /* ══════════════════════════════════════
    MAP SELECT — Adventure mode carousel
-   Uses CSS vars from :root (base.css)
+   All elements positioned independently.
+   Uses % so it scales with screen size.
    ══════════════════════════════════════ */
 
 #screen-map-select {
@@ -13,19 +14,18 @@
   aspect-ratio: 1;
   margin: 0 auto;
   text-align: center;
-  padding: 3% 0 2%;
   position: relative;
   background: var(--c-bg);
   border-radius: 16px;
   overflow: hidden;
 }
 
-/* ── BACK BUTTON (top left) ── */
+/* ── BACK BUTTON ── */
 .map-back-btn {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 10;
+  top: 2%;
+  left: 2%;
+  z-index: 20;
   background: rgba(17, 17, 34, 0.5);
   border: none;
   border-radius: 6px;
@@ -44,32 +44,35 @@
 
 /* ── MAP NAME ── */
 #map-select-wrapper h2 {
+  position: relative;
+  z-index: 10;
   font-family: 'Press Start 2P', monospace;
   font-size: 20px;
   color: var(--c-text);
-  margin-bottom: 2px;
+  margin: 0;
+  padding-top: 3%;
   letter-spacing: 1px;
   text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
-  transition: opacity 0.2s;
 }
 
 #carousel-map-sub {
+  position: relative;
+  z-index: 10;
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
   color: var(--c-text-dim);
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   min-height: 14px;
-  transition: opacity 0.2s;
 }
 
 /* ── CAROUSEL ── */
 #carousel-container {
+  position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  position: relative;
-  height: 280px;
+  height: 42%;
 }
 
 #carousel-track {
@@ -81,13 +84,13 @@
   height: 100%;
 }
 
-/* ── ARROWS ── */
+/* ── CAROUSEL ARROWS ── */
 #carousel-prev,
 #carousel-next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10;
+  z-index: 15;
   background: none;
   border: none;
   color: var(--c-text);
@@ -117,8 +120,8 @@
 }
 
 .map-slide.pos-center {
-  width: 250px;
-  height: 250px;
+  width: 44%;
+  aspect-ratio: 1;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
@@ -127,83 +130,98 @@
 }
 
 .map-slide.pos-left {
-  width: 155px;
-  height: 155px;
+  width: 26%;
+  aspect-ratio: 1;
   left: 50%;
-  transform: translateX(calc(-50% - 200px));
+  transform: translateX(calc(-50% - 34%));
   z-index: 3;
   filter: brightness(0.3);
 }
 
 .map-slide.pos-right {
-  width: 155px;
-  height: 155px;
+  width: 26%;
+  aspect-ratio: 1;
   left: 50%;
-  transform: translateX(calc(-50% + 200px));
+  transform: translateX(calc(-50% + 34%));
   z-index: 3;
   filter: brightness(0.3);
 }
 
 .map-slide.pos-far-left {
-  width: 100px;
-  height: 100px;
+  width: 16%;
+  aspect-ratio: 1;
   left: 50%;
-  transform: translateX(calc(-50% - 300px));
+  transform: translateX(calc(-50% - 52%));
   z-index: 1;
   filter: brightness(0.15);
   opacity: 0;
 }
 
 .map-slide.pos-far-right {
-  width: 100px;
-  height: 100px;
+  width: 16%;
+  aspect-ratio: 1;
   left: 50%;
-  transform: translateX(calc(-50% + 300px));
+  transform: translateX(calc(-50% + 52%));
   z-index: 1;
   filter: brightness(0.15);
   opacity: 0;
 }
 
-/* boss border */
 .map-slide.is-boss {
   border: 3px solid #E24B4A;
   box-shadow: 0 6px 24px rgba(226,75,74,0.3);
 }
 
-/* locked */
 .map-slide.is-locked {
   filter: brightness(0.12) !important;
   cursor: default;
 }
 
-/* ── BOTTOM ── */
-#carousel-bottom {
-  margin-top: 12px;
+/* ══════════════════════════════════════
+   PLAYER — absolute center
+   ══════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   STATUS — under player, centered
+   ══════════════════════════════════════ */
+#map-status {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
+  z-index: 10;
 }
 
 #carousel-completed {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 7px;
   color: #22C55E;
   letter-spacing: 2px;
-  min-height: 12px;
+  min-height: 10px;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
 }
 
 #carousel-best {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
+  font-size: 5px;
   color: var(--c-accent);
-  min-height: 10px;
+  min-height: 8px;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
 }
 
+/* ══════════════════════════════════════
+   PLAY BUTTON — centered under status
+   ══════════════════════════════════════ */
 #btn-map-play {
-  padding: 10px 40px;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 36px;
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;
   border-radius: 8px;
@@ -212,13 +230,15 @@
   color: var(--c-accent);
   cursor: pointer;
   letter-spacing: 2px;
+  white-space: nowrap;
+  z-index: 10;
   transition: background 0.15s, color 0.15s, transform 0.08s;
 }
 
 #btn-map-play:hover:not(:disabled) {
   background: var(--c-accent);
   color: var(--c-bg);
-  transform: scale(1.04);
+  transform: translateX(-50%) scale(1.04);
 }
 
 #btn-map-play:disabled {
@@ -228,73 +248,133 @@
 }
 
 /* ══════════════════════════════════════
-   ABILITY PICKER — mini carousel
+   ABILITY CARD — bottom left
    ══════════════════════════════════════ */
-#ability-picker {
+.map-side-card {
+  position: absolute;
+  bottom: 4%;
+  width: 28%;
+  background: rgba(17, 17, 34, 0.7);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 8px 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 10px;
-  position: relative;
-  z-index: 5;
+  gap: 4px;
+  z-index: 10;
 }
-.ability-arrow {
-  background: none;
-  border: none;
+
+#ability-card-select {
+  left: 3%;
+}
+
+#enemy-card-select {
+  right: 3%;
+}
+
+.card-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
   color: var(--c-text-dim);
-  font-size: 24px;
-  cursor: pointer;
-  padding: 4px 8px;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+.card-value {
   font-family: 'Press Start 2P', monospace;
-  transition: color 0.15s;
-}
-
-.ability-arrow:hover {
-  color: var(--c-text);
-}
-
-#ability-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(17, 17, 34, 0.5);
-  border-radius: 6px;
-  padding: 6px 14px;
-  min-width: 160px;
-  justify-content: center;
-}
-
-#ability-pick-icon {
-  font-size: 20px;
-}
-
-#ability-pick-name {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
+  font-size: 6px;
   color: var(--c-text);
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
 }
 
+/* ── ABILITY ROW (horizontal arrows) ── */
+.ability-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#ability-card-select .ability-arrow {
+  background: none;
+  border: none;
+  color: var(--c-text-dim);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-family: 'Press Start 2P', monospace;
+  transition: color 0.15s;
+}
+
+#ability-card-select .ability-arrow:hover {
+  color: var(--c-text);
+}
+
+#ability-pick-img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+#ability-pick-name {
+  font-size: 6px;
+  min-height: 10px;
+}
+
+/* ── ENEMY CARD ── */
+#enemy-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  align-items: flex-start;
+  padding: 2px 4px;
+}
+
+.enemy-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.enemy-preview-icon {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.enemy-preview-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: var(--c-text-dim);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  line-height: 1.4;
+}
+
 /* ══════════════════════════════════════
-   DEMO ARENA IN MAP SELECT
+   MAP PREVIEW BG — full bottom
    ══════════════════════════════════════ */
 #mapselect-demo {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 50%;
+  height: 55%;
   background-size: cover;
   background-position: center;
   image-rendering: pixelated;
   overflow: hidden;
   z-index: 0;
   border-radius: 0 0 16px 16px;
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.5) 50%, black 75%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.5) 50%, black 75%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.5) 45%, black 70%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.5) 45%, black 70%);
 }
-
+/* ── PLAYER IN DEMO ── */
 #mapselect-demo .demo-player-instance {
   position: absolute;
   top: 50%;
@@ -308,47 +388,4 @@
   image-rendering: pixelated;
   animation: playerIdle 1.2s steps(12) infinite;
   z-index: 10;
-}
-
-#mapselect-demo .demo-enemy,
-#mapselect-demo .demo-slash,
-#mapselect-demo .demo-particle,
-#mapselect-demo .demo-score-pop {
-  position: absolute;
-}
-
-#mapselect-demo .demo-enemy {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-}
-
-#mapselect-demo .demo-slash {
-  width: 64px;
-  height: 47px;
-  background-image: url('../../assets/effects/slash.png');
-  background-size: 192px 141px;
-  image-rendering: pixelated;
-  pointer-events: none;
-  z-index: 15;
-  animation: slashAnim 0.25s steps(1) forwards;
-}
-
-#mapselect-demo .demo-particle {
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 30;
-  transform: translate(-50%, -50%);
-}
-
-#mapselect-demo .demo-score-pop {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--c-text);
-  pointer-events: none;
-  z-index: 26;
-  text-shadow: 0 0 4px rgba(255,255,255,0.4), 1px 1px 0 #000;
-  animation: scoreBurst 0.8s ease-out forwards;
 }

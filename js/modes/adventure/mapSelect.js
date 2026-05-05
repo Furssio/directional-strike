@@ -141,11 +141,14 @@ function _renderCarousel() {
   const btn      = document.getElementById('btn-map-play');
   btn.disabled   = !unlocked;
 
- // sync map preview background
+// sync map preview background
   const demoEl = document.getElementById('mapselect-demo');
   if (demoEl && map.background) {
     demoEl.style.backgroundImage = `url(${map.background})`;
   }
+
+  // render enemy card
+  _renderEnemyCard(map);
 }
 
 /* ── BIND BOTTONI ── */
@@ -248,10 +251,91 @@ function _returnToMapSelect() {
   sMapComplete.style.display = 'none';
   showScreen(sMapSelect);
 }
+
+/* ── ENEMY HINTS (short descriptions) ── */
+const ENEMY_HINTS = {
+  ravager:       'Fast rusher',
+  crusher:       'Shoots bullets',
+  golem:         'Tanky, 3 hits',
+  slime_large:   'Splits in two',
+  slime_lava:    'Spits lava',
+  golem_lava:    'Splits sideways',
+  bear:          'Charges attack',
+  crab:          'Emerges + spawns',
+  scorpion:      'Poison sting',
+  eagle:         'Rush then shoot',
+  frog:          'Parryable jumps',
+  kitsune:       'Lunges close',
+  nara_deer:     'Changes direction',
+  oni:           '4 hits, bounces',
+  parrot:        'Double shot',
+  spectral_deer: 'Fades in/out',
+  star:          'Very fast, parry',
+  thunder_hound: 'Dodges first hit',
+  tornado:       'Fast, parryable',
+  turtle:        'Shell then slow',
+  wolf:          'Bounces back',
+};
+
+function _renderEnemyCard(map) {
+  const list = document.getElementById('enemy-preview-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const ids = _getMapEnemyIds(map);
+  ids.forEach(id => {
+    const def = EnemyRegistry.get(id);
+    if (!def) return;
+
+    const row = document.createElement('div');
+    row.className = 'enemy-preview';
+
+    const icon = document.createElement('div');
+    icon.className = 'enemy-preview-icon';
+    if (def.sprite) {
+      icon.style.backgroundImage = `url(${def.sprite})`;
+      // show only first frame
+      if (def.spriteFrames && def.spriteFrames > 1) {
+        const fw = def.spriteFrameW || 96;
+        const fh = def.spriteFrameH || 96;
+        const scale = 22 / fh;
+        icon.style.backgroundSize = `${Math.round(fw * def.spriteFrames * scale)}px 22px`;
+        icon.style.backgroundPosition = '0 0';
+      }
+    }
+
+    const hint = document.createElement('div');
+    hint.className = 'enemy-preview-hint';
+    hint.textContent = ENEMY_HINTS[id] || def.name || id;
+
+    row.appendChild(icon);
+    row.appendChild(hint);
+    list.appendChild(row);
+  });
+}
+
+/* ── EXTRACT ENEMY IDS FROM MAP DEF ── */
+function _getMapEnemyIds(map) {
+  const ids = new Set();
+  if (map.enemyPool) {
+    Object.keys(map.enemyPool).forEach(id => ids.add(id));
+  }
+  if (map.waveConfig) {
+    Object.values(map.waveConfig).forEach(wc => {
+      if (wc.pool) Object.keys(wc.pool).forEach(id => ids.add(id));
+    });
+  }
+  if (map.introWaves) {
+    Object.values(map.introWaves).forEach(iw => {
+      if (iw.pool) iw.pool.forEach(id => ids.add(id));
+    });
+  }
+  return [...ids];
+}
+
 /* ═══════════════════════════════════════
    ABILITY PICKER — mini carousel
    ═══════════════════════════════════════ */
-
 let _abilityList  = [];
 let _abilityIndex = 0;
 
@@ -282,8 +366,8 @@ function _applyAbilityPick() {
 function _renderAbilityPicker() {
   const ab = _abilityList[_abilityIndex];
   if (!ab) return;
-  const icon = document.getElementById('ability-pick-icon');
+  const img  = document.getElementById('ability-pick-img');
   const name = document.getElementById('ability-pick-name');
-  if (icon) icon.textContent = ab.icon;
+  if (img)  img.src = 'assets/abilities/' + ab.id + '.png';
   if (name) name.textContent = ab.name;
 }

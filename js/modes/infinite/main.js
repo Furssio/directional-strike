@@ -75,6 +75,7 @@ const SCRIPTS = [
   'js/systems/spawn.js',
   'js/systems/combat.js',
   'js/systems/loop.js',
+  'js/systems/pause.js',
   'js/systems/upgradeChoice.js',
   'js/systems/orbs.js',
   'js/systems/demoMode.js',

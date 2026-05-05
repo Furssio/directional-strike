@@ -1,8 +1,7 @@
 <div id="screen-map-select">
-  <div id="mapselect-player"></div>
   <div id="map-select-wrapper">
 
-    <!-- ── BACK (top left) ── -->
+    <!-- ── BACK ── -->
     <button id="btn-map-back" class="map-back-btn">← BACK</button>
 
     <!-- ── MAP NAME ── -->
@@ -16,24 +15,35 @@
       <button id="carousel-next">&#8250;</button>
     </div>
 
-    <!-- ── BOTTOM ── -->
-    <div id="carousel-bottom">
+  
+    <!-- ── STATUS (under player) ── -->
+    <div id="map-status">
       <div id="carousel-completed"></div>
       <div id="carousel-best"></div>
-      <button id="btn-map-play">PLAY</button>
-
-      <!-- ── ABILITY PICKER ── -->
-      <div id="ability-picker">
-        <button id="ability-prev" class="ability-arrow">‹</button>
-        <div id="ability-display">
-          <span id="ability-pick-icon"></span>
-          <span id="ability-pick-name"></span>
-        </div>
-        <button id="ability-next" class="ability-arrow">›</button>
-      </div>
     </div>
 
-    <!-- ── DEMO ARENA (inside wrapper, bottom) ── -->
+    <!-- ── PLAY (under status) ── -->
+    <button id="btn-map-play">PLAY</button>
+
+    <!-- ── ABILITY CARD (bottom left) ── -->
+    <div id="ability-card-select" class="map-side-card">
+      <div class="card-label">ABILITY</div>
+      <div class="ability-row">
+        <button id="ability-prev" class="ability-arrow">‹</button>
+        <img id="ability-pick-img" src="" alt="" />
+        <button id="ability-next" class="ability-arrow">›</button>
+      </div>
+      <div id="ability-pick-name" class="card-value"></div>
+    </div>
+
+    <!-- ── ENEMY CARD (bottom right) ── -->
+    <div id="enemy-card-select" class="map-side-card">
+      <div class="card-label">ENEMIES</div>
+      <div id="enemy-preview-list"></div>
+    </div>
+
+  
+    <!-- ── MAP PREVIEW BG ── -->
     <div id="mapselect-demo">
       <div class="demo-player-instance"></div>
     </div>
