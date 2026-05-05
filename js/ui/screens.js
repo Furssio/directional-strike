@@ -24,10 +24,10 @@ function saveBestScore(score) {
 }
 
 function updateMenuBest() {
+  if (!menuBest) return;
   const b = getBestScore();
   menuBest.textContent = b > 0 ? 'best: ' + b + ' pts' : '';
 }
-
 /* ── SCORE POPUP ── */
 
 const _popColors = ['#FFD700','#44ddff','#ff66aa','#66ff66','#ff8844','#aa88ff','#ffff44'];

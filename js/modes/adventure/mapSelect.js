@@ -16,6 +16,33 @@ let _carouselMaps  = [];
 
 const BOSS_ORDERS = [4, 8, 11, 13];
 
+
+/* ── EXTRACT ENEMY IDS FROM MAP DEF ── */
+function _getMapEnemyIds(map) {
+  const ids = new Set();
+
+  // from enemyPool keys
+  if (map.enemyPool) {
+    Object.keys(map.enemyPool).forEach(id => ids.add(id));
+  }
+
+  // from waveConfig pools
+  if (map.waveConfig) {
+    Object.values(map.waveConfig).forEach(wc => {
+      if (wc.pool) Object.keys(wc.pool).forEach(id => ids.add(id));
+    });
+  }
+
+  // from introWaves
+  if (map.introWaves) {
+    Object.values(map.introWaves).forEach(iw => {
+      if (iw.pool) iw.pool.forEach(id => ids.add(id));
+    });
+  }
+
+  return [...ids];
+}
+
 /* ── BUILD ── */
 function buildMapSelectScreen() {
   _carouselMaps  = MapRegistry.all();
@@ -31,11 +58,11 @@ function buildMapSelectScreen() {
   _bindCarouselButtons();
   _buildAbilityPicker();
 
-  // start demo in map select
+  // set initial map preview background
   const map = _carouselMaps[_carouselIndex];
-  if (map && map.background) {
-    DemoMode.start('mapselect-demo', { autoRotate: false });
-    DemoMode.setMap(map.background);
+  const demoEl = document.getElementById('mapselect-demo');
+  if (map && map.background && demoEl) {
+    demoEl.style.backgroundImage = `url(${map.background})`;
   }
 }
 
@@ -114,9 +141,10 @@ function _renderCarousel() {
   const btn      = document.getElementById('btn-map-play');
   btn.disabled   = !unlocked;
 
-  // sync demo map
-  if (map.background) {
-    DemoMode.setMap(map.background);
+ // sync map preview background
+  const demoEl = document.getElementById('mapselect-demo');
+  if (demoEl && map.background) {
+    demoEl.style.backgroundImage = `url(${map.background})`;
   }
 }
 
@@ -141,7 +169,6 @@ function _shiftCarousel(dir) {
 function onMapSelected(mapId) {
   selectedMapId = mapId;
   SFX.abilityPick();
-  if (typeof DemoMode !== 'undefined') DemoMode.stop();
   startAdventureMap(mapId);
 }
 /* ── SHOW BOSS ANNOUNCE ────────────────
@@ -234,11 +261,13 @@ function _buildAbilityPicker() {
   _abilityIndex = Math.max(0, _abilityList.findIndex(a => a.id === equipped));
   _renderAbilityPicker();
 
-  document.getElementById('ability-prev').onclick = () => {
+  const prev = document.getElementById('ability-prev');
+  const next = document.getElementById('ability-next');
+  if (prev) prev.onclick = () => {
     _abilityIndex = (_abilityIndex - 1 + _abilityList.length) % _abilityList.length;
     _applyAbilityPick();
   };
-  document.getElementById('ability-next').onclick = () => {
+  if (next) next.onclick = () => {
     _abilityIndex = (_abilityIndex + 1) % _abilityList.length;
     _applyAbilityPick();
   };
@@ -253,6 +282,8 @@ function _applyAbilityPick() {
 function _renderAbilityPicker() {
   const ab = _abilityList[_abilityIndex];
   if (!ab) return;
-  document.getElementById('ability-pick-icon').textContent = ab.icon;
-  document.getElementById('ability-pick-name').textContent = ab.name;
+  const icon = document.getElementById('ability-pick-icon');
+  const name = document.getElementById('ability-pick-name');
+  if (icon) icon.textContent = ab.icon;
+  if (name) name.textContent = ab.name;
 }

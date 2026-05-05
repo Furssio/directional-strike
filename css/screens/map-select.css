@@ -1,4 +1,233 @@
 /* ══════════════════════════════════════
+   MAP SELECT — Adventure mode carousel
+   Uses CSS vars from :root (base.css)
+   ══════════════════════════════════════ */
+
+#screen-map-select {
+  width: 100%;
+  position: relative;
+}
+
+#map-select-wrapper {
+  max-width: 620px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  text-align: center;
+  padding: 3% 0 2%;
+  position: relative;
+  background: var(--c-bg);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* ── BACK BUTTON (top left) ── */
+.map-back-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  background: rgba(17, 17, 34, 0.5);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--c-text-dim);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.map-back-btn:hover {
+  color: var(--c-text);
+  background: rgba(17, 17, 34, 0.7);
+}
+
+/* ── MAP NAME ── */
+#map-select-wrapper h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  color: var(--c-text);
+  margin-bottom: 2px;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+  transition: opacity 0.2s;
+}
+
+#carousel-map-sub {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--c-text-dim);
+  margin-bottom: 12px;
+  min-height: 14px;
+  transition: opacity 0.2s;
+}
+
+/* ── CAROUSEL ── */
+#carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  height: 280px;
+}
+
+#carousel-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  height: 100%;
+}
+
+/* ── ARROWS ── */
+#carousel-prev,
+#carousel-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: none;
+  border: none;
+  color: var(--c-text);
+  font-size: 44px;
+  cursor: pointer;
+  padding: 0 8px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+  line-height: 1;
+  font-family: 'Press Start 2P', monospace;
+}
+#carousel-prev { left: 2%; }
+#carousel-next { right: 2%; }
+#carousel-prev:hover,
+#carousel-next:hover { opacity: 1; }
+
+/* ── MAP SLIDES ── */
+.map-slide {
+  position: absolute;
+  border-radius: 12px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+}
+
+.map-slide.pos-center {
+  width: 250px;
+  height: 250px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  filter: brightness(0.85);
+}
+
+.map-slide.pos-left {
+  width: 155px;
+  height: 155px;
+  left: 50%;
+  transform: translateX(calc(-50% - 200px));
+  z-index: 3;
+  filter: brightness(0.3);
+}
+
+.map-slide.pos-right {
+  width: 155px;
+  height: 155px;
+  left: 50%;
+  transform: translateX(calc(-50% + 200px));
+  z-index: 3;
+  filter: brightness(0.3);
+}
+
+.map-slide.pos-far-left {
+  width: 100px;
+  height: 100px;
+  left: 50%;
+  transform: translateX(calc(-50% - 300px));
+  z-index: 1;
+  filter: brightness(0.15);
+  opacity: 0;
+}
+
+.map-slide.pos-far-right {
+  width: 100px;
+  height: 100px;
+  left: 50%;
+  transform: translateX(calc(-50% + 300px));
+  z-index: 1;
+  filter: brightness(0.15);
+  opacity: 0;
+}
+
+/* boss border */
+.map-slide.is-boss {
+  border: 3px solid #E24B4A;
+  box-shadow: 0 6px 24px rgba(226,75,74,0.3);
+}
+
+/* locked */
+.map-slide.is-locked {
+  filter: brightness(0.12) !important;
+  cursor: default;
+}
+
+/* ── BOTTOM ── */
+#carousel-bottom {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#carousel-completed {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #22C55E;
+  letter-spacing: 2px;
+  min-height: 12px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+#carousel-best {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: var(--c-accent);
+  min-height: 10px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+#btn-map-play {
+  padding: 10px 40px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 2px solid var(--c-accent);
+  background: transparent;
+  color: var(--c-accent);
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: background 0.15s, color 0.15s, transform 0.08s;
+}
+
+#btn-map-play:hover:not(:disabled) {
+  background: var(--c-accent);
+  color: var(--c-bg);
+  transform: scale(1.04);
+}
+
+#btn-map-play:disabled {
+  border-color: #333;
+  color: #333;
+  cursor: default;
+}
+
+/* ══════════════════════════════════════
    ABILITY PICKER — mini carousel
    ══════════════════════════════════════ */
 #ability-picker {
@@ -7,8 +236,9 @@
   justify-content: center;
   gap: 12px;
   margin-top: 10px;
+  position: relative;
+  z-index: 5;
 }
-
 .ability-arrow {
   background: none;
   border: none;
@@ -54,14 +284,15 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 45%;
+  height: 50%;
   background-size: cover;
   background-position: center;
   image-rendering: pixelated;
   overflow: hidden;
   z-index: 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.6) 50%, black 80%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.6) 50%, black 80%);
+  border-radius: 0 0 16px 16px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.5) 50%, black 75%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.5) 50%, black 75%);
 }
 
 #mapselect-demo .demo-player-instance {
@@ -79,7 +310,6 @@
   z-index: 10;
 }
 
-/* reuse demo classes */
 #mapselect-demo .demo-enemy,
 #mapselect-demo .demo-slash,
 #mapselect-demo .demo-particle,

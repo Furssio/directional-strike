@@ -23,12 +23,14 @@ const DemoMode = (() => {
   let CY = 250;
   let ATTACK_RANGE = 500 * 0.234;
 
-  const SPAWN_SEQ = [
+  const DEFAULT_POOL = [
     'ravager', 'ravager', 'crusher', 'ravager',
     'tornado', 'ravager', 'slime_large', 'ravager',
     'ravager', 'tornado', 'crusher', 'ravager',
     'ravager', 'ravager', 'slime_large', 'tornado',
   ];
+
+  let spawnPool = DEFAULT_POOL;
 
   const MAP_BGS = [
     'assets/maps/map01_forest/background_01.png',
@@ -88,7 +90,7 @@ const DemoMode = (() => {
   }
 
   function spawnEnemy() {
-    const id  = SPAWN_SEQ[spawnIdx % SPAWN_SEQ.length];
+    const id  = spawnPool[spawnIdx % spawnPool.length];
     spawnIdx++;
     const def = EnemyRegistry.get(id);
     if (!def) return;
@@ -371,6 +373,7 @@ const DemoMode = (() => {
     active     = true;
     dEnemies   = [];
     spawnIdx   = 0;
+    spawnPool  = DEFAULT_POOL;
     mapIdx     = Math.floor(Math.random() * MAP_BGS.length);
     spawnTimer = 500;
     botTimer   = 800;
@@ -404,6 +407,19 @@ const DemoMode = (() => {
     }, 350);
   }
 
-  return { start, stop, setMap };
+  // set enemy pool for map-specific preview
+  function setEnemyPool(ids) {
+    if (!ids || ids.length === 0) { spawnPool = DEFAULT_POOL; return; }
+    // build weighted pool: repeat each id for variety
+    spawnPool = [];
+    ids.forEach(id => {
+      const def = EnemyRegistry.get(id);
+      if (def) spawnPool.push(id);
+    });
+    if (spawnPool.length === 0) spawnPool = DEFAULT_POOL;
+    spawnIdx = 0;
+  }
+
+  return { start, stop, setMap, setEnemyPool };
 
 })();
