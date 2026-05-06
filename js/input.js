@@ -120,12 +120,20 @@ document.getElementById('btn-music').addEventListener('click', () => {
   if (btn) {
     btn.addEventListener('click', () => {
       if (paused) return;
+      if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+        Tutorial.onDirInput(dir);
+        return;
+      }
       handleDir(dir);
       if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
     });
     btn.addEventListener('touchstart', e => {
       e.preventDefault();
       if (paused) return;
+      if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+        Tutorial.onDirInput(dir);
+        return;
+      }
       handleDir(dir);
       if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
     }, { passive: false });
@@ -137,12 +145,20 @@ const specialBtn = document.getElementById('btn-special');
 if (specialBtn) {
   specialBtn.addEventListener('mousedown', () => {
     if (paused) return;
+    if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+      Tutorial.onSpaceInput();
+      return;
+    }
     activateSpecial();
     if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   });
   specialBtn.addEventListener('touchstart', e => {
     e.preventDefault();
     if (paused) return;
+    if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+      Tutorial.onSpaceInput();
+      return;
+    }
     activateSpecial();
     if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   }, { passive: false });
@@ -161,6 +177,11 @@ document.addEventListener('keydown', e => {
  if (e.code === 'Space') {
     e.preventDefault();
     if (paused) return;
+    // tutorial intercept
+    if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+      Tutorial.onSpaceInput();
+      return;
+    }
     activateSpecial();
     return;
   }
@@ -175,6 +196,11 @@ document.addEventListener('keydown', e => {
   if (map[e.key]) {
     e.preventDefault();
     if (paused) return;
+    // tutorial intercept
+    if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+      Tutorial.onDirInput(map[e.key]);
+      return;
+    }
     const btn = document.getElementById('btn-' + map[e.key]);
     if (btn) btn.classList.add('pressed');
     setTimeout(() => { if (btn) btn.classList.remove('pressed'); }, 120);

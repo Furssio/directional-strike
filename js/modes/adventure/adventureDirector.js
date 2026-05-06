@@ -214,6 +214,13 @@ const AdventureDirector = (() => {
       resetAdventureSpawner();
       if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
       setArenaBackground(currentMap.background || null);
+
+      // start tutorial on wave 1 of first map (first time only)
+      if (wave === 1 && currentMap.id === 'map01_forest' &&
+          typeof Tutorial !== 'undefined' && Tutorial.isNeeded()) {
+        Tutorial.start();
+      }
+
       return true;
     },
 
@@ -295,6 +302,15 @@ const AdventureDirector = (() => {
     /* ── TICK ─────────────────────────── */
     tick(dt) {
       if (!active) return;
+
+      // tutorial controls wave 1 spawning
+      if (typeof Tutorial !== 'undefined' && Tutorial.isActive()) {
+        Tutorial.tick(dt);
+        // still tick orbs and burst queue
+        if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
+        _tickBurstQueue(dt);
+        return; // skip normal spawn logic
+      }
 
       // process queued burst spawns
       _tickBurstQueue(dt);

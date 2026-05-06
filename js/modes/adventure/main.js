@@ -26,6 +26,7 @@ const ADVENTURE_SCRIPTS = [
   'js/modes/adventure/MapRegistry.js',
   'js/modes/adventure/progress.js',
   'js/modes/adventure/adventureSpawner.js',
+  'js/systems/tutorial.js',
   'js/modes/adventure/adventureDirector.js',
 
   /* ── MAPS ── */
