@@ -197,14 +197,10 @@ const CONFIG = {
                     overridable per map in map.js
   ─────────────────────────────────────── */
  adventure: {
-    wavesPerMap:    10,
-    bossPauseMs:    3000,
-    bossAnnounceMs: 2200,
+    /* upgrade choice triggers after these waves */
+    upgradeAfterWaves: [2, 4, 6, 8, 10],
 
-    /* wave timers in seconds — 0 = upgrade choice wave */
-    waveTimers: [0, 30, 30, 0, 35, 40, 0, 45, 50, 0, 60],
-
-    /* spawn pacing — used when map doesn't override */
+    /* spawn pacing — fallback when map doesn't override */
     defaultSpawnInterval: 1800,
     spawnAccelPct:        0.30,
     defaultMaxAlive:      4,

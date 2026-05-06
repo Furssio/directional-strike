@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════
    ADVENTUREDIRECTOR.JS
-   Adventure Mode orchestrator — v2.
-   Scripted spawn pacing with sawtooth
-   intensity curve per wave.
+   Adventure Mode orchestrator — v3.
+   Time-based waves with automatic upgrade
+   choice after configurable waves.
 
-   No stress meter — spawn rate is driven
-   by fixed per-wave config + time-based
-   acceleration + input idle detection.
+   Each wave's duration and spawn config
+   comes from the map's waveConfig.
+   No stress meter, no kill-based advance.
 
    Used by: systems/loop.js
    Depends on: MapRegistry, config.js,
@@ -18,14 +18,11 @@ const AdventureDirector = (() => {
   let currentMap    = null;
   let wave          = 1;
   let spawnTimer    = 0;
-  let killsThisWave = 0;
   let active        = false;
   let completed     = false;
   let waveTimeLeft  = 0;
   let waveDuration  = 0;
   let waveElapsed   = 0;
-  let bossPaused    = false;
-  let bossPauseT    = 0;
   let draining      = false;
   let drainPauseMs  = 0;
 
@@ -33,7 +30,7 @@ const AdventureDirector = (() => {
      Counts player actions to detect idle.
      If player isn't pressing anything
      and field is low, spawn faster.     */
-  let _inputTimes   = [];
+  let _inputTimes = [];
 
   function _trackInput() {
     _inputTimes.push(performance.now());
@@ -42,7 +39,6 @@ const AdventureDirector = (() => {
   function _getInputRate() {
     const now    = performance.now();
     const window = CONFIG.adventure.inputWindowMs || 3000;
-    // clean old entries
     while (_inputTimes.length > 0 && now - _inputTimes[0] > window) {
       _inputTimes.shift();
     }
@@ -56,6 +52,13 @@ const AdventureDirector = (() => {
       return currentMap.waveConfig[wave];
     }
     return null;
+  }
+
+  function _getWaveDuration() {
+    const wc = _getWaveConfig();
+    if (wc && wc.duration !== undefined) return wc.duration * 1000;
+    // fallback: 30 seconds
+    return 30000;
   }
 
   function _getSpawnInterval() {
@@ -77,7 +80,8 @@ const AdventureDirector = (() => {
 
   function _getMinAlive() {
     const wc = _getWaveConfig();
-    return wc ? wc.minAlive : (currentMap.minEnemiesAlive || CONFIG.adventure.defaultMinAlive);
+    return wc ? (wc.minAlive !== undefined ? wc.minAlive : CONFIG.adventure.defaultMinAlive)
+              : (currentMap.minEnemiesAlive || CONFIG.adventure.defaultMinAlive);
   }
 
   function _buildPool() {
@@ -93,25 +97,33 @@ const AdventureDirector = (() => {
     return buildEnemyPoolForMap(wave, currentMap, false);
   }
 
-  function _buildBossPool() {
-    const boss = currentMap.boss;
-    if (!boss || !boss.pool) return [];
-    const pool = [];
-    for (const [name, weight] of Object.entries(boss.pool)) {
-      for (let i = 0; i < weight; i++) pool.push(name);
-    }
-    return pool;
+  /* ── UPGRADE CHECK ──────────────────
+     Returns true if an upgrade choice
+     should trigger after this wave.     */
+  function _isUpgradeWave(w) {
+    const list = CONFIG.adventure.upgradeAfterWaves || [2, 4, 6, 8, 10];
+    return list.includes(w);
+  }
+
+  /* ── FINAL WAVE CHECK ───────────────
+     Wave 11 is the final wave.
+     Maps can override with totalWaves.  */
+  function _getTotalWaves() {
+    if (currentMap && currentMap.totalWaves) return currentMap.totalWaves;
+    return 11;
+  }
+
+  function _isFinalWave() {
+    return wave === _getTotalWaves();
   }
 
   /* ── SPAWN ONE ENEMY ──────────────── */
 
-  function _spawnOne(isBoss) {
-    const pool = isBoss ? _buildBossPool() : _buildPool();
+  function _spawnOne() {
+    const pool = _buildPool();
     if (pool.length === 0) return;
 
-    const maxAlive = isBoss
-      ? (currentMap.boss.maxAlive || 10)
-      : _getMaxAlive();
+    const maxAlive = _getMaxAlive();
     if (enemies.length >= maxAlive) return;
 
     const dir = pickDirAdventure();
@@ -129,20 +141,16 @@ const AdventureDirector = (() => {
 
   /* ── SPAWN BURST ──────────────────
      Spawns multiple enemies on the same
-     direction with small delays.
-     Creates the "line of enemies" feel. */
+     direction with small delays.         */
   let _burstQueue = [];
 
-  function _spawnBurst(isBoss, count) {
-    const pool = isBoss ? _buildBossPool() : _buildPool();
+  function _spawnBurst(count) {
+    const pool = _buildPool();
     if (pool.length === 0) return;
 
-    const maxAlive = isBoss
-      ? (currentMap.boss.maxAlive || 10)
-      : _getMaxAlive();
+    const maxAlive = _getMaxAlive();
     if (enemies.length >= maxAlive) return;
 
-    // pick one direction for the whole burst
     const dir = pickDirAdventure();
     if (!dir) return;
 
@@ -156,10 +164,9 @@ const AdventureDirector = (() => {
     // queue the rest with delays
     for (let i = 1; i < count; i++) {
       _burstQueue.push({
-        dir:    dir,
-        pool:   pool,
-        delay:  i * 500,
-        isBoss: isBoss,
+        dir:      dir,
+        pool:     pool,
+        delay:    i * 500,
         maxAlive: maxAlive,
       });
     }
@@ -193,10 +200,7 @@ const AdventureDirector = (() => {
 
       wave          = 1;
       spawnTimer    = 0;
-      killsThisWave = 0;
       completed     = false;
-      bossPaused    = false;
-      bossPauseT    = 0;
       waveElapsed   = 0;
       draining      = false;
       drainPauseMs  = 0;
@@ -204,10 +208,8 @@ const AdventureDirector = (() => {
       _inputTimes   = [];
       _burstQueue   = [];
 
-      const timers   = CONFIG.adventure.waveTimers;
-      const rawTimer = timers[1] !== undefined ? timers[1] : 30;
-      waveDuration   = rawTimer * 1000;
-      waveTimeLeft   = waveDuration;
+      waveDuration = _getWaveDuration();
+      waveTimeLeft = waveDuration;
 
       resetAdventureSpawner();
       if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
@@ -228,68 +230,44 @@ const AdventureDirector = (() => {
 
     /* ── EVENTS ───────────────────────── */
     onDamage() { /* no stress — kept for interface compat */ },
-
-    onKill() {
-      killsThisWave++;
-      // boss wave uses kills to advance
-      if (this.isBoss() && killsThisWave >= this.getKillsNeeded()) {
-        this.completeMap();
-      }
-    },
+    onKill()   { /* kills don't advance waves anymore */  },
 
     /* ── NEXT WAVE ────────────────────── */
     nextWave() {
-      const maxWave = this.getMaxWave();
-      if (wave >= maxWave) {
+      const total = _getTotalWaves();
+
+      // current wave just ended — check if it was the last
+      if (wave >= total) {
         this.completeMap();
         return;
       }
 
-      wave++;
-      killsThisWave = 0;
-      waveElapsed   = 0;
-      spawnTimer    = 0;
-      draining      = false;
-      drainPauseMs  = 0;
-      resetAdventureSpawner();
-
-      // set timer for new wave
-      const timers   = CONFIG.adventure.waveTimers;
-      const rawTimer = timers[wave] !== undefined ? timers[wave] : 45;
-      waveDuration   = rawTimer * 1000;
-      waveTimeLeft   = waveDuration;
-
-      // choice wave (timer = 0)
-      if (waveDuration === 0) {
+      // check if upgrade choice triggers after this wave
+      if (_isUpgradeWave(wave)) {
         active = false;
         if (typeof startUpgradeChoice === 'function') startUpgradeChoice();
-        if (typeof updateWaveDisplay === 'function') updateWaveDisplay(wave, false);
         return;
       }
 
-      const isBoss = (wave === maxWave);
-      if (isBoss) {
-        this._startBossPause();
-        return;
-      }
-
-      if (typeof updateWaveDisplay === 'function') {
-        updateWaveDisplay(wave, false);
-      }
+      // advance to next wave
+      this._startWave(wave + 1);
     },
 
-    /* ── BOSS PAUSE ───────────────────── */
-    _startBossPause() {
-      bossPaused = true;
-      bossPauseT = CONFIG.adventure.bossPauseMs;
+    /* ── START WAVE (internal) ────────── */
+    _startWave(newWave) {
+      wave         = newWave;
+      waveElapsed  = 0;
+      spawnTimer   = 0;
+      draining     = false;
+      drainPauseMs = 0;
+      _burstQueue  = [];
+      resetAdventureSpawner();
 
-      enemies.forEach(e => e.el.remove());
-      enemies.length = 0;
-      bullets.forEach(b => b.el.remove());
-      bullets.length = 0;
+      waveDuration = _getWaveDuration();
+      waveTimeLeft = waveDuration;
 
-      if (typeof showBossAnnounce === 'function') {
-        showBossAnnounce(currentMap);
+      if (typeof updateWaveDisplay === 'function') {
+        updateWaveDisplay(wave, _isFinalWave());
       }
     },
 
@@ -318,120 +296,90 @@ const AdventureDirector = (() => {
     tick(dt) {
       if (!active) return;
 
-      // boss pause countdown
-      if (bossPaused) {
-        bossPauseT -= dt;
-        if (bossPauseT <= 0) {
-          bossPaused = false;
-          if (typeof updateWaveDisplay === 'function') {
-            updateWaveDisplay(wave, true);
+      // process queued burst spawns
+      _tickBurstQueue(dt);
+
+      // tick orb system
+      if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
+
+      // wave timer countdown
+      if (draining) {
+        // waiting for remaining enemies to die
+        if (enemies.length === 0 && bullets.length === 0) {
+          drainPauseMs -= dt;
+          if (drainPauseMs <= 0) {
+            draining = false;
+            this.nextWave();
           }
-          spawnTimer = 0;
         }
         return;
       }
 
-      const isBoss = this.isBoss();
-
-      // process queued burst spawns
-      _tickBurstQueue(dt);
-
-// tick orb system
-      if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
-
-      // wave timer countdown (not for boss)
-      if (!isBoss) {
-        if (draining) {
-          // waiting for remaining enemies to die
-          if (enemies.length === 0 && bullets.length === 0) {
-            drainPauseMs -= dt;
-            if (drainPauseMs <= 0) {
-              draining = false;
-              this.nextWave();
-            }
-          }
-          return; // no spawning during drain
-        }
-
-        waveElapsed  += dt;
-        waveTimeLeft -= dt;
-        if (waveTimeLeft <= 0) {
-          waveTimeLeft = 0;
-          draining     = true;
-          drainPauseMs = 500; // half second pause after clearing
-          return;
-        }
+      waveElapsed  += dt;
+      waveTimeLeft -= dt;
+      if (waveTimeLeft <= 0) {
+        waveTimeLeft = 0;
+        draining     = true;
+        drainPauseMs = 500;
+        return;
       }
 
       // ── SPAWN LOGIC ──
 
-      // 1. anti-idle: if player isn't pressing and field is low, spawn fast
-      const minAlive = isBoss
-        ? (currentMap.boss.minAlive || 4)
-        : _getMinAlive();
+      const minAlive = _getMinAlive();
 
+      // anti-idle: if player isn't pressing and field is low, spawn fast
       if (enemies.length < minAlive) {
-        const inputRate = _getInputRate();
+        const inputRate     = _getInputRate();
         const idleThreshold = CONFIG.adventure.inputIdleThreshold || 1;
         if (inputRate <= idleThreshold) {
-          // player is idle + field empty → spawn immediately
-          _spawnOne(isBoss);
+          _spawnOne();
           spawnTimer = CONFIG.adventure.inputIdleSpawnMs || 600;
           return;
         }
-        // field below minimum but player is active → spawn soon
-        _spawnOne(isBoss);
+        // field below minimum but player is active — spawn soon
+        _spawnOne();
         spawnTimer = 400;
         return;
       }
 
-      // 2. standard spawn cycle
+      // standard spawn cycle
       spawnTimer -= dt;
       if (spawnTimer <= 0) {
-        const interval = isBoss
-          ? (currentMap.boss.spawnInterval || 400)
-          : _getSpawnInterval();
+        const interval = _getSpawnInterval();
 
-        // 40% chance to spawn a burst of 2-3 instead of 1
-        const wc = _getWaveConfig();
-        const burstChance = (wc && wc.burstChance !== undefined) ? wc.burstChance : 0.4;
+        // burst chance from wave config
+        const wc          = _getWaveConfig();
+        const burstChance = (wc && wc.burstChance !== undefined) ? wc.burstChance : 0;
         const burstSize   = (wc && wc.burstSize !== undefined) ? wc.burstSize : 2;
 
-        if (Math.random() < burstChance && _burstQueue.length === 0) {
-          _spawnBurst(isBoss, burstSize);
+        if (burstChance > 0 && Math.random() < burstChance && _burstQueue.length === 0) {
+          _spawnBurst(burstSize);
         } else {
-          _spawnOne(isBoss);
+          _spawnOne();
         }
         spawnTimer = interval;
       }
     },
 
     /* ── GETTERS ──────────────────────── */
-    getWave()        { return wave; },
-    getMaxWave()     { return (currentMap && currentMap.wavesPerMap) || CONFIG.adventure.wavesPerMap; },
-    getStress()      { return 0; },
-    getTarget()      { return 0; },
-
-    isBoss()   { return wave === this.getMaxWave(); },
-    getKills() { return killsThisWave; },
-
-    getKillsNeeded() {
-      const boss = currentMap.boss;
-      if (this.isBoss() && boss && boss.killsToAdvance !== undefined) {
-        return boss.killsToAdvance;
-      }
-      return 999;
-    },
-
+    getWave()           { return wave; },
+    getMaxWave()        { return _getTotalWaves(); },
+    getStress()         { return 0; },
+    getTarget()         { return 0; },
+    isBoss()            { return _isFinalWave(); },
+    getKills()          { return 0; },
+    getKillsNeeded()    { return 0; },
     getCurrentMap()     { return currentMap; },
     isCompleted()       { return completed; },
-    isBossPaused()      { return bossPaused; },
+    isBossPaused()      { return false; },
     getWaveTimeLeft()   { return waveTimeLeft; },
     getWaveDuration()   { return waveDuration; },
 
     resumeAfterChoice() {
       active = true;
-      this.nextWave();
+      // after upgrade choice, advance to next wave
+      this._startWave(wave + 1);
     },
 
     restart() {
