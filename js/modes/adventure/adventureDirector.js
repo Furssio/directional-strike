@@ -70,7 +70,14 @@ const AdventureDirector = (() => {
     const progress = Math.min(1, waveElapsed / waveDuration);
     const accel    = CONFIG.adventure.spawnAccelPct || 0.30;
     const factor   = 1 - (progress * accel);
-    return Math.max(300, Math.round(base * factor));
+    let interval = Math.max(300, Math.round(base * factor));
+
+    // slow spawn rate when bullet time (or any slow) is active
+    if (player && player.speedMultiplier < 1) {
+      interval = Math.round(interval / player.speedMultiplier);
+    }
+
+    return interval;
   }
 
   function _getMaxAlive() {

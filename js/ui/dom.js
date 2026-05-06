@@ -11,6 +11,7 @@ const sAbility = document.getElementById('screen-ability');
 const sGame    = document.getElementById('screen-game');
 const sOver    = document.getElementById('screen-over');
 const sMapSelect = document.getElementById('screen-map-select');
+const sMapComplete = document.getElementById('screen-map-complete');
 
 
 const arena          = document.getElementById('arena');

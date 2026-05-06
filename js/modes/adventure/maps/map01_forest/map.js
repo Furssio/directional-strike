@@ -15,26 +15,28 @@ MapRegistry.register({
      Permanent stat boosts that activate at
      specific waves. Once active, they stay
      for the rest of the run.
+
+     How damage works:
+       player hit dmg = maxHp * hitDamagePct * damageMult
+                      = 100 * 0.34 * 1.6 = 54 base
+       enemy HP = maxHp * hpPct * hpMult
+
+     Hit thresholds (base 54 dmg):
+       1 hit = HP ≤ 54
+       2 hit = HP 55-108
+       3 hit = HP 109-162
+
+     Sharp Blade I raises dmg to 59.
+     So hpMult 1.85 on ravager (HP 55.5)
+     = 2 hit base, but 1 hit with SB I.
+     Attack upgrades feel rewarding.
+
      Player upgrades after wave 2,4,6,8,10
-     → enemies scale at wave 3,5,7,9,11
-     Both grow together — upgrade choice
-     becomes meaningful.
+     → enemies scale at wave 5,11
   ─────────────────────────────────────────── */
   scalingAt: {
-    3: {
-      ravager: { speedMult: 1.08 },
-    },
-    5: {
-      crusher: { hpMult: 1.5 },
-    },
-    7: {
-      ravager: { hits: 2 },
-      crusher: { hpMult: 1.8 },
-    },
-    9: {
-      ravager: { hits: 2, speedMult: 1.15 },
-      crusher: { hpMult: 2.0, speedMult: 1.1 },
-    },
+   
+    // Final wave — ravagers speed up for victory lap
     11: {
       ravager: { speedMult: 1.2 },
     },
@@ -44,9 +46,9 @@ MapRegistry.register({
      duration:      seconds
      spawnInterval: ms between spawns
      maxAlive:      max enemies on field
-     minAlive:      spawn faster if below this
+     minAlive:      fast-spawn if below this
      pool:          { enemyId: weight }
-     burstChance:   0-1 chance to spawn burst
+     burstChance:   0-1 chance per spawn tick
      burstSize:     enemies per burst
   ─────────────────────────────────────────── */
   waveConfig: {
@@ -73,9 +75,9 @@ MapRegistry.register({
       burstSize: 1,
     },
 
-    // ── UPGRADE 1 → enemies scale at wave 3 ──
+    // ── UPGRADE 1 ──
 
-    // Wave 3 — Ravagers slightly faster
+    // Wave 3 — Slightly tighter spawns
     3: {
       duration: 18,
       spawnInterval: 2000,
@@ -97,9 +99,10 @@ MapRegistry.register({
       burstSize: 2,
     },
 
-    // ── UPGRADE 2 → enemies scale at wave 5 ──
+    // ── UPGRADE 2 → ravager scales to 2-hit at wave 5 ──
 
-    // Wave 5 — Crushers get tankier
+    // Wave 5 — Peak difficulty for beginners
+    // Ravager now 2-hit, same pressure as wave 4
     5: {
       duration: 22,
       spawnInterval: 1800,
@@ -110,75 +113,78 @@ MapRegistry.register({
       burstSize: 2,
     },
 
-    // Wave 6 — Steady pressure
+    // Wave 6 — BREATHER: ravager-only, no crusher
+    // Player just got upgrade, feels powerful
+    // But ravagers are 2-hit now so still engaging
     6: {
       duration: 25,
       spawnInterval: 1700,
       maxAlive: 5,
-      minAlive: 2,
-      pool: { ravager: 6, crusher: 4 },
+      minAlive: 3,
+      pool: { ravager: 10 },
       burstChance: 0.2,
       burstSize: 2,
     },
 
-    // ── UPGRADE 3 → enemies scale at wave 7 ──
+    // ── UPGRADE 3 ──
 
-    // Wave 7 — Ravagers now 2-hit, crushers beefier
+    // Wave 7 — Crusher returns, like wave 4 but
+    // ravagers are 2-hit so player feels the difference
     7: {
       duration: 25,
-      spawnInterval: 1700,
-      maxAlive: 5,
+      spawnInterval: 1800,
+      maxAlive: 4,
       minAlive: 2,
-      pool: { ravager: 5, crusher: 5 },
+      pool: { ravager: 6, crusher: 4 },
+      burstChance: 0.15,
+      burstSize: 2,
+    },
+
+    // Wave 8 — ALL CRUSHER: dangerous but fewer on field
+    // Player must parry bullets and manage space
+    8: {
+      duration: 28,
+      spawnInterval: 1700,
+      maxAlive: 3,
+      minAlive: 2,
+      pool: { crusher: 10 },
       burstChance: 0.2,
       burstSize: 2,
     },
 
-    // Wave 8 — Maintain intensity
-    8: {
-      duration: 28,
-      spawnInterval: 1600,
-      maxAlive: 5,
-      minAlive: 2,
-      pool: { ravager: 5, crusher: 5 },
-      burstChance: 0.25,
-      burstSize: 2,
-    },
+    // ── UPGRADE 4 ──
 
-    // ── UPGRADE 4 → enemies scale at wave 9 ──
-
-    // Wave 9 — Everything tougher
+    // Wave 9 — Mix returns, ravager-heavy
     9: {
       duration: 28,
-      spawnInterval: 1600,
-      maxAlive: 5,
+      spawnInterval: 1700,
+      maxAlive: 4,
       minAlive: 2,
-      pool: { ravager: 5, crusher: 5 },
+      pool: { ravager: 6, crusher: 4 },
       burstChance: 0.25,
       burstSize: 2,
     },
 
-    // Wave 10 — Last stand
+    // Wave 10 — Last stand, same mix
     10: {
       duration: 30,
-      spawnInterval: 1500,
-      maxAlive: 6,
+      spawnInterval: 1600,
+      maxAlive: 4,
       minAlive: 2,
-      pool: { ravager: 5, crusher: 5 },
+      pool: { ravager: 6, crusher: 4 },
       burstChance: 0.3,
       burstSize: 2,
     },
+    // ── UPGRADE 5 → ravagers speed up at wave 11 ──
 
-    // ── UPGRADE 5 → enemies scale at wave 11 ──
-
-    // Wave 11 — FINAL WAVE
-    // Ravager flood, fast but 1-hit again
-    // Victory lap — player with 5 upgrades destroys everything
+    // Wave 11 — FINAL WAVE: victory lap
+    // Ravager flood, fast (speedMult 1.2), 1-hit again
+    // Player with 5 upgrades destroys everything
     11: {
       duration: 35,
       spawnInterval: 700,
-      maxAlive: 7,
-      minAlive: 3,
+      maxAlive: 4,
+      minAlive: 2,
       pool: { ravager: 10 },
       burstChance: 0.4,
       burstSize: 3,

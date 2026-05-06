@@ -9,7 +9,7 @@
 /* ── SCREEN NAVIGATION ── */
 
 function showScreen(s) {
-  [sMenu, sGame, sOver, sAbility, sMapSelect].forEach(x => x.style.display = 'none');
+  [sMenu, sGame, sOver, sAbility, sMapSelect, sMapComplete].forEach(x => x.style.display = 'none');
   s.style.display = 'block';
 }
 
@@ -42,4 +42,50 @@ function showScorePop(x, y, pts) {
   pop.style.color = _popColors[Math.floor(Math.random() * _popColors.length)];
   arena.appendChild(pop);
   setTimeout(() => pop.remove(), 850);
+}
+/* ── MAP COMPLETE ── */
+
+function showMapComplete(map, newlyUnlocked) {
+  // stop game loop
+  running = false;
+
+  // populate card
+  document.getElementById('map-complete-icon').textContent = map.icon || '🏆';
+  document.getElementById('map-complete-name').textContent = map.name;
+
+  // ability unlock section
+  const abilitySection = document.getElementById('map-complete-ability');
+  if (newlyUnlocked && map.unlocksAbility) {
+    const aDef = AbilityRegistry.get(map.unlocksAbility);
+    if (aDef) {
+      document.getElementById('map-complete-ability-icon').innerHTML =
+        '<img src="assets/abilities/' + aDef.id + '.png" width="48" height="48" style="image-rendering:pixelated">';
+      document.getElementById('map-complete-ability-name').textContent = aDef.name || aDef.id;
+      document.getElementById('map-complete-ability-desc').textContent = aDef.desc || '';
+      abilitySection.classList.remove('hidden');
+    }
+  } else {
+    abilitySection.classList.add('hidden');
+  }
+
+  // show screen
+  showScreen(sMapComplete);
+
+  // button handlers (clean up old listeners)
+  const btnContinue = document.getElementById('btn-map-continue');
+  const btnAbilities = document.getElementById('btn-go-abilities');
+
+  const newContinue = btnContinue.cloneNode(true);
+  btnContinue.parentNode.replaceChild(newContinue, btnContinue);
+  newContinue.addEventListener('click', () => {
+    showScreen(sMapSelect);
+    if (typeof initMapSelect === 'function') initMapSelect();
+  });
+
+  const newAbilities = btnAbilities.cloneNode(true);
+  btnAbilities.parentNode.replaceChild(newAbilities, btnAbilities);
+  newAbilities.addEventListener('click', () => {
+    showScreen(sMapSelect);
+    if (typeof initMapSelect === 'function') initMapSelect();
+  });
 }

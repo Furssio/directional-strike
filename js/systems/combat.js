@@ -53,7 +53,9 @@ function registerKill(e, multiKill) {
 
   player.score += pts;
   player.kills += 1;
-  player.addKill();
+  if (!player.specialActive) {
+    player.addKill();
+  }
   ActiveDirector.onKill();
 
   showScorePop(e.x, e.y, pts);

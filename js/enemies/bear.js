@@ -15,8 +15,8 @@ EnemyRegistry.register({
   size:          100,
   hpPct:     1.50,
   damagePct: 1.50,
-  speedMult: 4538,
-  points:    50,
+  speedMult: 1.2,
+  points:    4538,
   shoots:    false,
 
   onTick(e, cx, cy, attackRange) {

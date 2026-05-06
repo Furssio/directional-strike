@@ -46,6 +46,8 @@ const Progress = (() => {
 
     /* ── MAPS ─────────────────────────── */
 
+    /* ── MAPS ─────────────────────────── */
+
     getCompletedMaps() {
       return _load(KEY_MAPS);
     },
@@ -55,12 +57,13 @@ const Progress = (() => {
     },
 
     isMapUnlocked(mapId) {
+      // DEV: all maps unlocked
+      return true;
       /*const map = MapRegistry.get(mapId);
       if (!map) return false;
       if (map.order === 1) return true;
-
       const prev = MapRegistry.all().find(m => m.order === map.order - 1);
-      return prev ? this.isMapCompleted(prev.id) : false;
+      return prev ? this.isMapCompleted(prev.id) : false;*/
     },
 
     markMapCompleted(mapId) {
@@ -68,8 +71,7 @@ const Progress = (() => {
       if (!list.includes(mapId)) {
         list.push(mapId);
         _save(KEY_MAPS, list);
-      }*/
-     return true; // DEV: all maps unlocked
+      }
     },
 
     /* ── ABILITIES ────────────────────── */
