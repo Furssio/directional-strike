@@ -47,7 +47,8 @@ function isDirFree(dir) {
   const { w, h } = getArenaSize();
   const cx       = w / 2;
   const cy       = h / 2;
-  const gate     = Math.min(w, h) * 0.40;
+  const mapGate = (map && map.gateThreshold !== undefined) ? map.gateThreshold : 0.40;
+const gate = Math.min(w, h) * mapGate;
   const last     = list[list.length - 1];
   const dist     = last.distToCenter(cx, cy);
 

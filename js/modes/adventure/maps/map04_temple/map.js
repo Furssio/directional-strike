@@ -1,23 +1,41 @@
 MapRegistry.register({
-  id:         'map04_temple',
-  order:      4,
-  name:       'Temple',
-  theme:      'temple',
+
+  id:    'map04_temple',
+  order: 4,
+  name:  'Temple',
+  theme: 'temple',
+  icon:  '⛩️',
   background: 'assets/maps/map04_temple/background_01.png',
-  stressTarget: 50,
+
+  totalWaves: 1,
+  minEnemiesAlive: 1,
+  maxPerDirection: 6,
+  gateThreshold: 0.25,
+maxPerDirection: 2,
+
+  scalingAt: {},
+
+  waveConfig: {
+
+    // Wave 1 — single long wave, pure survival
+    1: {
+      duration: 90,
+      spawnInterval: 2000,
+      maxAlive: 6,
+      minAlive: 2,
+      pool: { crusher: 6, tornado: 4, golem: 1 },
+      burstChance: 0.20,
+      burstSize: 2,
+    },
+
+  },
+
   enemyPool: {
-    ravager: { fromWave: 1, weight: 6 },
-    crusher: { fromWave: 1, weight: 2 },
-    golem:   { fromWave: 1, weight: 2 },
+    crusher: { fromWave: 1, weight: 6 },
+    tornado: { fromWave: 1, weight: 4 },
+    golem:   { fromWave: 1, weight: 1 },
   },
-  boss: {
-    name:           'Giant Golem',
-    desc:           'The temple guardian awakens',
-    icon:           '⛩️',
-    enemyPool:      { golem: { weight: 10 } },
-    killsToAdvance: 25,
-    speedMult:      1.7,
-    maxEnemies:     4,
-  },
+
   unlocksAbility: null,
+
 });

@@ -172,8 +172,16 @@ function tick() {
         }
       }
 
-      e.el.remove();
+     e.el.remove();
       enemies.splice(i, 1);
+
+      // shield absorbs contact — register as kill to keep gate system clean
+      if (player.specialActive && player.ability.blocksBullets) {
+        e.hp = 0; // mark as dead so gate system cleans it up
+        spawnParticles(e.x, e.y, player.color, e.isElite);
+        registerKill(e);
+        continue;
+      }
 
       // ── DANNO CONTATTO (multi-hit per slime medium/small) ──
       const hits = e.contactHits || 1;

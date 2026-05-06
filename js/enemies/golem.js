@@ -12,13 +12,14 @@ EnemyRegistry.register({
   spriteFrameH:  104,
   spriteSpeed:   1.0,
   size:          104,
-  hpPct:     1.00,
+  hpPct:     1.50,
   speedMult: 0.60,
+  damagePct: 0.40,
   points:    2500,
   shoots:    false,
   calcStress(distToCenter) {
-    if (distToCenter <= 80)  return 35;
-    if (distToCenter <= 160) return 25;
-    return 18;
-  },
+  if (distToCenter <= 80)  return 40;
+  if (distToCenter <= 160) return 30;
+  return 20;
+},
 });

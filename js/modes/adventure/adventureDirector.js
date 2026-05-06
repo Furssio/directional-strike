@@ -216,7 +216,8 @@ const AdventureDirector = (() => {
       _burstQueue   = [];
 
       waveDuration = _getWaveDuration();
-      waveTimeLeft = waveDuration;
+waveTimeLeft = waveDuration;
+console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
 
       resetAdventureSpawner();
       if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
@@ -339,13 +340,15 @@ const AdventureDirector = (() => {
       }
 
       waveElapsed  += dt;
-      waveTimeLeft -= dt;
-      if (waveTimeLeft <= 0) {
-        waveTimeLeft = 0;
-        draining     = true;
-        drainPauseMs = 500;
-        return;
-      }
+waveTimeLeft -= dt;
+if (dt > 100) console.log('BIG DT:', dt, 'waveTimeLeft:', waveTimeLeft);
+if (waveTimeLeft <= 0) {
+  waveTimeLeft = 0;
+  draining     = true;
+  drainPauseMs = 500;
+  console.log('DRAINING at waveElapsed:', waveElapsed, 'waveDuration:', waveDuration);
+  return;
+}
 
       // ── SPAWN LOGIC ──
 
