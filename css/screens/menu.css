@@ -139,16 +139,19 @@
 /* ── CARD IMAGE AREA ── */
 .mode-card-img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-radius: 8px 8px 0 0;
 }
-
 .mode-card-icon {
-  font-size: 40px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
   filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.6));
 }
 
@@ -156,9 +159,12 @@
 .mode-card-name {
   font-size: 11px;
   color: var(--c-text);
-  padding: 10px 4px 6px;
+  padding: 6px 4px 4px;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
   letter-spacing: 2px;
+  background: rgba(17, 17, 34, 0.55);
+  width: 100%;
+  text-align: center;
 }
 
 /* ── TOOLTIP (inside card, appears on hover) ── */
@@ -227,7 +233,7 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  background: rgba(17, 17, 34, 0.4);
+  background: rgba(0, 0, 0, 0.6);
   border: none;
   border-radius: 6px;
   padding: 6px 12px;
@@ -238,7 +244,7 @@
 }
 
 .menu-sm-btn:hover {
-  background: rgba(17, 17, 34, 0.6);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .menu-sm-btn:active {
