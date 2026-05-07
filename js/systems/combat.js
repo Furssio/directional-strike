@@ -182,15 +182,16 @@ function handleDir(dir) {
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
 
-        if (e.def.onHit && e.isAlive()) e.def.onHit(e);
-
-        // frost touch — permanent freeze
+        // frost touch — freeze BEFORE onHit so enemy can't teleport/jump
         if (e.isAlive() && player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
           e.frozen = true;
           e.speed = 0;
           if (e.el) e.el.classList.add('frozen');
           showActionPop(d, 'FREEZE!', '#44ddff');
         }
+
+        // onHit only if NOT frozen
+        if (e.def.onHit && e.isAlive() && !e.frozen) e.def.onHit(e);
 
         // critical hit pop
         if (player._lastHitWasCrit) {
@@ -234,19 +235,20 @@ function handleDir(dir) {
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
 
-        if (e.def.onHit && e.isAlive()) e.def.onHit(e);
-
-        // stun chance (base ability)
-        if (player.stunChance > 0 && Math.random() < player.stunChance) {
-          e.stun(1000);
-        }
-
-        // frost touch — permanent freeze
-        if (player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
+        // frost touch — freeze BEFORE onHit so enemy can't teleport/jump
+        if (e.isAlive() && player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
           e.frozen = true;
           e.speed = 0;
           if (e.el) e.el.classList.add('frozen');
           showActionPop(d, 'FREEZE!', '#44ddff');
+        }
+
+        // onHit only if NOT frozen
+        if (e.def.onHit && e.isAlive() && !e.frozen) e.def.onHit(e);
+
+        // stun chance (base ability)
+        if (player.stunChance > 0 && Math.random() < player.stunChance) {
+          e.stun(1000);
         }
 
         // critical hit pop

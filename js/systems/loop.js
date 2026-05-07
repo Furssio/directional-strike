@@ -156,7 +156,7 @@ function tick() {
    if (!e.underground && !e.def.customOpacity) {
       e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
     }
-    if (e.def.onTick) e.def.onTick(e, cx, cy, attackRange);
+    if (e.def.onTick && !e.frozen) e.def.onTick(e, cx, cy, attackRange);
 
     if (dist < hitR && !e.underground) {
 
