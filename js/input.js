@@ -17,10 +17,13 @@ document.getElementById('btn-infinite').addEventListener('click', () => {
   startGame();
 });
 document.getElementById('btn-adventure').addEventListener('click', () => {
+  if (Transition.isPlaying()) return;
   if (typeof DemoMode !== 'undefined') DemoMode.stop();
-  loadAdventureMode(() => {
-    buildMapSelectScreen();
-    showScreen(sMapSelect);
+  Transition.play(() => {
+    loadAdventureMode(() => {
+      buildMapSelectScreen();
+      showScreen(sMapSelect);
+    });
   });
 });
 
@@ -84,14 +87,20 @@ document.getElementById('btn-restart').addEventListener('click', () => {
   startGame();
 });
 document.getElementById('btn-home').addEventListener('click', () => {
-  updateMenuBest();
-  showScreen(sMenu);
-  if (typeof DemoMode !== 'undefined') DemoMode.start();
+  if (Transition.isPlaying()) return;
+  Transition.play(() => {
+    updateMenuBest();
+    showScreen(sMenu);
+    if (typeof DemoMode !== 'undefined') DemoMode.start();
+  });
 });
 
 document.getElementById('btn-map-back').addEventListener('click', () => {
-  if (typeof DemoMode !== 'undefined') DemoMode.stop();
-  showScreen(sMenu);
+  if (Transition.isPlaying()) return;
+  Transition.play(() => {
+    showScreen(sMenu);
+    if (typeof DemoMode !== 'undefined') DemoMode.start();
+  });
 });
 
 /* ── AUDIO ── */

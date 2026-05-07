@@ -46,8 +46,11 @@ const ADVENTURE_SCRIPTS = [
   'js/modes/adventure/maps/map13_dark/map.js',
   
 
+  /* ── TRANSITION ── */
+  'js/systems/transition.js',
+
   /* ── UI ── */
-  'js/modes/adventure/mapSelect.js',
+  'js/ui/dom.js',
 
 ];
 

@@ -64,6 +64,9 @@ const SCRIPTS = [
   'js/modes/infinite/spawner.js',
   'js/modes/infinite/director.js',
 
+/* ── TRANSITION ── */
+  'js/systems/transition.js',
+
   /* ── UI ── */
   'js/ui/dom.js',
   'js/ui/hud.js',

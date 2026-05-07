@@ -1,0 +1,25 @@
+/* ═══════════════════════════════════════
+   TRANSITION.CSS
+   Pixel grid transition overlay
+   ═══════════════════════════════════════ */
+
+#transition-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 9999;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(var(--tr-cols), 1fr);
+  grid-template-rows: repeat(var(--tr-rows), 1fr);
+}
+
+#transition-overlay .tr-cell {
+  background: #000;
+  transform: scale(0);
+  border-radius: 2px;
+}
+
+#transition-overlay .tr-cell.active {
+  transform: scale(1.05);
+}
