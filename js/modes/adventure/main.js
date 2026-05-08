@@ -46,11 +46,8 @@ const ADVENTURE_SCRIPTS = [
   'js/modes/adventure/maps/map13_dark/map.js',
   
 
-  /* ── TRANSITION ── */
-  'js/systems/transition.js',
-
-  /* ── UI ── */
-  'js/ui/dom.js',
+  /* ── MAP SELECT UI ── */
+  'js/modes/adventure/mapSelect.js',
 
 ];
 
@@ -90,7 +87,7 @@ function loadAdventureMode(callback) {
    Called by mapSelect when user picks a map.
    @param mapId  id from MapRegistry
 ─────────────────────────────────────── */
-function startAdventureMap(mapId) {
+function startAdventureMap(mapId, delayLoop) {
   const map = MapRegistry.get(mapId);
   if (!map) {
     console.error(`startAdventureMap: map "${mapId}" not found.`);
@@ -107,7 +104,8 @@ function startAdventureMap(mapId) {
   equippedAbilityId = getEquippedAbility();
 
   // reuse the common startGame() from loop.js
-  startGame();
+  // delayLoop passed through from caller
+  startGame(delayLoop);
 
   // overwrite initial wave display for adventure
   if (typeof updateWaveDisplay === 'function') {

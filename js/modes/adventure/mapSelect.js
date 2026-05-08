@@ -170,9 +170,14 @@ function _shiftCarousel(dir) {
 
 /* ── MAP SELECTED ── */
 function onMapSelected(mapId) {
+  if (Transition.isPlaying()) return;
   selectedMapId = mapId;
   SFX.abilityPick();
-  startAdventureMap(mapId);
+  Transition.play('normal', () => {
+    startAdventureMap(mapId, true);
+  }, () => {
+    startGameLoop();
+  });
 }
 /* ── SHOW BOSS ANNOUNCE ────────────────
    Called by AdventureDirector when wave 10
@@ -234,14 +239,19 @@ function showMapComplete(map, newlyUnlocked) {
   const autoTimer = setTimeout(() => _returnToMapSelect(), 6000);
 
   document.getElementById('btn-map-continue').onclick = () => {
+    if (Transition.isPlaying()) return;
     clearTimeout(autoTimer);
-    _returnToMapSelect();
+    Transition.play('normal', () => {
+      _returnToMapSelect();
+    });
   };
-
   document.getElementById('btn-go-abilities').onclick = () => {
+    if (Transition.isPlaying()) return;
     clearTimeout(autoTimer);
-    buildAbilityScreen();
-    showScreen(sAbility);
+    Transition.play('normal', () => {
+      buildAbilityScreen();
+      showScreen(sAbility);
+    });
   };
 }
 

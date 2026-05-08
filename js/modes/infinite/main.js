@@ -64,9 +64,6 @@ const SCRIPTS = [
   'js/modes/infinite/spawner.js',
   'js/modes/infinite/director.js',
 
-/* ── TRANSITION ── */
-  'js/systems/transition.js',
-
   /* ── UI ── */
   'js/ui/dom.js',
   'js/ui/hud.js',
@@ -82,6 +79,7 @@ const SCRIPTS = [
   'js/systems/upgradeChoice.js',
   'js/systems/orbs.js',
   'js/systems/demoMode.js',
+  'js/systems/transition.js',
 
   /* ── INPUT ── */
   'js/input.js',

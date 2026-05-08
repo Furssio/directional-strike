@@ -11,7 +11,7 @@
 
 /* ── START / END ── */
 
-function startGame() {
+function startGame(delayLoop) {
   SFX.init();
 
   player      = new Player(equippedAbilityId);
@@ -42,11 +42,20 @@ function startGame() {
   if (_barSpecial) _barSpecial.classList.remove('bar-ready');
   playerEl.classList.remove('special-ready');
 
-  showScreen(sGame);
+showScreen(sGame);
   setTimeout(updateRangeCircle, 50);
 
   clearInterval(gameLoop);
   if (ActiveDirector === Director) ActiveDirector.init();
+
+  if (!delayLoop) {
+    gameLoop = setInterval(tick, 16);
+  }
+}
+
+function startGameLoop() {
+  lastTick = performance.now();
+  clearInterval(gameLoop);
   gameLoop = setInterval(tick, 16);
 }
 

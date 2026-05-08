@@ -42,21 +42,27 @@ document.getElementById('pause-continue').addEventListener('click', () => {
 });
 
 document.getElementById('pause-retry').addEventListener('click', () => {
+  if (Transition.isPlaying()) return;
   resumeGame();
-  // same logic as btn-restart
-  equippedAbilityId = getEquippedAbility();
-  if (ActiveDirector && ActiveDirector === AdventureDirector) {
-    if (!AdventureDirector.restart()) {
-      showScreen(sMenu);
-      return;
+  Transition.play('fast', () => {
+    equippedAbilityId = getEquippedAbility();
+    if (ActiveDirector && ActiveDirector === AdventureDirector) {
+      if (!AdventureDirector.restart()) {
+        showScreen(sMenu);
+        return;
+      }
     }
-  }
-  startGame();
+    startGame(true);
+  }, () => {
+    startGameLoop();
+  });
 });
-
 document.getElementById('pause-exit').addEventListener('click', () => {
+  if (Transition.isPlaying()) return;
   resumeGame();
-  endGame();
-  showScreen(sMenu);
-  if (typeof DemoMode !== 'undefined') DemoMode.start();
+  Transition.play('fast', () => {
+    endGame();
+    showScreen(sMenu);
+    if (typeof DemoMode !== 'undefined') DemoMode.start();
+  });
 });

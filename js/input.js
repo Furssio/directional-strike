@@ -10,16 +10,25 @@
 
 /* ── MENU NAVIGATION ── */
 
-document.getElementById('btn-infinite').addEventListener('click', () => {
-  if (typeof DemoMode !== 'undefined') DemoMode.stop();
-  equippedAbilityId = getEquippedAbility();
-  ActiveDirector = Director;
-  startGame();
+document.getElementById('btn-restart').addEventListener('click', () => {
+  if (Transition.isPlaying()) return;
+  Transition.play('fast', () => {
+    equippedAbilityId = getEquippedAbility();
+    if (ActiveDirector && ActiveDirector === AdventureDirector) {
+      if (!AdventureDirector.restart()) {
+        showScreen(sMenu);
+        return;
+      }
+    }
+    startGame(true);
+  }, () => {
+    startGameLoop();
+  });
 });
 document.getElementById('btn-adventure').addEventListener('click', () => {
   if (Transition.isPlaying()) return;
   if (typeof DemoMode !== 'undefined') DemoMode.stop();
-  Transition.play(() => {
+  Transition.play('fast', () => {
     loadAdventureMode(() => {
       buildMapSelectScreen();
       showScreen(sMapSelect);
@@ -73,31 +82,30 @@ if (_btnAbilityBack) {
 }
 
 document.getElementById('btn-restart').addEventListener('click', () => {
-  equippedAbilityId = getEquippedAbility();
-
-  // Adventure Mode: re-init the current map before starting
-  if (ActiveDirector && ActiveDirector === AdventureDirector) {
-    if (!AdventureDirector.restart()) {
-      // safety fallback — no map loaded, go back to menu
-      showScreen(sMenu);
-      return;
+  if (Transition.isPlaying()) return;
+  Transition.play('fast', () => {
+    equippedAbilityId = getEquippedAbility();
+    if (ActiveDirector && ActiveDirector === AdventureDirector) {
+      if (!AdventureDirector.restart()) {
+        showScreen(sMenu);
+        return;
+      }
     }
-  }
-
-  startGame();
+    startGame();
+  });
 });
+
 document.getElementById('btn-home').addEventListener('click', () => {
   if (Transition.isPlaying()) return;
-  Transition.play(() => {
+  Transition.play('fast', () => {
     updateMenuBest();
     showScreen(sMenu);
     if (typeof DemoMode !== 'undefined') DemoMode.start();
   });
 });
-
 document.getElementById('btn-map-back').addEventListener('click', () => {
   if (Transition.isPlaying()) return;
-  Transition.play(() => {
+  Transition.play('fast', () => {
     showScreen(sMenu);
     if (typeof DemoMode !== 'undefined') DemoMode.start();
   });
