@@ -111,8 +111,15 @@ function _renderCarousel() {
       .trim();
 
     const diff = i - idx;
-    const key  = Math.max(-2, Math.min(2, diff)).toString();
-    const pos  = posMap[key];
+
+    // slides too far from center — hide them
+    if (diff < -2 || diff > 2) {
+      slide.classList.add('pos-hidden');
+      return;
+    }
+
+    const key = diff.toString();
+    const pos = posMap[key];
     if (pos) slide.classList.add(pos);
   });
 

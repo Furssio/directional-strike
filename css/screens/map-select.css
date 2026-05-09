@@ -117,54 +117,77 @@
   image-rendering: pixelated;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
+  /* hidden by default */
+  opacity: 0;
+  pointer-events: none;
+  width: 16%;
+  aspect-ratio: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
 }
 
 .map-slide.pos-center {
   width: 44%;
-  aspect-ratio: 1;
   left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 5;
   box-shadow: 0 6px 24px rgba(0,0,0,0.5);
   filter: brightness(0.85);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .map-slide.pos-left {
   width: 26%;
-  aspect-ratio: 1;
-  left: 50%;
-  transform: translateX(calc(-50% - 34%));
+  left: 16%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 3;
   filter: brightness(0.3);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .map-slide.pos-right {
   width: 26%;
-  aspect-ratio: 1;
-  left: 50%;
-  transform: translateX(calc(-50% + 34%));
+  left: 84%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 3;
   filter: brightness(0.3);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .map-slide.pos-far-left {
   width: 16%;
-  aspect-ratio: 1;
-  left: 50%;
-  transform: translateX(calc(-50% - 52%));
+  left: 2%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
   filter: brightness(0.15);
   opacity: 0;
+  pointer-events: none;
 }
 
 .map-slide.pos-far-right {
   width: 16%;
-  aspect-ratio: 1;
-  left: 50%;
-  transform: translateX(calc(-50% + 52%));
+  left: 98%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
   filter: brightness(0.15);
   opacity: 0;
+  pointer-events: none;
+}
+
+/* slides out of range */
+.map-slide.pos-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .map-slide.is-boss {
@@ -176,10 +199,6 @@
   filter: brightness(0.12) !important;
   cursor: default;
 }
-
-/* ══════════════════════════════════════
-   PLAYER — absolute center
-   ══════════════════════════════════════ */
 
 /* ══════════════════════════════════════
    STATUS — under player, centered
@@ -374,6 +393,7 @@
   mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.5) 45%, black 70%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.5) 45%, black 70%);
 }
+
 /* ── PLAYER IN DEMO ── */
 #mapselect-demo .demo-player-instance {
   position: absolute;

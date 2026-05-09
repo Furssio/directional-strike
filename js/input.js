@@ -191,9 +191,10 @@ document.addEventListener('keydown', e => {
   }
 
   // Space = special
- if (e.code === 'Space') {
+if (e.code === 'Space') {
     e.preventDefault();
     if (paused) return;
+    if (e.repeat) return;
     // tutorial intercept
     if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
       Tutorial.onSpaceInput();
@@ -210,9 +211,10 @@ document.addEventListener('keydown', e => {
     ArrowRight: 'right',
   };
 
-  if (map[e.key]) {
+ if (map[e.key]) {
     e.preventDefault();
     if (paused) return;
+    if (e.repeat) return;
     // tutorial intercept
     if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
       Tutorial.onDirInput(map[e.key]);
