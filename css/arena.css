@@ -19,7 +19,6 @@
   from{background-position-x:0;}
   to{background-position-x:-1152px;}
 }
-#player.special-active{border:2.5px solid #FFD700;background:rgba(42,34,0,0.5);}
 #player.special-ready{animation:playerGlow 0.8s ease-in-out infinite alternate;}
 
 /* ── PIXEL BARS BLOCK ────────────────── */

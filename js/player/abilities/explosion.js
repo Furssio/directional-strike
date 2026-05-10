@@ -1,10 +1,11 @@
 /* ═══════════════════════════════════════
    EXPLOSION.JS
    Explosion — instantly kills all enemies
-   within attack range. No duration.
+   within attack range. Violent burst with
+   ground scorch mark.
 
    Used by: Player.js (via AbilityRegistry)
-   Depends on: AbilityRegistry
+   Depends on: AbilityRegistry, juice.js
    ═══════════════════════════════════════ */
 
 AbilityRegistry.register({
@@ -27,8 +28,9 @@ AbilityRegistry.register({
     const arenaSize   = Math.min(w, h);
     const attackRange = player.getAttackRange(arenaSize);
 
+    // ── Kill all enemies in range ──
     for (let i = enemies.length - 1; i >= 0; i--) {
-      const e    = enemies[i];
+      const e = enemies[i];
       if (e.underground) continue;
 
       const dx   = e.x - cx;
@@ -44,8 +46,118 @@ AbilityRegistry.register({
     }
 
     SFX.kill();
-    triggerShake();
+
+    const a = document.getElementById('arena');
+
+    // ── Heavy shake ──
+    a.classList.remove('explosion-shake');
+    void a.offsetWidth;
+    a.classList.add('explosion-shake');
+    setTimeout(() => a.classList.remove('explosion-shake'), 550);
+
+    // ── White-hot flash ──
+    const flash = document.createElement('div');
+    flash.className = 'explosion-flash';
+    flash.style.width  = (attackRange * 0.8) + 'px';
+    flash.style.height = (attackRange * 0.8) + 'px';
+    a.appendChild(flash);
+    setTimeout(() => { if (flash.parentNode) flash.remove(); }, 350);
+
+    // ── Debris burst (chaotic particles) ──
+    _explosionDebris(cx, cy, attackRange);
+
+    // ── Scorch mark on ground ──
+    const scorch = document.createElement('div');
+    scorch.className = 'explosion-scorch';
+    const scorchSize = attackRange * 1.6;
+    scorch.style.width  = scorchSize + 'px';
+    scorch.style.height = scorchSize + 'px';
+    a.appendChild(scorch);
+
+    // ── Embers inside scorch ──
+    const embers = [];
+    const emberCount = 8;
+    for (let i = 0; i < emberCount; i++) {
+      const em = document.createElement('div');
+      em.className = 'explosion-ember';
+      const angle  = Math.random() * Math.PI * 2;
+      const dist   = Math.random() * attackRange * 0.5;
+      const sz     = 2 + Math.random() * 4;
+      const colors = ['#ff4400', '#ff6600', '#cc2200', '#ff8800'];
+      em.style.width      = sz + 'px';
+      em.style.height     = sz + 'px';
+      em.style.background = colors[Math.floor(Math.random() * colors.length)];
+      em.style.left       = (cx + Math.cos(angle) * dist) + 'px';
+      em.style.top        = (cy + Math.sin(angle) * dist) + 'px';
+      em.style.transform  = 'translate(-50%, -50%)';
+      em.style.animationDelay = (Math.random() * 0.4) + 's';
+      a.appendChild(em);
+      embers.push(em);
+    }
+
+    // ── Fade out embers after 1s, scorch after 1.2s ──
+    setTimeout(() => {
+      embers.forEach(em => em.classList.add('dying'));
+    }, 1000);
+
+    setTimeout(() => {
+      scorch.classList.add('fading');
+    }, 1200);
+
+    // ── Full cleanup after 2.8s ──
+    setTimeout(() => {
+      if (scorch.parentNode) scorch.remove();
+      embers.forEach(em => { if (em.parentNode) em.remove(); });
+    }, 2800);
   },
 
   onDeactivate() {},
 });
+
+/* ── Chaotic debris burst from center ──
+   Irregular chunks, fire/earth colors,
+   different sizes and speeds. */
+
+function _explosionDebris(cx, cy, range) {
+  const count  = 22;
+  const colors = ['#ff3300', '#ff6600', '#cc2200', '#ffaa00',
+                  '#882200', '#ff4400', '#dddd44'];
+
+  for (let i = 0; i < count; i++) {
+    const p     = document.createElement('div');
+    p.className = 'particle';
+
+    // irregular sizes — some big chunks, some small sparks
+    const isBig = Math.random() < 0.3;
+    const size  = isBig ? (6 + Math.random() * 6) : (2 + Math.random() * 4);
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1.5 + Math.random() * 4.5;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    p.style.cssText =
+      `width:${size}px;height:${size}px;background:${color};` +
+      `left:${cx}px;top:${cy}px;opacity:1;` +
+      (isBig ? 'border-radius:2px;' : '');
+    arena.appendChild(p);
+
+    const start = performance.now();
+    const life  = 250 + Math.random() * 300;
+    const dist  = range * (0.4 + Math.random() * 0.6);
+    const vx    = Math.cos(angle);
+    const vy    = Math.sin(angle);
+    // slight gravity effect for big chunks
+    const grav  = isBig ? 0.003 : 0;
+
+    (function anim(now) {
+      const t = (now - start) / life;
+      if (t >= 1) { p.remove(); return; }
+
+      const ex = cx + vx * speed * t * dist * 0.5;
+      const ey = cy + vy * speed * t * dist * 0.5 + grav * t * t * dist * 80;
+      p.style.left    = ex + 'px';
+      p.style.top     = ey + 'px';
+      p.style.opacity = (1 - t * t) + '';
+      requestAnimationFrame(anim);
+    })(performance.now());
+  }
+}

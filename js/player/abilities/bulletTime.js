@@ -36,6 +36,7 @@ AbilityRegistry.register({
     a.classList.remove('bullet-time-ending');
     a.classList.add('bullet-time-active');
 
+
     // sound
     if (typeof SFX !== 'undefined') SFX.bulletTimeStart();
   },
@@ -62,6 +63,7 @@ AbilityRegistry.register({
       if (ov) ov.remove();
     }, 550);
 
+   
     // sound
     if (typeof SFX !== 'undefined') SFX.bulletTimeStop();
   },

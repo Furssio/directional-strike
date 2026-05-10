@@ -18,11 +18,19 @@ function cleanupAbilityEffects() {
 
   const a = document.getElementById('arena');
   if (a) {
+   // bullet time
     a.classList.remove('bullet-time-active');
     a.classList.remove('bullet-time-ending');
     const ov = a.querySelector('.bt-overlay');
     if (ov) ov.remove();
+
+    // explosion
+    a.classList.remove('explosion-shake');
+    a.querySelectorAll('.explosion-ring, .explosion-flash, .explosion-scorch, .explosion-ember').forEach(el => el.remove());
   }
+
+  // restore range circle in case ability hid it
+  if (typeof rangeEl !== 'undefined' && rangeEl) rangeEl.style.display = '';
 
   if (player && player.specialActive && player.ability) {
     player.specialActive = false;
