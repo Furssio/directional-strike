@@ -21,6 +21,9 @@ function pauseGame() {
   clearInterval(gameLoop);
   gameLoop = null;
   document.getElementById('pause-overlay').classList.remove('hidden');
+
+  // freeze ability audio
+  if (typeof SFX !== 'undefined') SFX.pauseAll();
 }
 
 function resumeGame() {
@@ -29,6 +32,9 @@ function resumeGame() {
   document.getElementById('pause-overlay').classList.add('hidden');
   lastTick = performance.now();
   gameLoop = setInterval(tick, 16);
+
+  // resume ability audio
+  if (typeof SFX !== 'undefined') SFX.resumeAll();
 }
 
 /* ── BUTTON BINDINGS ── */

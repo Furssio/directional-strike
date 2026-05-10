@@ -185,6 +185,12 @@ function _buildAvailablePool() {
 function startUpgradeChoice() {
   _choosingUpgrade = true;
 
+  // cancel any active ability and orb buffs
+  if (typeof cleanupAbilityEffects === 'function') cleanupAbilityEffects();
+  if (typeof OrbSystem !== 'undefined') {
+    OrbSystem.reset();
+  }
+
   // build pool of available upgrades
   const pool = _buildAvailablePool();
 

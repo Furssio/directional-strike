@@ -53,7 +53,12 @@ const SCRIPTS = [
 
   /* ── AUDIO ── */
   'js/audio.js',
-
+  'js/sfx-combat.js',
+  'js/sfx-abilities.js',
+  'js/sfx-ui.js',
+  'js/sfx.js',
+  'js/music.js',
+  
   /* ── STATE ── */
   'js/state.js',
 

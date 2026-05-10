@@ -66,8 +66,8 @@ if (!_isIntro) {
 
   const enemy     = new Enemy(def, x, y, dir, sMult, w, h);
 
-  if (player.specialActive) {
-    player.ability.onActivate([enemy]);
+  if (player.specialActive && player.ability.onEnemySpawn) {
+    player.ability.onEnemySpawn(enemy);
   }
 
   const el = document.createElement('div');

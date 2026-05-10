@@ -1,0 +1,71 @@
+/* ═══════════════════════════════════════
+   BULLET-TIME.CSS
+   Visual effects for Bullet Time ability.
+   Ninja instinct — dark, warm, organic feel.
+   Applied to #arena via .bullet-time-active class.
+   ═══════════════════════════════════════ */
+
+/* ── ACTIVATION PULSE (dark wave from center) ── */
+#arena .bt-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(20, 10, 30, 0.6) 0%,
+    rgba(15, 5, 25, 0.3) 60%,
+    transparent 100%
+  );
+  transform: translate(-50%, -50%);
+  z-index: 90;
+  pointer-events: none;
+  animation: btPulseExpand 0.45s ease-out forwards;
+}
+
+@keyframes btPulseExpand {
+  0%   { width: 0;    height: 0;    opacity: 1; }
+  70%  { width: 160%; height: 160%; opacity: 0.6; }
+  100% { width: 200%; height: 200%; opacity: 0; }
+}
+
+/* ── DARK OVERLAY + VIGNETTE (warm indigo) ── */
+#arena .bt-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(15, 8, 25, 0.2) 30%,
+    rgba(10, 5, 20, 0.45) 70%,
+    rgba(5, 2, 15, 0.6) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+#arena.bullet-time-active .bt-overlay {
+  opacity: 1;
+}
+
+/* ── STATIC INNER SHADOW ── */
+#arena.bullet-time-active {
+  box-shadow:
+    inset 0 0 45px rgba(20, 10, 35, 0.45),
+    inset 0 0 90px rgba(10, 5, 20, 0.25);
+}
+
+/* ── DEACTIVATION FADE ── */
+#arena.bullet-time-ending .bt-overlay {
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+#arena.bullet-time-ending {
+  animation: none;
+  box-shadow: none;
+  transition: box-shadow 0.5s ease-in;
+}

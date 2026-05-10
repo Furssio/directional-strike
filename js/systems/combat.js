@@ -70,6 +70,7 @@ function registerKill(e, multiKill) {
 
 function activateSpecial() {
   if (!running) return;
+  if (_choosingUpgrade || _countdownActive || _inputBlocked) return;
   if (!player.activateSpecial()) return;
 
   SFX.special();

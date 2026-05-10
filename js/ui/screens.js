@@ -12,6 +12,9 @@ function showScreen(s) {
   [sMenu, sGame, sOver, sAbility, sMapSelect, sMapComplete].forEach(x => x.style.display = 'none');
   s.style.display = 'block';
 
+  // stop all ability audio when leaving game screen
+  if (s !== sGame && typeof SFX !== 'undefined') SFX.stopAll();
+
   // fireflies only on menu
   if (s === sMenu) startMenuFireflies();
   else stopMenuFireflies();

@@ -9,10 +9,35 @@
                audio.js, Player.js
    ═══════════════════════════════════════ */
 
+/* ── ABILITY CLEANUP ──
+   Removes all ability visual effects and stops audio.
+   Called on startGame, endGame, and exit to menu. */
+
+function cleanupAbilityEffects() {
+  if (typeof SFX !== 'undefined') SFX.stopAll();
+
+  const a = document.getElementById('arena');
+  if (a) {
+    a.classList.remove('bullet-time-active');
+    a.classList.remove('bullet-time-ending');
+    const ov = a.querySelector('.bt-overlay');
+    if (ov) ov.remove();
+  }
+
+  if (player && player.specialActive && player.ability) {
+    player.specialActive = false;
+    player.specialTimer  = 0;
+    player.speedMultiplier = 1.0;
+  }
+}
+
 /* ── START / END ── */
 
 function startGame(delayLoop) {
   SFX.init();
+
+  // cleanup any active ability effects from previous game
+  cleanupAbilityEffects();
 
   player      = new Player(equippedAbilityId);
   enemies     = [];
@@ -53,6 +78,7 @@ showScreen(sGame);
   }
 }
 
+
 function startGameLoop() {
   lastTick = performance.now();
   clearInterval(gameLoop);
@@ -60,6 +86,7 @@ function startGameLoop() {
 }
 
 function endGame() {
+  cleanupAbilityEffects();
   SFX.gameOver();
 
   running = false;
@@ -94,8 +121,10 @@ function tick() {
   const dt  = Math.min(now - lastTick, 50);
   lastTick  = now;
 
+ if (!_choosingUpgrade && !_countdownActive && !_inputBlocked) {
   player.tickSpecial(dt);
-  updateProgress();
+}
+updateProgress();
   // poison tick
   if (player.poisonEffects && player.poisonEffects.length > 0) {
     for (let i = player.poisonEffects.length - 1; i >= 0; i--) {
