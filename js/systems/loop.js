@@ -27,6 +27,13 @@ function cleanupAbilityEffects() {
     // explosion
     a.classList.remove('explosion-shake');
     a.querySelectorAll('.explosion-ring, .explosion-flash, .explosion-scorch, .explosion-ember').forEach(el => el.remove());
+
+    // shield
+    ShieldFX.stop();
+
+    // slash
+    SlashFX.stop();
+    a.querySelectorAll('.slash-aura-canvas').forEach(el => el.remove());
   }
 
   // restore range circle in case ability hid it
@@ -211,6 +218,7 @@ updateProgress();
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
         if (!e.isAlive()) {
           spawnParticles(e.x, e.y, player.color, e.isElite);
+          triggerShieldRipple();
           e.el.remove();
           registerKill(e);
           enemies.splice(i, 1);
@@ -223,8 +231,9 @@ updateProgress();
 
       // shield absorbs contact — register as kill to keep gate system clean
       if (player.specialActive && player.ability.blocksBullets) {
-        e.hp = 0; // mark as dead so gate system cleans it up
+        e.hp = 0;
         spawnParticles(e.x, e.y, player.color, e.isElite);
+        triggerShieldRipple();
         registerKill(e);
         continue;
       }

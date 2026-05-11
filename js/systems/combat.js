@@ -9,6 +9,12 @@
    ═══════════════════════════════════════ */
 
 function showSlashEffect(dir) {
+  // full-line trail when slash ability is active
+  if (player && player.slashActive) {
+    showSlashTrail(dir);
+    return;
+  }
+
   const { w, h } = getArenaSize();
   const cx = w / 2;
   const cy = h / 2;
@@ -107,13 +113,17 @@ function handleDir(dir) {
   if (player.doubleAttack && !isPiercing) {
     dirs = [dir, ...getAdjacentDirs(dir)];
   }
-  if (player.doubleStrikeActive) {
+ if (player.doubleStrikeActive) {
     const opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
     const opp = opposites[dir];
     if (!dirs.includes(opp)) dirs.push(opp);
   }
 
   showSlashEffect(dir);
+  if (player.doubleStrikeActive) {
+    const opp = { up: 'down', down: 'up', left: 'right', right: 'left' }[dir];
+    showSlashEffect(opp);
+  }
   let anyHit = false;
 
   // check orb collection

@@ -2,7 +2,7 @@
    EXPLOSION.JS
    Explosion — instantly kills all enemies
    within attack range. Violent burst with
-   ground scorch mark.
+   ground scorch mark. Dark reds + black.
 
    Used by: Player.js (via AbilityRegistry)
    Depends on: AbilityRegistry, juice.js
@@ -55,7 +55,7 @@ AbilityRegistry.register({
     a.classList.add('explosion-shake');
     setTimeout(() => a.classList.remove('explosion-shake'), 550);
 
-    // ── White-hot flash ──
+    // ── Dark red flash ──
     const flash = document.createElement('div');
     flash.className = 'explosion-flash';
     flash.style.width  = (attackRange * 0.8) + 'px';
@@ -63,7 +63,7 @@ AbilityRegistry.register({
     a.appendChild(flash);
     setTimeout(() => { if (flash.parentNode) flash.remove(); }, 350);
 
-    // ── Debris burst (chaotic particles) ──
+    // ── Debris burst ──
     _explosionDebris(cx, cy, attackRange);
 
     // ── Scorch mark on ground ──
@@ -76,14 +76,14 @@ AbilityRegistry.register({
 
     // ── Embers inside scorch ──
     const embers = [];
-    const emberCount = 8;
+  const emberCount = 14;
     for (let i = 0; i < emberCount; i++) {
       const em = document.createElement('div');
       em.className = 'explosion-ember';
       const angle  = Math.random() * Math.PI * 2;
-      const dist   = Math.random() * attackRange * 0.5;
-      const sz     = 2 + Math.random() * 4;
-      const colors = ['#ff4400', '#ff6600', '#cc2200', '#ff8800'];
+      const dist   = Math.random() * attackRange * 0.55;
+      const sz     = 2 + Math.random() * 3;
+      const colors = ['#aa0000', '#cc1100', '#880000', '#661100'];
       em.style.width      = sz + 'px';
       em.style.height     = sz + 'px';
       em.style.background = colors[Math.floor(Math.random() * colors.length)];
@@ -95,39 +95,38 @@ AbilityRegistry.register({
       embers.push(em);
     }
 
-    // ── Fade out embers after 1s, scorch after 1.2s ──
+   // ── Embers start dying after 1.2s ──
     setTimeout(() => {
       embers.forEach(em => em.classList.add('dying'));
-    }, 1000);
-
-    setTimeout(() => {
-      scorch.classList.add('fading');
     }, 1200);
 
-    // ── Full cleanup after 2.8s ──
+    // ── Scorch starts fading after 1s ──
+    setTimeout(() => {
+      scorch.classList.add('fading');
+    }, 1000);
+
+    // ── Full cleanup after 5.5s (1s wait + 4s fade) ──
     setTimeout(() => {
       if (scorch.parentNode) scorch.remove();
       embers.forEach(em => { if (em.parentNode) em.remove(); });
-    }, 2800);
+    }, 5500);
   },
 
   onDeactivate() {},
 });
 
 /* ── Chaotic debris burst from center ──
-   Irregular chunks, fire/earth colors,
-   different sizes and speeds. */
+   Dark chunks and red sparks. */
 
 function _explosionDebris(cx, cy, range) {
-  const count  = 22;
-  const colors = ['#ff3300', '#ff6600', '#cc2200', '#ffaa00',
-                  '#882200', '#ff4400', '#dddd44'];
+  const count  = 32;
+  const colors = ['#aa0000', '#cc1100', '#660000', '#881100',
+                  '#440000', '#bb2200', '#551100'];
 
   for (let i = 0; i < count; i++) {
     const p     = document.createElement('div');
     p.className = 'particle';
 
-    // irregular sizes — some big chunks, some small sparks
     const isBig = Math.random() < 0.3;
     const size  = isBig ? (6 + Math.random() * 6) : (2 + Math.random() * 4);
     const angle = Math.random() * Math.PI * 2;
@@ -136,8 +135,7 @@ function _explosionDebris(cx, cy, range) {
 
     p.style.cssText =
       `width:${size}px;height:${size}px;background:${color};` +
-      `left:${cx}px;top:${cy}px;opacity:1;` +
-      (isBig ? 'border-radius:2px;' : '');
+      `left:${cx}px;top:${cy}px;opacity:1;image-rendering:pixelated;`;
     arena.appendChild(p);
 
     const start = performance.now();
@@ -145,7 +143,6 @@ function _explosionDebris(cx, cy, range) {
     const dist  = range * (0.4 + Math.random() * 0.6);
     const vx    = Math.cos(angle);
     const vy    = Math.sin(angle);
-    // slight gravity effect for big chunks
     const grav  = isBig ? 0.003 : 0;
 
     (function anim(now) {

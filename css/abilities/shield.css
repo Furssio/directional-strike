@@ -1,0 +1,17 @@
+/* ═══════════════════════════════════════
+   SHIELD ABILITY — Arena tint only
+   Canvas handles all particle effects.
+   ═══════════════════════════════════════ */
+
+.shield-active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 30%,
+    rgba(81, 238, 252, 0.04) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
