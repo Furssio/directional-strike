@@ -15,6 +15,11 @@ function showSlashEffect(dir) {
     return;
   }
 
+  // screen shake on every attack during one-hit
+  if (player && player.oneHitActive) {
+    triggerShake();
+  }
+
   const { w, h } = getArenaSize();
   const cx = w / 2;
   const cy = h / 2;

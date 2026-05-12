@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════
+   ONE-HIT ABILITY — visual effects
+   Red super saiyan aura (CSS only)
+   + red slash tint + player glow
+   ═══════════════════════════════════════ */
+
+/* ── RED AURA OVERLAY (centered on player) ── */
+.onehit-aura {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9;
+  background: radial-gradient(
+    circle,
+    rgba(255, 60, 0, 0.35) 0%,
+    rgba(200, 30, 0, 0.2) 30%,
+    rgba(150, 10, 0, 0.1) 55%,
+    transparent 75%
+  );
+  animation: oneHitAuraPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes oneHitAuraPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.7;
+    background: radial-gradient(
+      circle,
+      rgba(255, 60, 0, 0.35) 0%,
+      rgba(200, 30, 0, 0.2) 30%,
+      rgba(150, 10, 0, 0.1) 55%,
+      transparent 75%
+    );
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 1;
+    background: radial-gradient(
+      circle,
+      rgba(255, 100, 0, 0.45) 0%,
+      rgba(255, 50, 0, 0.25) 30%,
+      rgba(200, 20, 0, 0.12) 55%,
+      transparent 75%
+    );
+  }
+}
+
+/* ── RED TINT on slash sprites ── */
+#arena.one-hit-active .slash-effect {
+  filter: sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.1);
+}
+
+/* ── PLAYER RED GLOW ── */
+#arena.one-hit-active #player {
+  filter: drop-shadow(0 0 6px #ff2200) drop-shadow(0 0 14px #ff4400) drop-shadow(0 0 22px #ff6600) brightness(1.15);
+  animation: oneHitPlayerPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes oneHitPlayerPulse {
+  0%   { filter: drop-shadow(0 0 6px #ff2200) drop-shadow(0 0 14px #ff4400) brightness(1.15); }
+  100% { filter: drop-shadow(0 0 10px #ff4400) drop-shadow(0 0 20px #ff6600) brightness(1.3); }
+}

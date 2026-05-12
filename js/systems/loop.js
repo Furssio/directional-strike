@@ -34,6 +34,13 @@ function cleanupAbilityEffects() {
     // slash
     SlashFX.stop();
     a.querySelectorAll('.slash-aura-canvas').forEach(el => el.remove());
+
+    // one hit
+    a.classList.remove('one-hit-active');
+    a.querySelectorAll('.onehit-aura').forEach(el => el.remove());
+
+    // range boost
+    if (typeof RangeBoostFX !== 'undefined') RangeBoostFX.stop();
   }
 
   // restore range circle in case ability hid it
