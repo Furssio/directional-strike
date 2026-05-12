@@ -14,6 +14,11 @@
    Called on startGame, endGame, and exit to menu. */
 
 function cleanupAbilityEffects() {
+  // call onDeactivate on active ability before cleanup
+  if (player && player.specialActive && player.ability && player.ability.onDeactivate) {
+    player.ability.onDeactivate(enemies);
+  }
+
   if (typeof SFX !== 'undefined') SFX.stopAll();
 
   const a = document.getElementById('arena');

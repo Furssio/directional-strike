@@ -22,6 +22,12 @@ AbilityRegistry.register({
     if (player) {
       player.hp = player.maxHp;
       updateHpBar();
+
+      // green heal glow (reuses orb heal effect)
+      playerEl.classList.remove('orb-heal-effect');
+      void playerEl.offsetWidth;
+      playerEl.classList.add('orb-heal-effect');
+      setTimeout(() => playerEl.classList.remove('orb-heal-effect'), 1500);
     }
   },
 

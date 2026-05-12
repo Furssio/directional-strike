@@ -91,6 +91,9 @@ const SCRIPTS = [
   
  /* ── ADVENTURE (entry, does not auto-run) ── */
   'js/modes/adventure/main.js',
+
+  /* ── DEBUG (must be last) ── */
+  'js/debug.js',
 ];
 
 (function loadScripts(scripts, index) {

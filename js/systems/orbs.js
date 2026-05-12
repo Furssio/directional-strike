@@ -314,6 +314,26 @@ const OrbSystem = (() => {
       _defenseBuffMs = 0;
       playerEl.classList.remove('orb-heal-effect', 'orb-attack-effect', 'orb-defense-effect');
     },
+
+    /* ── DEBUG INTERFACE ─────────────────
+       Only used by debug.js. */
+    _debug() {
+      const orbBonus = (player && player._orbChanceBonus) ? player._orbChanceBonus : 0;
+      return {
+        activeOrb:    _activeOrb ? _activeOrb.type : null,
+        activeOrbDir: _activeOrb ? _activeOrb.dir : null,
+        cooldownMs:   _cooldownMs,
+        rollTimerMs:  _rollTimerMs,
+        attackBuffMs:  _attackBuffMs,
+        defenseBuffMs: _defenseBuffMs,
+        healChance:    (_healChance() + orbBonus),
+        attackChance:  (_attackChance() + orbBonus),
+        defenseChance: (_defenseChance() + orbBonus),
+        orbBonus,
+        rollInterval:  ORB_ROLL_INTERVAL,
+        cooldownBase:  ORB_COOLDOWN,
+      };
+    },
   };
 
 })();

@@ -10,6 +10,11 @@
 
 const CONFIG = {
 
+  /* ── DEBUG ──────────────────────────────
+     debug: enables debug overlay + hotkeys
+  ─────────────────────────────────────── */
+  debug: true,
+
   /* ── PLAYER ─────────────────────────────
      maxHp:            base max HP
      hpBarGreenPct:    above this % → green

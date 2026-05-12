@@ -408,9 +408,47 @@ if (waveTimeLeft <= 0) {
       this._startWave(wave + 1);
     },
 
-    restart() {
+   restart() {
       if (!currentMap) return false;
       return this.init(currentMap.id);
+    },
+
+    /* ── DEBUG INTERFACE ─────────────────
+       Only used by debug.js when CONFIG.debug = true.
+       Returns snapshot of internal state. */
+    _debug() {
+      return {
+        wave,
+        totalWaves:    _getTotalWaves(),
+        waveTimeLeft,
+        waveDuration,
+        waveElapsed,
+        draining,
+        drainPauseMs,
+        spawnTimer,
+        active,
+        completed,
+        waveConfig:    _getWaveConfig(),
+        spawnInterval: _getSpawnInterval(),
+        maxAlive:      _getMaxAlive(),
+        minAlive:      _getMinAlive(),
+        pool:          _buildPool(),
+        inputRate:     _getInputRate(),
+        burstQueue:    _burstQueue.length,
+        isFinalWave:   _isFinalWave(),
+        isUpgradeWave: _isUpgradeWave(wave),
+      };
+    },
+
+    /* ── DEBUG SKIP TIMER ────────────────
+       Sets wave timer to 10s or less.
+       No-op if already draining or inactive. */
+    debugSkipTimer() {
+      if (!active || draining) return;
+      if (waveTimeLeft > 10000) {
+        waveElapsed  = waveDuration - 10000;
+        waveTimeLeft = 10000;
+      }
     },
 
   };

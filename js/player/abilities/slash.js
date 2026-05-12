@@ -101,9 +101,11 @@ const SlashFX = (() => {
 
   /* ── PUBLIC ── */
 
-  function start() {
+ function start() {
     const a = document.getElementById('arena');
     if (!a) return;
+    // cleanup orphaned canvases
+    a.querySelectorAll('.slash-aura-canvas').forEach(c => c.remove());
 
     _canvas = document.createElement('canvas');
     _canvas.width = SIZE;
@@ -136,8 +138,7 @@ const SlashFX = (() => {
     const a = document.getElementById('arena');
     if (a) {
       a.classList.remove('slash-active');
-      const c = a.querySelector('.slash-aura-canvas');
-      if (c) c.remove();
+      a.querySelectorAll('.slash-aura-canvas').forEach(c => c.remove());
     }
     _canvas = null;
     _ctx = null;
