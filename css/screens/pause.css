@@ -1,26 +1,36 @@
 /* ══════════════════════════════════════
-   PAUSE — button + overlay popup
+   PAUSE — button + overlay
+   Same visual style as game-over overlay
    ══════════════════════════════════════ */
 
-/* ── PAUSE BUTTON (in-game) ── */
+/* ── PAUSE BUTTON (inside arena) ── */
 #btn-pause {
   position: absolute;
   top: 8px;
   right: 8px;
-  z-index: 50;
-  width: 36px;
-  height: 36px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
   background: rgba(17, 17, 34, 0.5);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
   color: var(--c-text-dim);
-  font-size: 16px;
-  font-family: 'Press Start 2P', monospace;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.15s, color 0.15s;
+  padding: 0;
+  line-height: 0;
+}
+
+#btn-pause:hover {
+  background: rgba(17, 17, 34, 0.8);
+  color: var(--c-text);
+}
+
+#btn-pause svg {
+  image-rendering: pixelated;
 }
 
 #btn-pause:hover {
@@ -32,7 +42,6 @@
 #pause-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,55 +52,115 @@
   display: none;
 }
 
+/* ── DARKEN ── */
+#pause-darken {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
 /* ── CARD ── */
 #pause-card {
-  background: var(--c-bg);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 24px 32px;
+  position: relative;
+  width: 72%;
+  max-width: 320px;
+  background-image: url('../../assets/ui/menu_bg.png');
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 28px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  min-width: 200px;
+  gap: 16px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
 }
 
+/* ── TITLE ── */
 #pause-title {
   font-family: 'Press Start 2P', monospace;
   font-size: 16px;
   color: var(--c-text);
   letter-spacing: 3px;
-  margin-bottom: 8px;
+  margin: 0;
   text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
 }
 
-/* ── BUTTONS ── */
+/* ── MAIN BUTTONS ── */
+.pause-btn-col {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .pause-btn {
   width: 100%;
-  padding: 10px 16px;
+  padding: 12px 16px;
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(17, 17, 34, 0.6);
+  border: 1px solid transparent;
+  background: rgba(0, 0, 0, 0.5);
   color: var(--c-text-dim);
   cursor: pointer;
   letter-spacing: 1px;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .pause-btn:hover {
-  background: rgba(17, 17, 34, 0.9);
+  background: rgba(0, 0, 0, 0.7);
   color: var(--c-text);
-  border-color: rgba(255,255,255,0.2);
 }
 
-#pause-continue {
-  border-color: var(--c-accent);
+.pause-btn-primary {
+  border-color: rgba(81, 238, 252, 0.4);
   color: var(--c-accent);
 }
 
-#pause-continue:hover {
+.pause-btn-primary:hover {
   background: var(--c-accent);
   color: var(--c-bg);
+}
+
+/* ── SMALL BUTTONS ROW (SFX / MUSIC) ── */
+.pause-sm-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pause-sm-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pause-sm-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.pause-sm-btn.muted {
+  opacity: 0.45;
+}
+
+.pause-btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.pause-btn-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: var(--c-text-dim);
+  letter-spacing: 1px;
 }

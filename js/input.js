@@ -248,6 +248,23 @@ document.addEventListener('keydown', e => {
     updateSpecialBar();
     return;
   }
+
+  // M = skip entire wave (clear field + advance to next)
+  if (e.code === 'KeyM') {
+    e.preventDefault();
+    if (ActiveDirector === AdventureDirector) {
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        if (enemies[i].el) enemies[i].el.remove();
+        enemies.splice(i, 1);
+      }
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].el.remove();
+        bullets.splice(i, 1);
+      }
+      AdventureDirector.nextWave();
+    }
+    return;
+  }
 });
 
 updateMenuBest();

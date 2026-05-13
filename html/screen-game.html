@@ -9,6 +9,12 @@
     <div id="progress-wrap"><div id="progress-bar"></div></div>
   </div>
   <div id="arena">
+    <button id="btn-pause">
+      <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
+        <rect x="3" y="2" width="4" height="12"/>
+        <rect x="9" y="2" width="4" height="12"/>
+      </svg>
+    </button>
     <div id="flash"></div>
     <div id="attack-range"></div>
     <div id="level-up-pop"></div>
@@ -92,16 +98,28 @@
     </div>
   </div>
 
-  <!-- ── PAUSE BUTTON (top right) ── -->
-  <button id="btn-pause">Ⅱ</button>
-
-  <!-- ── PAUSE POPUP ── -->
+  
+  <!-- ── PAUSE OVERLAY ── -->
   <div id="pause-overlay" class="hidden">
+    <div id="pause-darken"></div>
     <div id="pause-card">
       <h2 id="pause-title">PAUSED</h2>
-      <button class="pause-btn" id="pause-continue">CONTINUE</button>
-      <button class="pause-btn" id="pause-retry">TRY AGAIN</button>
-      <button class="pause-btn" id="pause-exit">EXIT</button>
+      <div class="pause-btn-col">
+        <button class="pause-btn pause-btn-primary" id="pause-continue">RESUME</button>
+        <button class="pause-btn" id="pause-retry">TRY AGAIN</button>
+        <button class="pause-btn" id="pause-maps">MAPS</button>
+      </div>
+      <div class="pause-sm-row">
+        <button class="pause-sm-btn" id="pause-sfx">
+          <span class="pause-btn-icon">🔊</span>
+          <span class="pause-btn-label">SFX</span>
+        </button>
+        <button class="pause-sm-btn" id="pause-music">
+          <span class="pause-btn-icon">🎵</span>
+          <span class="pause-btn-label">MUSIC</span>
+        </button>
+      </div>
     </div>
+  </div>
   </div>
 </div>

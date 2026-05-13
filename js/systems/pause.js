@@ -22,6 +22,9 @@ function pauseGame() {
   gameLoop = null;
   document.getElementById('pause-overlay').classList.remove('hidden');
 
+  // sync toggle states with menu buttons
+  _syncPauseToggles();
+
   // freeze ability audio
   if (typeof SFX !== 'undefined') SFX.pauseAll();
 }
@@ -35,6 +38,23 @@ function resumeGame() {
 
   // resume ability audio
   if (typeof SFX !== 'undefined') SFX.resumeAll();
+}
+
+/* ── SYNC TOGGLE STATES ── */
+
+function _syncPauseToggles() {
+  // SFX
+  const pSfx = document.getElementById('pause-sfx');
+  const sfxOff = !CONFIG.audio.enabled;
+  pSfx.classList.toggle('muted', sfxOff);
+  pSfx.querySelector('.pause-btn-icon').textContent = sfxOff ? '🔇' : '🔊';
+
+  // Music
+  const pMusic = document.getElementById('pause-music');
+  const menuMusic = document.getElementById('btn-music');
+  const musicOff = menuMusic.classList.contains('muted');
+  pMusic.classList.toggle('muted', musicOff);
+  pMusic.querySelector('.pause-btn-icon').textContent = musicOff ? '🔇' : '🎵';
 }
 
 /* ── BUTTON BINDINGS ── */
@@ -63,12 +83,45 @@ document.getElementById('pause-retry').addEventListener('click', () => {
     startGameLoop();
   });
 });
-document.getElementById('pause-exit').addEventListener('click', () => {
+
+document.getElementById('pause-maps').addEventListener('click', () => {
   if (Transition.isPlaying()) return;
   resumeGame();
   Transition.play('fast', () => {
     endGame();
-    showScreen(sMenu);
-    if (typeof DemoMode !== 'undefined') DemoMode.start();
+    showScreen(sMapSelect);
+    if (typeof initMapSelect === 'function') initMapSelect();
   });
+});
+
+/* ── SFX TOGGLE ── */
+document.getElementById('pause-sfx').addEventListener('click', () => {
+  SFX.init();
+  CONFIG.audio.enabled = !CONFIG.audio.enabled;
+  const off = !CONFIG.audio.enabled;
+
+  // update pause button
+  const pSfx = document.getElementById('pause-sfx');
+  pSfx.classList.toggle('muted', off);
+  pSfx.querySelector('.pause-btn-icon').textContent = off ? '🔇' : '🔊';
+
+  // sync menu button
+  const mSfx = document.getElementById('btn-sfx');
+  mSfx.classList.toggle('muted', off);
+  mSfx.querySelector('.menu-btn-icon').textContent = off ? '🔇' : '🔊';
+});
+
+/* ── MUSIC TOGGLE ── */
+document.getElementById('pause-music').addEventListener('click', () => {
+  const off = !document.getElementById('pause-music').classList.contains('muted');
+
+  // update pause button
+  const pMusic = document.getElementById('pause-music');
+  pMusic.classList.toggle('muted', off);
+  pMusic.querySelector('.pause-btn-icon').textContent = off ? '🔇' : '🎵';
+
+  // sync menu button
+  const mMusic = document.getElementById('btn-music');
+  mMusic.classList.toggle('muted', off);
+  mMusic.querySelector('.menu-btn-icon').textContent = off ? '🔇' : '🎵';
 });

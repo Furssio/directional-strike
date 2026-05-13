@@ -263,58 +263,6 @@ function showBossAnnounce(map) {
 }
 
 
-/* ── SHOW MAP COMPLETE ── */
-function showMapComplete(map, newlyUnlocked) {
-  const sMapComplete = document.getElementById('screen-map-complete');
-
-  document.getElementById('map-complete-icon').textContent = map.icon || '🗺️';
-  document.getElementById('map-complete-name').textContent = map.name;
-
-  const abilityBlock = document.getElementById('map-complete-ability');
-
-  if (newlyUnlocked && map.unlocksAbility) {
-    const ab = AbilityRegistry.get(map.unlocksAbility);
-    if (ab) {
-      document.getElementById('map-complete-ability-icon').textContent = ab.icon;
-      document.getElementById('map-complete-ability-name').textContent = ab.name;
-      document.getElementById('map-complete-ability-desc').textContent = ab.desc;
-      abilityBlock.classList.remove('hidden');
-    } else {
-      abilityBlock.classList.add('hidden');
-    }
-  } else {
-    abilityBlock.classList.add('hidden');
-  }
-
-  [sMenu, sGame, sOver, sAbility, sMapSelect].forEach(x => x.style.display = 'none');
-  sMapComplete.style.display = 'block';
-
-  const autoTimer = setTimeout(() => _returnToMapSelect(), 6000);
-
-  document.getElementById('btn-map-continue').onclick = () => {
-    if (Transition.isPlaying()) return;
-    clearTimeout(autoTimer);
-    Transition.play('normal', () => {
-      _returnToMapSelect();
-    });
-  };
-  document.getElementById('btn-go-abilities').onclick = () => {
-    if (Transition.isPlaying()) return;
-    clearTimeout(autoTimer);
-    Transition.play('normal', () => {
-      buildAbilityScreen();
-      showScreen(sAbility);
-    });
-  };
-}
-
-function _returnToMapSelect() {
-  buildMapSelectScreen();
-  const sMapComplete = document.getElementById('screen-map-complete');
-  sMapComplete.style.display = 'none';
-  showScreen(sMapSelect);
-}
-
 
 /* ── ENEMY HINTS ── */
 const ENEMY_HINTS = {
