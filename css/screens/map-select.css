@@ -409,3 +409,111 @@
   animation: playerIdle 1.2s steps(12) infinite;
   z-index: 10;
 }
+/* ══════════════════════════════════════
+   BOSS MAP — lock icon + glitch effect
+   ══════════════════════════════════════ */
+
+/* ── Lock icon — bottom right of slide ── */
+.slide-lock {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 12px;
+  z-index: 10;
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.map-slide.pos-center .slide-lock {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+/* ── Boss cards — no red border ── */
+.map-slide.is-boss {
+  border: none;
+  box-shadow: none;
+}
+
+/* ── Boss locked — slightly darker than normal locked ── */
+.map-slide.is-boss.is-locked {
+  filter: brightness(0.15) !important;
+}
+
+.map-slide.is-boss.is-locked.pos-center {
+  filter: brightness(0.35) !important;
+}
+
+/* ── Glitch effect — after moon completed ── */
+.map-slide.is-glitch.pos-center {
+  filter: brightness(0.5) saturate(1.4) !important;
+  animation: bossGlitch 3s steps(1) infinite;
+}
+
+.map-slide.is-glitch:not(.pos-center) {
+  filter: brightness(0.2) saturate(1.2) !important;
+}
+
+@keyframes bossGlitch {
+  0%, 100% {
+    transform: translate(-50%, -50%);
+    clip-path: none;
+  }
+  7% {
+    transform: translate(-50%, -50%) translate(2px, 0);
+    clip-path: inset(20% 0 30% 0);
+  }
+  8% {
+    transform: translate(-50%, -50%) translate(-3px, 0);
+    clip-path: inset(50% 0 10% 0);
+  }
+  9% {
+    transform: translate(-50%, -50%);
+    clip-path: none;
+  }
+  45% {
+    transform: translate(-50%, -50%);
+    clip-path: none;
+  }
+  47% {
+    transform: translate(-50%, -50%) translate(-2px, 1px);
+    clip-path: inset(10% 0 60% 0);
+  }
+  48% {
+    transform: translate(-50%, -50%) translate(3px, -1px);
+    clip-path: inset(40% 0 20% 0);
+  }
+  50% {
+    transform: translate(-50%, -50%);
+    clip-path: none;
+  }
+}
+
+/* ── Glitch scanline overlay ── */
+.map-slide.is-glitch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 5;
+  mix-blend-mode: multiply;
+}
+
+/* ── COMING SOON sub text pulse ── */
+#carousel-map-sub.coming-soon {
+  color: #E24B4A;
+  animation: comingSoonPulse 2s ease-in-out infinite;
+}
+
+@keyframes comingSoonPulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}

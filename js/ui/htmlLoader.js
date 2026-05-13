@@ -4,7 +4,6 @@ const HTML_PARTIALS = [
   'html/screen-over.html',
   'html/screen-ability.html',
   'html/screen-map-select.html',
-  'html/screen-map-complete.html',
 ];
 
 async function loadHTMLPartials() {

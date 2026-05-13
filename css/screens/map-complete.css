@@ -1,11 +1,143 @@
-#screen-map-complete{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);z-index:900;}
-#map-complete-card{background:#222;border:1px solid #444;border-radius:12px;padding:2rem 1.5rem;text-align:center;max-width:340px;margin:0 auto;}
-#map-complete-card h2{font-size:22px;font-weight:600;color:#22C55E;margin-bottom:6px;}
-#map-complete-icon{font-size:40px;margin-bottom:10px;}
-#map-complete-name{font-size:14px;color:#aaa;margin-bottom:20px;}
-#map-complete-ability{background:#1a1a1a;border:1.5px solid #FFD700;border-radius:10px;padding:14px;margin-bottom:20px;}
-#map-complete-ability.hidden{display:none;}
-.ability-unlock-label{font-size:10px;font-weight:700;color:#FFD700;letter-spacing:2px;margin-bottom:8px;}
-#map-complete-ability-icon{font-size:28px;margin-bottom:6px;}
-#map-complete-ability-name{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;}
-#map-complete-ability-desc{font-size:11px;color:#aaa;}
+/* ═══════════════════════════════════════
+   MAP COMPLETE OVERLAY
+   Shown inside #arena after final wave.
+   ═══════════════════════════════════════ */
+
+/* ── CONTAINER ── */
+#complete-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: completeOverlayIn 0.4s ease-out;
+}
+#complete-overlay.hidden { display: none; }
+
+/* ── DARK BACKDROP ── */
+#complete-darken {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* ── CARD ── */
+#complete-card {
+  position: relative;
+  z-index: 1;
+  width: 72%;
+  max-width: 320px;
+  background-image: url('../../assets/ui/menu_bg.png');
+  background-size: 128px 128px;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  padding: 28px 20px 22px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ── TITLE ── */
+#complete-title {
+  font-size: 14px;
+  color: #22C55E;
+  text-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+  margin: 0 0 6px;
+  letter-spacing: 1px;
+}
+
+/* ── MAP NAME ── */
+#complete-map-name {
+  font-size: 9px;
+  color: var(--c-text-dim, #8888aa);
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── SCORE BLOCK ── */
+#complete-score-block {
+  margin-bottom: 18px;
+}
+#complete-score-label {
+  font-size: 7px;
+  color: var(--c-text-dim, #8888aa);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+#complete-score {
+  font-size: 20px;
+  color: #22C55E;
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+/* ── ABILITY UNLOCK ── */
+#complete-ability {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 8px;
+  padding: 12px 10px;
+  margin-bottom: 18px;
+}
+#complete-ability.hidden { display: none; }
+
+#complete-ability-label {
+  font-size: 7px;
+  color: #FFD700;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+#complete-ability-icon {
+  margin-bottom: 6px;
+}
+#complete-ability-name {
+  font-size: 10px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+#complete-ability-desc {
+  font-size: 7px;
+  color: var(--c-text-dim, #8888aa);
+  line-height: 1.6;
+}
+
+/* ── AD SLOT (future) ── */
+#complete-ad-slot {
+  min-height: 0;
+}
+
+/* ── BUTTONS ── */
+.complete-btn-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.complete-btn {
+  width: 100%;
+  padding: 12px 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--c-text, #ffffff);
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+.complete-btn:hover { background: rgba(0, 0, 0, 0.7); }
+.complete-btn:active { transform: scale(0.97); }
+
+.complete-btn-primary {
+  color: var(--c-accent, #51eefc);
+  border: 1px solid rgba(81, 238, 252, 0.25);
+}
+
+/* ── ENTRANCE ANIMATION ── */
+@keyframes completeOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

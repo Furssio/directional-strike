@@ -9,8 +9,14 @@
 /* ── SCREEN NAVIGATION ── */
 
 function showScreen(s) {
-  [sMenu, sGame, sOver, sAbility, sMapSelect, sMapComplete].forEach(x => x.style.display = 'none');
+  [sMenu, sGame, sAbility, sMapSelect].forEach(x => {
+    if (x) x.style.display = 'none';
+  });
   s.style.display = 'block';
+
+  // always hide overlays when switching screens
+  if (overOverlay) overOverlay.classList.add('hidden');
+  if (completeOverlay) completeOverlay.classList.add('hidden');
 
   // stop all ability audio when leaving game screen
   if (s !== sGame && typeof SFX !== 'undefined') SFX.stopAll();
@@ -35,6 +41,7 @@ function updateMenuBest() {
   const b = getBestScore();
   menuBest.textContent = b > 0 ? 'best: ' + b + ' pts' : '';
 }
+
 /* ── SCORE POPUP ── */
 
 const _popColors = ['#FFD700','#44ddff','#ff66aa','#66ff66','#ff8844','#aa88ff','#ffff44'];
@@ -50,52 +57,73 @@ function showScorePop(x, y, pts) {
   arena.appendChild(pop);
   setTimeout(() => pop.remove(), 850);
 }
+
 /* ── MAP COMPLETE ── */
 
 function showMapComplete(map, newlyUnlocked) {
   // stop game loop
   running = false;
+  clearInterval(gameLoop);
 
-  // populate card
-  document.getElementById('map-complete-icon').textContent = map.icon || '🏆';
-  document.getElementById('map-complete-name').textContent = map.name;
+  // populate overlay
+  document.getElementById('complete-map-name').textContent = map.name || map.id;
+  document.getElementById('complete-score').textContent =
+    (player ? player.score : 0).toLocaleString();
 
   // ability unlock section
-  const abilitySection = document.getElementById('map-complete-ability');
+  const abilitySection = document.getElementById('complete-ability');
   if (newlyUnlocked && map.unlocksAbility) {
     const aDef = AbilityRegistry.get(map.unlocksAbility);
     if (aDef) {
-      document.getElementById('map-complete-ability-icon').innerHTML =
+      document.getElementById('complete-ability-icon').innerHTML =
         '<img src="assets/abilities/' + aDef.id + '.png" width="48" height="48" style="image-rendering:pixelated">';
-      document.getElementById('map-complete-ability-name').textContent = aDef.name || aDef.id;
-      document.getElementById('map-complete-ability-desc').textContent = aDef.desc || '';
+      document.getElementById('complete-ability-name').textContent = aDef.name || aDef.id;
+      document.getElementById('complete-ability-desc').textContent = aDef.desc || '';
       abilitySection.classList.remove('hidden');
     }
   } else {
     abilitySection.classList.add('hidden');
   }
 
-  // show screen
-  showScreen(sMapComplete);
+  // show overlay (game screen stays visible behind)
+  completeOverlay.classList.remove('hidden');
 
-  // button handlers (clean up old listeners)
-  const btnContinue = document.getElementById('btn-map-continue');
-  const btnAbilities = document.getElementById('btn-go-abilities');
+  // button handlers (clone to clean old listeners)
+  const btnAgain = document.getElementById('btn-play-again');
+  const btnMaps  = document.getElementById('btn-complete-maps');
 
-  const newContinue = btnContinue.cloneNode(true);
-  btnContinue.parentNode.replaceChild(newContinue, btnContinue);
-  newContinue.addEventListener('click', () => {
-    showScreen(sMapSelect);
-    if (typeof initMapSelect === 'function') initMapSelect();
+  const newAgain = btnAgain.cloneNode(true);
+  btnAgain.parentNode.replaceChild(newAgain, btnAgain);
+  newAgain.addEventListener('click', () => {
+    if (Transition.isPlaying()) return;
+    completeOverlay.classList.add('hidden');
+    cleanupArena();
+    Transition.play('fast', () => {
+      equippedAbilityId = getEquippedAbility();
+      if (AdventureDirector.restart()) {
+        startGame(true);
+      } else {
+        showScreen(sMapSelect);
+        if (typeof initMapSelect === 'function') initMapSelect();
+      }
+    }, () => {
+      startGameLoop();
+    });
   });
 
-  const newAbilities = btnAbilities.cloneNode(true);
-  btnAbilities.parentNode.replaceChild(newAbilities, btnAbilities);
-  newAbilities.addEventListener('click', () => {
-    showScreen(sMapSelect);
-    if (typeof initMapSelect === 'function') initMapSelect();
+  const newMaps = btnMaps.cloneNode(true);
+  btnMaps.parentNode.replaceChild(newMaps, btnMaps);
+  newMaps.addEventListener('click', () => {
+    if (Transition.isPlaying()) return;
+    completeOverlay.classList.add('hidden');
+    cleanupArena();
+    Transition.play('fast', () => {
+      showScreen(sMapSelect);
+      if (typeof initMapSelect === 'function') initMapSelect();
+    });
   });
 }
+
 /* ── MENU FIREFLIES ── */
 
 let menuFireflies = [];
@@ -138,17 +166,14 @@ function startMenuFireflies() {
       f.x += f.vx * f.speed;
       f.y += f.vy * f.speed;
 
-      // wrap around
       if (f.x < -5) f.x = 105;
       if (f.x > 105) f.x = -5;
       if (f.y < -5) f.y = 105;
       if (f.y > 105) f.y = -5;
 
-      // gentle wobble
       const wx = Math.sin(t * 0.8 + f.phase) * 0.3;
       const wy = Math.cos(t * 0.6 + f.phase) * 0.2;
 
-      // fade in/out pulse
       const alpha = (Math.sin(t * f.speed + f.phase) + 1) * 0.5;
       const opacity = alpha * 0.7 + 0.05;
 

@@ -14,42 +14,62 @@ let selectedMapId  = null;
 let _carouselIndex = 0;
 let _carouselMaps  = [];
 
-const BOSS_ORDERS = [4, 8, 11, 13];
+const BOSS_MAP_IDS = ['map04_temple', 'map08_storm', 'map11_dragon', 'map13_dark'];
+
+const DISPLAY_ORDER = [
+  'map01_forest', 'map02_dungeon', 'map03_desert',
+  'map05_snow', 'map06_beach', 'map07_clouds',
+  'map09_volcano', 'map10_sakura', 'map12_moon',
+  'map04_temple', 'map08_storm', 'map11_dragon', 'map13_dark'
+];
+
+/* ── HELPERS ── */
+function _isBossMap(mapId) {
+  return BOSS_MAP_IDS.includes(mapId);
+}
+
+function _allPlayableCompleted() {
+  return DISPLAY_ORDER
+    .filter(id => !_isBossMap(id))
+    .every(id => Progress.isMapCompleted(id));
+}
 
 
 /* ── EXTRACT ENEMY IDS FROM MAP DEF ── */
 function _getMapEnemyIds(map) {
   const ids = new Set();
-
-  // from enemyPool keys
   if (map.enemyPool) {
     Object.keys(map.enemyPool).forEach(id => ids.add(id));
   }
-
-  // from waveConfig pools
   if (map.waveConfig) {
     Object.values(map.waveConfig).forEach(wc => {
       if (wc.pool) Object.keys(wc.pool).forEach(id => ids.add(id));
     });
   }
-
-  // from introWaves
   if (map.introWaves) {
     Object.values(map.introWaves).forEach(iw => {
       if (iw.pool) iw.pool.forEach(id => ids.add(id));
     });
   }
-
   return [...ids];
 }
 
+
 /* ── BUILD ── */
 function buildMapSelectScreen() {
-  _carouselMaps  = MapRegistry.all();
+  // sort maps by visual display order
+  const allMaps = MapRegistry.all();
+  _carouselMaps = DISPLAY_ORDER
+    .map(id => allMaps.find(m => m.id === id))
+    .filter(Boolean);
+
   _carouselIndex = 0;
 
+  // start on first unfinished playable map
   const firstUnfinished = _carouselMaps.findIndex(m =>
-    Progress.isMapUnlocked(m.id) && !Progress.isMapCompleted(m.id)
+    !_isBossMap(m.id) &&
+    Progress.isMapUnlocked(m.id) &&
+    !Progress.isMapCompleted(m.id)
   );
   if (firstUnfinished >= 0) _carouselIndex = firstUnfinished;
 
@@ -66,37 +86,54 @@ function buildMapSelectScreen() {
   }
 }
 
-/* ── CREA LE SLIDE ── */
+
+/* ── BUILD SLIDES ── */
 function _buildCarouselTrack() {
   const track = document.getElementById('carousel-track');
   track.innerHTML = '';
+  const moonDone = Progress.isMapCompleted('map12_moon');
 
   _carouselMaps.forEach((map, i) => {
     const slide = document.createElement('div');
-    slide.className  = 'map-slide';
+    slide.className = 'map-slide';
     slide.dataset.index = i;
 
     const bg = map.background || '';
     if (bg) slide.style.backgroundImage = `url('${bg}')`;
     else    slide.style.background = '#333';
 
-    if (BOSS_ORDERS.includes(map.order)) slide.classList.add('is-boss');
+    const isBoss = _isBossMap(map.id);
 
-    const unlocked = Progress.isMapUnlocked(map.id);
-    if (!unlocked) slide.classList.add('is-locked');
+    if (isBoss) {
+      slide.classList.add('is-boss');
+      slide.classList.add('is-locked');
+      // glitch effect only after moon completed
+      if (moonDone) slide.classList.add('is-glitch');
+    } else {
+      const unlocked = Progress.isMapUnlocked(map.id);
+      if (!unlocked) slide.classList.add('is-locked');
+    }
+
+    // lock icon for boss and locked maps
+    if (isBoss || !Progress.isMapUnlocked(map.id)) {
+      const lock = document.createElement('div');
+      lock.className = 'slide-lock';
+      lock.textContent = '🔒';
+      slide.appendChild(lock);
+    }
 
     track.appendChild(slide);
   });
 }
 
-/* ── RENDER POSIZIONI ── */
+
+/* ── RENDER POSITIONS ── */
 function _renderCarousel() {
   const maps  = _carouselMaps;
   const idx   = _carouselIndex;
   const map   = maps[idx];
   const slides = document.querySelectorAll('.map-slide');
 
-  // posizioni relative all'indice corrente
   const posMap = {
     '-2': 'pos-far-left',
     '-1': 'pos-left',
@@ -111,25 +148,35 @@ function _renderCarousel() {
       .trim();
 
     const diff = i - idx;
-
-    // slides too far from center — hide them
     if (diff < -2 || diff > 2) {
       slide.classList.add('pos-hidden');
       return;
     }
-
-    const key = diff.toString();
-    const pos = posMap[key];
+    const pos = posMap[diff.toString()];
     if (pos) slide.classList.add(pos);
   });
 
-  // header
-  const isBoss = BOSS_ORDERS.includes(map.order);
-  document.getElementById('carousel-map-name').textContent = map.name;
-  document.getElementById('carousel-map-sub').textContent  =
-    isBoss ? '⚔️ BOSS FIGHT' : `level ${map.order}`;
+  // visual level number (1-based index in display order)
+  const visualLevel = DISPLAY_ORDER.indexOf(map.id) + 1;
+  const isBoss      = _isBossMap(map.id);
+  const moonDone    = Progress.isMapCompleted('moon');
 
-  // completed
+  // header
+  document.getElementById('carousel-map-name').textContent =
+    (isBoss && !moonDone) ? map.name : map.name;
+
+  // sub text
+  const sub = document.getElementById('carousel-map-sub');
+  sub.classList.remove('coming-soon');
+  if (isBoss && moonDone) {
+    sub.textContent = 'COMING SOON';
+    sub.classList.add('coming-soon');
+  } else if (isBoss) {
+    sub.textContent = 'LOCKED';
+  } else {
+    sub.textContent = `level ${visualLevel}`;
+  }
+
   // completed
   const completed = Progress.isMapCompleted(map.id);
   document.getElementById('carousel-completed').textContent =
@@ -143,28 +190,31 @@ function _renderCarousel() {
     bestEl.textContent = (completed && best) ? 'BEST: ' + best + ' pts' : '';
   }
 
-  // play button
-  const unlocked = Progress.isMapUnlocked(map.id);
+  // play button — boss always disabled
+  const unlocked = !isBoss && Progress.isMapUnlocked(map.id);
   const btn      = document.getElementById('btn-map-play');
   btn.disabled   = !unlocked;
 
-// sync map preview background
+  // sync map preview background
   const demoEl = document.getElementById('mapselect-demo');
   if (demoEl && map.background) {
     demoEl.style.backgroundImage = `url(${map.background})`;
   }
 
-  // render enemy card
+  // enemy card — hide for boss maps
   _renderEnemyCard(map);
 }
 
-/* ── BIND BOTTONI ── */
+
+/* ── BIND BUTTONS ── */
 function _bindCarouselButtons() {
   document.getElementById('carousel-prev').onclick = () => _shiftCarousel(-1);
   document.getElementById('carousel-next').onclick = () => _shiftCarousel(1);
   document.getElementById('btn-map-play').onclick  = () => {
     const map = _carouselMaps[_carouselIndex];
-    if (map && Progress.isMapUnlocked(map.id)) onMapSelected(map.id);
+    if (map && !_isBossMap(map.id) && Progress.isMapUnlocked(map.id)) {
+      onMapSelected(map.id);
+    }
   };
 }
 
@@ -174,6 +224,7 @@ function _shiftCarousel(dir) {
   _carouselIndex = next;
   _renderCarousel();
 }
+
 
 /* ── MAP SELECTED ── */
 function onMapSelected(mapId) {
@@ -186,12 +237,9 @@ function onMapSelected(mapId) {
     startGameLoop();
   });
 }
-/* ── SHOW BOSS ANNOUNCE ────────────────
-   Called by AdventureDirector when wave 10
-   starts. Shows a centered popup with the
-   boss name for ~2 seconds.
-   @param map  current map def with boss config
-─────────────────────────────────────── */
+
+
+/* ── SHOW BOSS ANNOUNCE ── */
 function showBossAnnounce(map) {
   if (!map.boss) return;
 
@@ -213,10 +261,9 @@ function showBossAnnounce(map) {
     setTimeout(() => pop.classList.add('hidden'), 400);
   }, CONFIG.adventure.bossAnnounceMs);
 }
-/* ── SHOW MAP COMPLETE ──────────────────
-   Called by AdventureDirector when map is done.
-   Shows popup, then auto-returns to map select.
-─────────────────────────────────────── */
+
+
+/* ── SHOW MAP COMPLETE ── */
 function showMapComplete(map, newlyUnlocked) {
   const sMapComplete = document.getElementById('screen-map-complete');
 
@@ -242,7 +289,6 @@ function showMapComplete(map, newlyUnlocked) {
   [sMenu, sGame, sOver, sAbility, sMapSelect].forEach(x => x.style.display = 'none');
   sMapComplete.style.display = 'block';
 
-  // auto-ritorno dopo 6 secondi
   const autoTimer = setTimeout(() => _returnToMapSelect(), 6000);
 
   document.getElementById('btn-map-continue').onclick = () => {
@@ -269,7 +315,8 @@ function _returnToMapSelect() {
   showScreen(sMapSelect);
 }
 
-/* ── ENEMY HINTS (short descriptions) ── */
+
+/* ── ENEMY HINTS ── */
 const ENEMY_HINTS = {
   ravager:       'Fast rusher',
   crusher:       'Shoots bullets',
@@ -299,6 +346,17 @@ function _renderEnemyCard(map) {
   if (!list) return;
   list.innerHTML = '';
 
+  // hide enemies for boss maps
+  if (_isBossMap(map.id)) {
+    const hint = document.createElement('div');
+    hint.className = 'enemy-preview-hint';
+    hint.textContent = '???';
+    hint.style.textAlign = 'center';
+    hint.style.width = '100%';
+    list.appendChild(hint);
+    return;
+  }
+
   const ids = _getMapEnemyIds(map);
   ids.forEach(id => {
     const def = EnemyRegistry.get(id);
@@ -311,7 +369,6 @@ function _renderEnemyCard(map) {
     icon.className = 'enemy-preview-icon';
     if (def.sprite) {
       icon.style.backgroundImage = `url(${def.sprite})`;
-      // show only first frame
       if (def.spriteFrames && def.spriteFrames > 1) {
         const fw = def.spriteFrameW || 96;
         const fh = def.spriteFrameH || 96;
@@ -331,24 +388,6 @@ function _renderEnemyCard(map) {
   });
 }
 
-/* ── EXTRACT ENEMY IDS FROM MAP DEF ── */
-function _getMapEnemyIds(map) {
-  const ids = new Set();
-  if (map.enemyPool) {
-    Object.keys(map.enemyPool).forEach(id => ids.add(id));
-  }
-  if (map.waveConfig) {
-    Object.values(map.waveConfig).forEach(wc => {
-      if (wc.pool) Object.keys(wc.pool).forEach(id => ids.add(id));
-    });
-  }
-  if (map.introWaves) {
-    Object.values(map.introWaves).forEach(iw => {
-      if (iw.pool) iw.pool.forEach(id => ids.add(id));
-    });
-  }
-  return [...ids];
-}
 
 /* ═══════════════════════════════════════
    ABILITY PICKER — mini carousel

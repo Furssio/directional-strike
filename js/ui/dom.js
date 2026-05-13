@@ -9,10 +9,10 @@
 const sMenu    = document.getElementById('screen-menu');
 const sAbility = document.getElementById('screen-ability');
 const sGame    = document.getElementById('screen-game');
-const sOver    = document.getElementById('screen-over');
 const sMapSelect = document.getElementById('screen-map-select');
-const sMapComplete = document.getElementById('screen-map-complete');
 
+const overOverlay     = document.getElementById('over-overlay');
+const completeOverlay = document.getElementById('complete-overlay');
 
 const arena          = document.getElementById('arena');
 const flashEl        = document.getElementById('flash');
@@ -28,9 +28,9 @@ const progressBar    = document.getElementById('progress-bar');
 const comboTimerWrap = document.getElementById('combo-timer-wrap');
 const comboTimerBar  = document.getElementById('combo-timer-bar');
 const specialBar     = document.getElementById('special-bar');
-const finalScoreEl   = document.getElementById('final-score');
-const finalLevelEl   = document.getElementById('final-level');
-const bestLabel      = document.getElementById('best-label');
+const finalScoreEl   = document.getElementById('over-score');
+const finalLevelEl   = document.getElementById('over-wave');
+const bestLabel      = document.getElementById('over-best');
 const menuBest       = document.getElementById('menu-best');
 const btnMute        = document.getElementById('btn-mute');
 

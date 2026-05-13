@@ -12,6 +12,8 @@
 
 document.getElementById('btn-restart').addEventListener('click', () => {
   if (Transition.isPlaying()) return;
+  overOverlay.classList.add('hidden');
+  cleanupArena();
   Transition.play('fast', () => {
     equippedAbilityId = getEquippedAbility();
     if (ActiveDirector && ActiveDirector === AdventureDirector) {
@@ -88,10 +90,11 @@ if (_btnAbilityBack) {
 
 document.getElementById('btn-home').addEventListener('click', () => {
   if (Transition.isPlaying()) return;
+  overOverlay.classList.add('hidden');
+  cleanupArena();
   Transition.play('fast', () => {
-    updateMenuBest();
-    showScreen(sMenu);
-    if (typeof DemoMode !== 'undefined') DemoMode.start();
+    showScreen(sMapSelect);
+    if (typeof initMapSelect === 'function') initMapSelect();
   });
 });
 

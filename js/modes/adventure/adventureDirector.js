@@ -234,9 +234,8 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
 
     /* ── STOP ─────────────────────────── */
     stop() {
-      active = false;
-      setArenaBackground(null);
-    },
+  active = false;
+},
 
     /* ── INPUT TRACKING (called from input.js) ── */
     trackInput() {
@@ -288,25 +287,22 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
 
     /* ── COMPLETE MAP ─────────────────── */
     completeMap() {
-      if (completed) return;
-      completed = true;
-      active    = false;
+  if (completed) return;
+  completed = true;
+  active    = false;
 
-      enemies.forEach(e => e.el.remove());
-      enemies.length = 0;
-      bullets.forEach(b => b.el.remove());
-      bullets.length = 0;
+  // DO NOT remove enemies/bullets — they stay visible behind overlay
+  // cleanup happens when player presses a button
 
-      Progress.markMapCompleted(currentMap.id);
-      const newlyUnlocked = currentMap.unlocksAbility
-        ? Progress.unlockAbility(currentMap.unlocksAbility)
-        : false;
+  Progress.markMapCompleted(currentMap.id);
+  const newlyUnlocked = currentMap.unlocksAbility
+    ? Progress.unlockAbility(currentMap.unlocksAbility)
+    : false;
 
-      if (typeof showMapComplete === 'function') {
-        showMapComplete(currentMap, newlyUnlocked);
-      }
-    },
-
+  if (typeof showMapComplete === 'function') {
+    showMapComplete(currentMap, newlyUnlocked);
+  }
+},
     /* ── TICK ─────────────────────────── */
     tick(dt) {
       if (!active) return;

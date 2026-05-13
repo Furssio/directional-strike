@@ -121,22 +121,30 @@ function endGame() {
   clearInterval(gameLoop);
   ActiveDirector.stop();
 
-  document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
-  enemies = [];
-  bullets = [];
+  // DO NOT remove enemies/bullets — they stay visible behind overlay
+  // cleanup happens when player presses a button
 
   const best  = getBestScore();
   const isNew = player.score > best;
   if (isNew) saveBestScore(player.score);
 
-  finalScoreEl.textContent = player.score;
-  finalLevelEl.textContent = 'wave ' + ActiveDirector.getWave() + ' · ' + player.kills + ' kills';
+  finalScoreEl.textContent = player.score.toLocaleString();
+  finalLevelEl.textContent = 'WAVE ' + ActiveDirector.getWave() + ' · ' + player.kills + ' KILLS';
   bestLabel.textContent    = isNew
-    ? 'new record! 🎉'
-    : 'best: ' + Math.max(best, player.score);
+    ? 'NEW RECORD!'
+    : 'BEST: ' + Math.max(best, player.score).toLocaleString();
 
   updateMenuBest();
-  showScreen(sOver);
+
+  // show game over overlay (game screen stays visible)
+  overOverlay.classList.remove('hidden');
+}
+
+/* cleanup enemies/bullets — called when leaving game over */
+function cleanupArena() {
+  document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
+  enemies = [];
+  bullets = [];
 }
 
 /* ── TICK ── */

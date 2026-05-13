@@ -46,9 +46,50 @@
       </div>
     </div>
 
-    
-
     <div id="player">🧑</div>
+
+    <!-- ── GAME OVER OVERLAY ── -->
+    <div id="over-overlay" class="hidden">
+      <div id="over-darken"></div>
+      <div id="over-card">
+        <h2 id="over-title">GAME OVER</h2>
+        <div id="over-score-block">
+          <div id="over-score-label">SCORE</div>
+          <div id="over-score">0</div>
+        </div>
+        <div id="over-wave"></div>
+        <div id="over-best"></div>
+        <div id="over-ad-slot"></div>
+        <div class="over-btn-col">
+          <button class="over-btn over-btn-primary" id="btn-restart">TRY AGAIN</button>
+          <button class="over-btn" id="btn-home">MAPS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAP COMPLETE OVERLAY ── -->
+    <div id="complete-overlay" class="hidden">
+      <div id="complete-darken"></div>
+      <div id="complete-card">
+        <h2 id="complete-title">MAP COMPLETE!</h2>
+        <div id="complete-map-name"></div>
+        <div id="complete-score-block">
+          <div id="complete-score-label">SCORE</div>
+          <div id="complete-score">0</div>
+        </div>
+        <div id="complete-ability" class="hidden">
+          <div id="complete-ability-label">NEW ABILITY UNLOCKED!</div>
+          <div id="complete-ability-icon"></div>
+          <div id="complete-ability-name"></div>
+          <div id="complete-ability-desc"></div>
+        </div>
+        <div id="complete-ad-slot"></div>
+        <div class="complete-btn-col">
+          <button class="complete-btn complete-btn-primary" id="btn-play-again">PLAY AGAIN</button>
+          <button class="complete-btn" id="btn-complete-maps">MAPS</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ── PAUSE BUTTON (top right) ── -->
