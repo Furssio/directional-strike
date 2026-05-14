@@ -52,12 +52,13 @@ const SCRIPTS = [
   'js/player/abilities/slash.js',
 
   /* ── AUDIO ── */
-  'js/audio.js',
-  'js/sfx-combat.js',
-  'js/sfx-abilities.js',
-  'js/sfx-ui.js',
-  'js/sfx.js',
-  'js/music.js',
+  'js/audio/core.js',
+  'js/audio/combat.js',
+  'js/audio/ui.js',
+  'js/audio/abilities.js',
+  'js/audio/music.js',
+  'js/audio/index.js',
+  'js/audio/uiBind.js',
   
   /* ── STATE ── */
   'js/state.js',
@@ -88,8 +89,9 @@ const SCRIPTS = [
 
   /* ── INPUT ── */
   'js/input.js',
+
   
- /* ── ADVENTURE (entry, does not auto-run) ── */
+  /* ── ADVENTURE (entry, does not auto-run) ── */
   'js/modes/adventure/main.js',
 
   /* ── DEBUG (must be last) ── */

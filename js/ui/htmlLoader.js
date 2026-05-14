@@ -22,6 +22,10 @@ async function loadHTMLPartials() {
 loadHTMLPartials().then(() => {
   const s   = document.createElement('script');
   s.src     = 'js/modes/infinite/main.js';
+  s.onload  = () => {
+    // bind UI sounds after all HTML + scripts are ready
+    if (typeof UiBind !== 'undefined') UiBind.init();
+  };
   s.onerror = e => console.error('Impossibile caricare main.js', e);
   document.head.appendChild(s);
 });

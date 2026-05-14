@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════
-   MUSIC.JS
+   AUDIO/MUSIC.JS
    Background music manager.
-   Play, stop, crossfade between tracks.
+   Play, stop, pause, resume tracks.
 
-   Depends on: audio.js (AudioCore)
+   Depends on: audio/core.js (AudioCore)
    ═══════════════════════════════════════ */
 
 const Music = (() => {
@@ -20,10 +20,22 @@ const Music = (() => {
     _current = null;
   }
 
+  function pause() {
+    if (_current && !_current.paused) {
+      _current.pause();
+    }
+  }
+
+  function resume() {
+    if (_current && _current.paused && _current.currentTime > 0) {
+      _current.play();
+    }
+  }
+
   function isPlaying() {
     return _current && !_current.paused;
   }
 
-  return { play, stop, isPlaying };
+  return { play, stop, pause, resume, isPlaying };
 
 })();

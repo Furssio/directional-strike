@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════
-   SFX-COMBAT.JS
+   AUDIO/COMBAT.JS
    Combat sound effects: hit, kill, damage,
    miss, bullet, game over.
 
-   Depends on: audio.js (AudioCore)
+   Depends on: audio/core.js (AudioCore)
    ═══════════════════════════════════════ */
 
 const SfxCombat = (() => {

@@ -109,6 +109,9 @@ const Transition = (() => {
     busy = true;
     init();
 
+    // transition sound — cover
+    try { if (typeof SFX !== 'undefined') SFX.transIn(); } catch(e) {}
+
     // Phase 1: dissolve IN
     const orderIn = shuffle([...Array(TOTAL).keys()]);
     await animateCells(orderIn, true, speed.cellDelay);
@@ -118,6 +121,9 @@ const Transition = (() => {
 
     // Phase 2: hold
     await new Promise(r => setTimeout(r, speed.hold));
+
+    // transition sound — reveal
+    try { if (typeof SFX !== 'undefined') SFX.transOut(); } catch(e) {}
 
     // Phase 3: dissolve OUT
     const orderOut = shuffle([...Array(TOTAL).keys()]);

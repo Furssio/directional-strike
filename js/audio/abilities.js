@@ -1,9 +1,11 @@
 /* ═══════════════════════════════════════
-   SFX-ABILITIES.JS
-   Ability sound effects. Uses both procedural
-   audio and file playback for specials.
+   AUDIO/ABILITIES.JS
+   Ability sound effects. Procedural and
+   file-based audio for special abilities.
+   Manages pause/resume/stop for looping
+   or long-duration ability audio.
 
-   Depends on: audio.js (AudioCore)
+   Depends on: audio/core.js (AudioCore)
    ═══════════════════════════════════════ */
 
 const SfxAbilities = (() => {

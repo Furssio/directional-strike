@@ -1,7 +1,8 @@
 /* ═══════════════════════════════════════
-   AUDIO.JS — CORE
-   Web Audio API context, tone() and noise()
-   helpers. File audio playback utility.
+   AUDIO/CORE.JS
+   Web Audio API context with auto-init on
+   first user gesture. Provides tone(), noise(),
+   playFile(), stopFile() utilities.
 
    Depends on: config.js (CONFIG.audio)
    ═══════════════════════════════════════ */
@@ -9,19 +10,35 @@
 const AudioCore = (() => {
 
   let ctx = null;
+  let _bound = false;
 
-  const vol = () => CONFIG.audio.volume;
+  /* ── AUTO-INIT ON FIRST USER GESTURE ── */
+  function _autoInit() {
+    if (_bound) return;
+    _bound = true;
+    const handler = () => {
+      init();
+      if (ctx && ctx.state === 'suspended') ctx.resume();
+      document.removeEventListener('click', handler);
+      document.removeEventListener('touchstart', handler);
+      document.removeEventListener('keydown', handler);
+    };
+    document.addEventListener('click', handler);
+    document.addEventListener('touchstart', handler);
+    document.addEventListener('keydown', handler);
+  }
 
   function init() {
     if (ctx) return;
     try {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch(e) {
+    } catch (e) {
       console.warn('Web Audio API not available', e);
     }
   }
 
   function getCtx() { return ctx; }
+  const vol = () => CONFIG.audio.volume;
 
   function tone({
     type = 'sine', freq = 440, freq2 = null,
@@ -50,7 +67,7 @@ const AudioCore = (() => {
       o.connect(g);
       o.start(now);
       o.stop(now + duration + 0.02);
-    } catch(e) {}
+    } catch (e) {}
   }
 
   function noise({
@@ -85,10 +102,10 @@ const AudioCore = (() => {
       last.connect(ctx.destination);
       src.start();
       src.stop(ctx.currentTime + duration + 0.02);
-    } catch(e) {}
+    } catch (e) {}
   }
 
-  /* ── FILE PLAYBACK UTILITY ── */
+  /* ── FILE PLAYBACK ── */
   function playFile(path, { loop = false, volume = 1.0 } = {}) {
     if (!CONFIG.audio.enabled) return null;
     try {
@@ -97,7 +114,7 @@ const AudioCore = (() => {
       audio.loop   = loop;
       audio.play();
       return audio;
-    } catch(e) { return null; }
+    } catch (e) { return null; }
   }
 
   function stopFile(audio) {
@@ -105,6 +122,9 @@ const AudioCore = (() => {
     audio.pause();
     audio.currentTime = 0;
   }
+
+  // auto-bind on script load
+  _autoInit();
 
   return { init, getCtx, tone, noise, playFile, stopFile, vol };
 
