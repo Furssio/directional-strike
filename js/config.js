@@ -36,6 +36,7 @@ const CONFIG = {
   ─────────────────────────────────────── */
   combo: {
     minKills:           3,
+    soundStartKills:    5,
     multipliers:        [1, 1, 1, 1.2, 1.2, 1.5, 1.5, 1.5, 2, 2, 2, 2, 2.5, 2.5, 2.5, 3],
     decayMs:            3000,
     chargePerKill:      8,

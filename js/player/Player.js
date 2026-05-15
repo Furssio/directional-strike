@@ -150,6 +150,10 @@ class Player {
   /* ── COMBO ──────────────────────────── */
 
   resetCombo() {
+    // combo lost sound — only if we had an active combo
+    if (this.combo >= CONFIG.combo.minKills) {
+      if (typeof SFX !== 'undefined') SFX.comboLost(this.combo);
+    }
     this.combo      = 0;
     this.comboTimer = 0;
   }
@@ -158,6 +162,18 @@ class Player {
     const inCombo = this.combo >= CONFIG.combo.minKills;
     this.combo++;
     this.comboTimer = CONFIG.combo.decayMs + this.comboDecayBonus;
+
+    // combo sounds
+    if (this.combo >= CONFIG.combo.minKills) {
+      const m = CONFIG.combo.multipliers;
+      const prevMult = m[Math.min(this.combo - 1, m.length - 1)];
+      const currMult = m[Math.min(this.combo, m.length - 1)];
+      if (currMult > prevMult) {
+        if (typeof SFX !== 'undefined') SFX.comboThreshold(currMult);
+      } else if (this.combo >= CONFIG.combo.soundStartKills) {
+        if (typeof SFX !== 'undefined') SFX.comboTick(this.combo);
+      }
+    }
 
     const baseCharge = inCombo
       ? CONFIG.combo.chargePerComboKill

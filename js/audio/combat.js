@@ -139,7 +139,12 @@ const SfxCombat = (() => {
     },
 
     miss() {
-      t({ type: 'sine', freq: 200, freq2: 160, duration: 0.07, attack: 0.002, decay: 0.03, sustain: 0.2, release: 0.03, gain: 0.2 });
+      // whiff — airy slash that hits nothing, unsatisfying but not annoying
+      const rnd = 1 + (Math.random() - 0.5) * 0.08;
+      // hollow swoosh descending
+      t({ type: 'sine', freq: 350 * rnd, freq2: 180, duration: 0.16, attack: 0.003, decay: 0.05, sustain: 0.25, release: 0.08, gain: 0.25 });
+      // airy noise layer — whoosh feel
+      n({ duration: 0.14, gain: 0.18, highpass: 500, lowpass: 3000 });
     },
 
     parry() {
@@ -192,6 +197,53 @@ const SfxCombat = (() => {
 
     bullet() {
       t({ type: 'sine', freq: 800, freq2: 300, duration: 0.14, attack: 0.002, decay: 0.05, sustain: 0.3, release: 0.07, gain: 0.28 });
+    },
+    comboTick(combo) {
+      // 9 ascending pitch steps — each combo kill climbs one step
+      // step 0 = combo 3 (minKills), step 8 = combo 11+
+      const STEPS = [440, 520, 600, 700, 800, 920, 1050, 1200, 1400];
+      const idx = Math.min(combo - CONFIG.combo.soundStartKills, STEPS.length - 1);
+      const pitch = STEPS[idx];
+      const rnd = 1 + (Math.random() - 0.5) * 0.04;
+      // volume grows slightly with each step
+      const vol = Math.min(0.55, 0.28 + idx * 0.03);
+      // main chime — ascending
+      t({ type: 'sine', freq: pitch * rnd, freq2: pitch * 1.12, duration: 0.16, attack: 0.002, decay: 0.04, sustain: 0.35, release: 0.08, gain: vol });
+      // harmonic overtone — sparkle grows with combo
+      t({ type: 'sine', freq: pitch * 2 * rnd, duration: 0.12, attack: 0.003, decay: 0.03, sustain: 0.2, release: 0.06, gain: vol * 0.25 + idx * 0.02 });
+      // at high steps (6+), add subtle shimmer noise
+      if (idx >= 6) {
+        n({ duration: 0.08, gain: 0.08 + (idx - 6) * 0.04, highpass: 4000, lowpass: 10000 });
+      }
+    },
+
+    comboThreshold(mult) {
+      // power-up burst — new multiplier tier reached, triumphant ascending chord
+      const rnd = 1 + (Math.random() - 0.5) * 0.03;
+      // base note — deeper at low mult, higher at max
+      const base = 400 + (mult - 1) * 120;
+      // three-note ascending chord burst
+      t({ type: 'sine', freq: base * rnd, duration: 0.22, attack: 0.003, decay: 0.06, sustain: 0.4, release: 0.1, gain: 0.45 });
+      setTimeout(() =>
+        t({ type: 'sine', freq: base * 1.25 * rnd, duration: 0.18, attack: 0.003, decay: 0.05, sustain: 0.35, release: 0.08, gain: 0.4 })
+      , 40);
+      setTimeout(() =>
+        t({ type: 'sine', freq: base * 1.5 * rnd, duration: 0.2, attack: 0.004, decay: 0.06, sustain: 0.3, release: 0.1, gain: 0.35 })
+      , 90);
+      // shimmer noise layer
+      n({ duration: 0.12, gain: 0.15, highpass: 3000, lowpass: 9000 });
+    },
+
+    comboLost(combo) {
+      // deflating sigh — descending, hollow, the streak is gone
+      const intensity = Math.min(1, combo / 15);
+      // sad descending tone — pitch drops more for bigger combos lost
+      const startFreq = 400 + intensity * 200;
+      t({ type: 'sine', freq: startFreq, freq2: 200, duration: 0.3, attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.15, gain: 0.3 + intensity * 0.15 });
+      // hollow undertone
+      t({ type: 'triangle', freq: startFreq * 0.5, freq2: 100, duration: 0.25, attack: 0.004, decay: 0.08, sustain: 0.25, release: 0.12, gain: 0.2 });
+      // soft breathy noise — deflation feel
+      n({ duration: 0.2, gain: 0.12, highpass: 200, lowpass: 1500 });
     },
 
     gameOver() {
