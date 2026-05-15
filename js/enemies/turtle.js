@@ -13,6 +13,7 @@ EnemyRegistry.register({
   damagePct: 0.30,
   speedMult: 2.0,
   points:    3553,
+  hitSound:  'shell',
   shoots:    false,
 
   onHit(e) {

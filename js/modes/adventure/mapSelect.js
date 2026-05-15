@@ -222,6 +222,7 @@ function _shiftCarousel(dir) {
   const next = _carouselIndex + dir;
   if (next < 0 || next >= _carouselMaps.length) return;
   _carouselIndex = next;
+  SFX.mapSlide();
   _renderCarousel();
 }
 
@@ -230,7 +231,7 @@ function _shiftCarousel(dir) {
 function onMapSelected(mapId) {
   if (Transition.isPlaying()) return;
   selectedMapId = mapId;
-  SFX.abilityPick();
+ SFX.mapConfirm();
   Transition.play('normal', () => {
     startAdventureMap(mapId, true);
   }, () => {

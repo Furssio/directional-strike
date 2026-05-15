@@ -297,7 +297,7 @@ function selectUpgrade(dir) {
   // track picked tier for chain progression
   _pickedTiers[choice.chainId] = choice.tierIndex;
 
-  SFX.abilityPick();
+  SFX.cardPick();
 
   // highlight chosen, fade others
   const dirs = ['up', 'down', 'left', 'right'];
@@ -354,12 +354,14 @@ function _showCountdown(from, callback) {
 
   function showNext() {
     if (count <= 0) {
+      SFX.countdownGo();
       countEl.style.display = 'none';
       callback();
       return;
     }
     countEl.style.display = 'block';
     countEl.textContent   = count;
+    if (count > 0) SFX.countdown();
     countEl.style.animation = 'none';
     void countEl.offsetWidth;
     countEl.style.animation = 'countdownPop ' + delayMs + 'ms ease-out forwards';

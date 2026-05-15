@@ -105,6 +105,7 @@ function handleDir(dir) {
     return;
   }
   isAttacking = true;
+  SFX.slash();
 
   const hitDmg      = player.getHitDamage();
   const { w, h }    = getArenaSize();
@@ -149,7 +150,7 @@ function handleDir(dir) {
       if (bdist > attackRange) continue;
 
       anyHit = true;
-      SFX.hit();
+      SFX.parry();
       spawnParticles(b.x, b.y, '#378ADD', false);
       showActionPop(d, 'PARRY', '#44ddff');
       b.el.remove();
@@ -170,7 +171,7 @@ function handleDir(dir) {
       if (dist > attackRange) continue;
 
       anyHit = true;
-      SFX.hit();
+      SFX.parry();
       spawnParticles(e.x, e.y, '#aaaaff', false);
       showActionPop(d, 'PARRY', '#44ddff');
       e.el.remove();
@@ -193,7 +194,7 @@ function handleDir(dir) {
         if (!player.slashActive && dist > attackRange) continue;
 
         anyHit = true;
-        SFX.hit();
+        SFX.hitByType(e.def.hitSound || 'flesh');
         e.flashHit();
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
@@ -211,6 +212,7 @@ function handleDir(dir) {
 
         // critical hit pop
         if (player._lastHitWasCrit) {
+          SFX.crit();
           showActionPop(d, 'CRIT!', '#ff4444');
         }
 
@@ -246,7 +248,7 @@ function handleDir(dir) {
         if (dist > attackRange) continue;
 
         anyHit = true;
-        SFX.hit();
+        SFX.hitByType(e.def.hitSound || 'flesh');
         e.flashHit();
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
@@ -269,6 +271,7 @@ function handleDir(dir) {
 
         // critical hit pop
         if (player._lastHitWasCrit) {
+          SFX.crit();
           showActionPop(d, 'CRIT!', '#ff4444');
         }
 

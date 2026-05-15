@@ -27,6 +27,7 @@ function pauseGame() {
 
   // freeze ability audio
   if (typeof SFX !== 'undefined') SFX.pauseAll();
+  SFX.pauseOpen();
 }
 
 function resumeGame() {
@@ -38,6 +39,7 @@ function resumeGame() {
 
   // resume ability audio
   if (typeof SFX !== 'undefined') SFX.resumeAll();
+  SFX.pauseClose();
 }
 
 /* ── SYNC TOGGLE STATES ── */

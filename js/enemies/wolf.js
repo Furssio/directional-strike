@@ -17,6 +17,7 @@ EnemyRegistry.register({
   damagePct: 0.30,
   speedMult: 1.10,
   points:    2234,
+  hitSound:  'flesh',
   shoots:    false,
 
   onTick(e, cx, cy, attackRange) {

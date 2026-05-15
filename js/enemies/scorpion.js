@@ -6,6 +6,7 @@ EnemyRegistry.register({
   damagePct: 0.15,
   speedMult: 1.00,
   points:    799,
+  hitSound:  'flesh',
   shoots:    false,
   noHpBar:   true,
 

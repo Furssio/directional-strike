@@ -18,6 +18,7 @@ EnemyRegistry.register({
   points:          1659,
   shoots:          true,
   shootInterval:   2000,
+  hitSound:  'flesh',
   bulletDamagePct: 0.20,
   bulletSpeed:     4.5,
   calcStress(distToCenter) {

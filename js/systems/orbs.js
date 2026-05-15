@@ -130,21 +130,21 @@ const OrbSystem = (() => {
       player.hp = Math.min(player.maxHp, player.hp + healAmt);
       updateHpBar();
       _showPlayerEffect('heal');
-      SFX.specialReady();
+      SFX.healOrb();
       _showOrbLabel('HEAL +' + Math.round(HEAL_PERCENT * 100) + '%', '#44ff66');
     }
 
     if (orb.type === 'attack') {
       _attackBuffMs = ATTACK_DURATION;
       _showPlayerEffect('attack');
-      SFX.special();
+      SFX.orbCollect();
       _showOrbLabel('ATK BOOST x2', '#ff4444');
     }
 
     if (orb.type === 'defense') {
       _defenseBuffMs = DEFENSE_DURATION;
       _showPlayerEffect('defense');
-      SFX.special();
+      SFX.orbCollect();
       _showOrbLabel('DEF BOOST x2', '#4488ff');
     }
 

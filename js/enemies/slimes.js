@@ -20,6 +20,7 @@ EnemyRegistry.register({
   contactHits: 1,
   speedMult:   0.48,
   points:      855,
+  hitSound:  'slime',
   shoots:      false,
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 28;
@@ -108,6 +109,7 @@ EnemyRegistry.register({
   contactHits: 1,
   speedMult:   0.42,
   points:      300,
+  hitSound:  'slime',
   shoots:      false,
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 12;

@@ -12,6 +12,7 @@ EnemyRegistry.register({
   damagePct: 0.22,
   speedMult: 2.4,
   points:    700,
+  hitSound:  'ethereal',
   shoots:    false,
   noHpBar:   true,
   parryable: true,

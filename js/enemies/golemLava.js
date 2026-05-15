@@ -17,6 +17,7 @@ EnemyRegistry.register({
   damagePct: 0.34,
   speedMult: 0.44,
   points:    1476,
+  hitSound:  'rock',
   shoots:    false,
 
   onDeath(parent) {
@@ -101,6 +102,7 @@ EnemyRegistry.register({
   damagePct: 0.25,
   speedMult: 0.55,
   points:    800,
+  hitSound:  'rock',
   shoots:    false,
 
   calcStress(distToCenter) {

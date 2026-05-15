@@ -17,7 +17,28 @@ const SFX = {
   init: () => AudioCore.init(),
 
   /* ── COMBAT ── */
-  hit:       () => SfxCombat.hit(),
+  hit:          () => SfxCombat.hit(),
+  hitFlesh:     () => SfxCombat.hitFlesh(),
+  hitRock:      () => SfxCombat.hitRock(),
+  hitSlime:     () => SfxCombat.hitSlime(),
+  hitShell:     () => SfxCombat.hitShell(),
+  hitEthereal:  () => SfxCombat.hitEthereal(),
+  hitThunder:   () => SfxCombat.hitThunder(),
+  hitDemon:     () => SfxCombat.hitDemon(),
+
+  // dispatch by enemy material type
+  hitByType(type) {
+    const fn = this['hit' + type.charAt(0).toUpperCase() + type.slice(1)];
+    if (fn) fn();
+    else SfxCombat.hit();
+  },
+  parry:     () => SfxCombat.parry(),
+  crit:      () => SfxCombat.crit(),
+  slash:     () => SfxCombat.slash(),
+  orbCollect:   () => SfxCombat.orbCollect(),
+  healOrb:      () => SfxCombat.healOrb(),
+  healVampiric: () => SfxCombat.healVampiric(),
+  healAbility:  () => SfxCombat.healAbility(),
   kill:      () => SfxCombat.kill(),
   damage:    () => SfxCombat.damage(),
   miss:      () => SfxCombat.miss(),
@@ -31,13 +52,24 @@ const SFX = {
   bulletTimeStop:  () => SfxAbilities.bulletTimeStop(),
 
   /* ── UI ── */
-  levelUp:     () => SfxUi.levelUp(),
-  abilityPick: () => SfxUi.abilityPick(),
-  shield:      () => SfxUi.shield(),
-  click:       () => SfxUi.click(),
-  hover:       () => SfxUi.hover(),
-  transIn:     () => SfxUi.transIn(),
-  transOut:    () => SfxUi.transOut(),
+  levelUp:      () => SfxUi.levelUp(),
+  abilityPick:  () => SfxUi.abilityPick(),
+  shield:       () => SfxUi.shield(),
+  click:        () => SfxUi.click(),
+  hover:        () => SfxUi.hover(),
+  back:         () => SfxUi.back(),
+  error:        () => SfxUi.error(),
+  pauseOpen:    () => SfxUi.pauseOpen(),
+  pauseClose:   () => SfxUi.pauseClose(),
+  mapSlide:     () => SfxUi.mapSlide(),
+  mapConfirm:   () => SfxUi.mapConfirm(),
+  cardHover:    () => SfxUi.cardHover(),
+  cardPick:     () => SfxUi.cardPick(),
+  countdown:    () => SfxUi.countdown(),
+  countdownGo:  () => SfxUi.countdownGo(),
+  mapComplete:  () => SfxUi.mapComplete(),
+  transIn:      () => SfxUi.transIn(),
+  transOut:     () => SfxUi.transOut(),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),

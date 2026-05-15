@@ -175,6 +175,7 @@ class Player {
         const healAmt = Math.round(this.maxHp * this._vampHealPct);
         this.hp = Math.min(this.maxHp, this.hp + healAmt);
         if (typeof updateHpBar === 'function') updateHpBar();
+        if (typeof SFX !== 'undefined') SFX.healVampiric();
         if (typeof showActionPop === 'function') {
           showActionPop('up', 'HEAL!', '#44ff66');
         }

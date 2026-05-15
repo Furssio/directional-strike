@@ -14,6 +14,7 @@ EnemyRegistry.register({
   damagePct: 0.18,
   speedMult: 1.4,
   points:    0,
+  hitSound:  'shell',
   shoots:    false,
   noHpBar:   true,
   underground:     true,
@@ -98,6 +99,7 @@ EnemyRegistry.register({
   damagePct: 0.15,
   speedMult: 0.90,
   points:    347,
+  hitSound:  'shell',
   shoots:    false,
   noHpBar:   true,
 

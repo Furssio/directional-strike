@@ -16,6 +16,7 @@ EnemyRegistry.register({
   damagePct:       0.20,
   speedMult:       0.50,
   points:          2217,
+  hitSound:  'flesh',
   shoots:          false,
   bulletDamagePct: 0.15,
   bulletSpeed:     4.0,

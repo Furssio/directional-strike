@@ -17,6 +17,7 @@ EnemyRegistry.register({
   damagePct: 0.40,
   speedMult: 0.60,
   points:    4890,
+  hitSound:  'demon',
   shoots:    false,
 
   onHit(e) {

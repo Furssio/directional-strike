@@ -16,6 +16,7 @@ EnemyRegistry.register({
   speedMult: 0.60,
   damagePct: 0.40,
   points:    2500,
+  hitSound:  'rock',
   shoots:    false,
   calcStress(distToCenter) {
   if (distToCenter <= 80)  return 40;

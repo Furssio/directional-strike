@@ -13,6 +13,7 @@ EnemyRegistry.register({
   damagePct: 0.30,
   speedMult: 0.48,
   points:    799,
+  hitSound:  'slime',
   shoots:    false,
   wobble:    { frequency: 1.8, amplitude: 18 },
 
@@ -90,6 +91,7 @@ EnemyRegistry.register({
   damagePct: 0.18,
   speedMult: 0.42,
   points:    3,
+  hitSound:  'slime',
   shoots:    false,
   wobble:    { frequency: 2.8, amplitude: 10 },
 

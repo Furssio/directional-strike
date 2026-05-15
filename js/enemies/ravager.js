@@ -16,6 +16,7 @@ EnemyRegistry.register({
   damagePct: 0.34,
   speedMult: 1.3,
   points:    899,
+  hitSound:  'flesh',
   shoots:    false,
   calcStress(distToCenter) {
     return 0; // handled as group in calculator

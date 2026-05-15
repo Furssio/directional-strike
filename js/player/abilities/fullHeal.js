@@ -22,6 +22,7 @@ AbilityRegistry.register({
     if (player) {
       player.hp = player.maxHp;
       updateHpBar();
+      SFX.healAbility();
 
       // green heal glow (reuses orb heal effect)
       playerEl.classList.remove('orb-heal-effect');
