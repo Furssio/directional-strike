@@ -45,7 +45,7 @@ EnemyRegistry.register({
 
       const child = new Enemy(childDef, sx, sy, parent.dir, 1, w, h);
 
-      if (player.specialActive) player.ability.onActivate([child]);
+     if (player.specialActive && player.ability.onEnemySpawn) player.ability.onEnemySpawn(child);
 
       const el = document.createElement('div');
       el.className        = 'enemy';
