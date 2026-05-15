@@ -167,11 +167,7 @@ const SfxCombat = (() => {
     },
 
     parry() {
-      // metallic deflect — sharp tink + body + spark
-      const rnd = 1 + (Math.random() - 0.5) * 0.06;
-      t({ type: 'sine',     freq: 1800 * rnd, duration: 0.04, attack: 0.001, decay: 0.015, sustain: 0.2, release: 0.02, gain: 0.45 });
-      t({ type: 'triangle', freq: 900 * rnd,  duration: 0.07, attack: 0.002, decay: 0.03,  sustain: 0.3, release: 0.03, gain: 0.35 });
-      n({ duration: 0.04, gain: 0.18, highpass: 3000, lowpass: 8000 });
+      AudioCore.playFile('assets/audio/sfx/combat/parry.mp3', { volume: 0.15 });
     },
 
     crit() {
