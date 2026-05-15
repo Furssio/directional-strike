@@ -196,12 +196,10 @@ function _animateComboCounter(from, to, el, duration) {
 
 function onComboKill(x, y, pts) {
   if (player.combo < CONFIG.combo.minKills) {
-    _comboKills = 0;
     _comboTarget = 0;
     return;
   }
 
-  _comboKills++;
   const oldTarget = _comboTarget;
   _comboTarget += pts;
   const mult = player.getComboMult();
@@ -210,8 +208,9 @@ function onComboKill(x, y, pts) {
   const ptsEl = el.querySelector('.combo-float-pts');
   const multEl = el.querySelector('.combo-float-mult');
 
-  const colorClass = getComboColor(_comboKills);
-  const tierClass = getComboTier(_comboKills);
+  // use player.combo as single source of truth — matches audio tiers
+  const colorClass = getComboColor(player.combo);
+  const tierClass = getComboTier(player.combo);
   el.className = 'combo-float visible ' + colorClass;
   ptsEl.className = 'combo-float-pts ' + tierClass;
   multEl.textContent = 'x' + mult.toFixed(1);
@@ -229,7 +228,6 @@ function onComboKill(x, y, pts) {
 }
 
 function resetComboFloat() {
-  _comboKills = 0;
   _comboTarget = 0;
   if (_comboEl) {
     _comboEl.classList.remove('visible');
