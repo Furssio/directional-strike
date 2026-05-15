@@ -198,52 +198,85 @@ const SfxCombat = (() => {
     bullet() {
       t({ type: 'sine', freq: 800, freq2: 300, duration: 0.14, attack: 0.002, decay: 0.05, sustain: 0.3, release: 0.07, gain: 0.28 });
     },
-    comboTick(combo) {
-      // 9 ascending pitch steps — each combo kill climbs one step
-      // step 0 = combo 3 (minKills), step 8 = combo 11+
-      const STEPS = [440, 520, 600, 700, 800, 920, 1050, 1200, 1400];
-      const idx = Math.min(combo - CONFIG.combo.soundStartKills, STEPS.length - 1);
-      const pitch = STEPS[idx];
+    comboTick(combo, tierIndex) {
+      // pitch climbs within current tier, resets at each tier change
+      // tierIndex 0=white, 1=blue, 2=yellow, 3=orange, 4=red, 5=purple, 6=rainbow
+      const TIER_BASE  = [400, 500, 600, 720, 850, 1000, 1200];
+      const TIER_RANGE = [80,  90,  100, 110, 120, 140,  160];
+      const tiers = CONFIG.combo.tiers;
+      const tierStart = tiers[tierIndex][0];
+      const tierEnd   = tierIndex < tiers.length - 1 ? tiers[tierIndex + 1][0] : tierStart + 20;
+      // progress within tier: 0.0 → 1.0
+      const progress = Math.min(1, (combo - tierStart) / Math.max(1, tierEnd - tierStart));
+      const base  = TIER_BASE[tierIndex]  || 1200;
+      const range = TIER_RANGE[tierIndex] || 160;
+      const pitch = base + progress * range;
       const rnd = 1 + (Math.random() - 0.5) * 0.04;
-      // volume grows slightly with each step
-      const vol = Math.min(0.55, 0.28 + idx * 0.03);
-      // main chime — ascending
-      t({ type: 'sine', freq: pitch * rnd, freq2: pitch * 1.12, duration: 0.16, attack: 0.002, decay: 0.04, sustain: 0.35, release: 0.08, gain: vol });
-      // harmonic overtone — sparkle grows with combo
-      t({ type: 'sine', freq: pitch * 2 * rnd, duration: 0.12, attack: 0.003, decay: 0.03, sustain: 0.2, release: 0.06, gain: vol * 0.25 + idx * 0.02 });
-      // at high steps (6+), add subtle shimmer noise
-      if (idx >= 6) {
-        n({ duration: 0.08, gain: 0.08 + (idx - 6) * 0.04, highpass: 4000, lowpass: 10000 });
+      // volume grows with tier
+      const vol = Math.min(0.6, 0.25 + tierIndex * 0.05);
+
+      // main chime — ascending within tier
+      t({ type: 'sine', freq: pitch * rnd, freq2: pitch * 1.1, duration: 0.16, attack: 0.002, decay: 0.04, sustain: 0.35, release: 0.08, gain: vol });
+      // harmonic overtone — richer at higher tiers
+      const overtoneGain = Math.min(0.25, 0.06 + tierIndex * 0.03);
+      t({ type: 'sine', freq: pitch * 2 * rnd, duration: 0.12, attack: 0.003, decay: 0.03, sustain: 0.2, release: 0.06, gain: overtoneGain });
+      // shimmer noise from tier 3 (orange) onward
+      if (tierIndex >= 3) {
+        n({ duration: 0.08, gain: 0.06 + (tierIndex - 3) * 0.03, highpass: 4000, lowpass: 10000 });
       }
     },
 
-    comboThreshold(mult) {
-      // power-up burst — new multiplier tier reached, triumphant ascending chord
+    comboThreshold(tierIndex) {
+      // tier-up burst — plays when color changes
+      // tierIndex 0=white (never fires), 1=blue, 2=yellow, 3=orange, 4=red, 5=purple, 6=rainbow
+      const TIER_CHORDS = [
+        [400, 500, 600],     // 0 white (not used — first tier doesn't trigger threshold)
+        [500, 625, 750],     // 1 blue — clean fifth
+        [600, 750, 900],     // 2 yellow — bright
+        [700, 875, 1050],    // 3 orange — warm power
+        [820, 1025, 1230],   // 4 red — intense
+        [950, 1190, 1425],   // 5 purple — triumphant
+        [1100, 1375, 1650],  // 6 rainbow — epic climax
+      ];
       const rnd = 1 + (Math.random() - 0.5) * 0.03;
-      // base note — deeper at low mult, higher at max
-      const base = 400 + (mult - 1) * 120;
-      // three-note ascending chord burst
-      t({ type: 'sine', freq: base * rnd, duration: 0.22, attack: 0.003, decay: 0.06, sustain: 0.4, release: 0.1, gain: 0.45 });
+      const chord = TIER_CHORDS[tierIndex] || TIER_CHORDS[6];
+      const vol = Math.min(0.6, 0.35 + tierIndex * 0.04);
+      const dur = 0.2 + tierIndex * 0.015;
+
+      // three-note ascending chord
+      t({ type: 'sine', freq: chord[0] * rnd, duration: dur, attack: 0.003, decay: 0.06, sustain: 0.4, release: 0.1, gain: vol });
       setTimeout(() =>
-        t({ type: 'sine', freq: base * 1.25 * rnd, duration: 0.18, attack: 0.003, decay: 0.05, sustain: 0.35, release: 0.08, gain: 0.4 })
+        t({ type: 'sine', freq: chord[1] * rnd, duration: dur * 0.85, attack: 0.003, decay: 0.05, sustain: 0.35, release: 0.08, gain: vol * 0.9 })
       , 40);
       setTimeout(() =>
-        t({ type: 'sine', freq: base * 1.5 * rnd, duration: 0.2, attack: 0.004, decay: 0.06, sustain: 0.3, release: 0.1, gain: 0.35 })
+        t({ type: 'sine', freq: chord[2] * rnd, duration: dur * 0.9, attack: 0.004, decay: 0.06, sustain: 0.3, release: 0.1, gain: vol * 0.8 })
       , 90);
-      // shimmer noise layer
-      n({ duration: 0.12, gain: 0.15, highpass: 3000, lowpass: 9000 });
+      // shimmer — grows with tier
+      n({ duration: 0.1 + tierIndex * 0.02, gain: 0.1 + tierIndex * 0.02, highpass: 3000, lowpass: 9000 });
+      // rainbow tier (6): extra octave tail for epic feel
+      if (tierIndex >= 6) {
+        setTimeout(() =>
+          t({ type: 'sine', freq: chord[2] * 2 * rnd, duration: 0.25, attack: 0.005, decay: 0.08, sustain: 0.25, release: 0.12, gain: 0.25 })
+        , 150);
+      }
     },
-
     comboLost(combo) {
-      // deflating sigh — descending, hollow, the streak is gone
-      const intensity = Math.min(1, combo / 15);
+      // deflating sigh — scales with how big the combo was
+      // tier lookup for intensity: losing a rainbow combo hurts more than blue
+      const tiers = CONFIG.combo.tiers;
+      let tierIdx = 0;
+      for (let i = tiers.length - 1; i >= 0; i--) {
+        if (combo >= tiers[i][0]) { tierIdx = i; break; }
+      }
+      const intensity = Math.min(1, tierIdx / (tiers.length - 1));
       // sad descending tone — pitch drops more for bigger combos lost
-      const startFreq = 400 + intensity * 200;
-      t({ type: 'sine', freq: startFreq, freq2: 200, duration: 0.3, attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.15, gain: 0.3 + intensity * 0.15 });
+      const startFreq = 380 + intensity * 280;
+      const dur = 0.28 + intensity * 0.15;
+      t({ type: 'sine', freq: startFreq, freq2: 170, duration: dur, attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.15, gain: 0.28 + intensity * 0.2 });
       // hollow undertone
-      t({ type: 'triangle', freq: startFreq * 0.5, freq2: 100, duration: 0.25, attack: 0.004, decay: 0.08, sustain: 0.25, release: 0.12, gain: 0.2 });
-      // soft breathy noise — deflation feel
-      n({ duration: 0.2, gain: 0.12, highpass: 200, lowpass: 1500 });
+      t({ type: 'triangle', freq: startFreq * 0.5, freq2: 90, duration: dur * 0.85, attack: 0.004, decay: 0.08, sustain: 0.25, release: 0.12, gain: 0.18 + intensity * 0.1 });
+      // breathy noise — deflation feel, longer at high tiers
+      n({ duration: 0.18 + intensity * 0.1, gain: 0.1 + intensity * 0.08, highpass: 200, lowpass: 1500 });
     },
 
     gameOver() {

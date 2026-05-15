@@ -112,9 +112,24 @@ class Player {
   isAlive()   { return this.hp > 0; }
   hpPercent() { return this.hp / this.maxHp; }
 
+  /* ── COMBO TIER LOOKUP ─────────────── */
+
+  _getComboTierIndex() {
+    // returns index into CONFIG.combo.tiers for current combo count
+    const tiers = CONFIG.combo.tiers;
+    let idx = 0;
+    for (let i = tiers.length - 1; i >= 0; i--) {
+      if (this.combo >= tiers[i][0]) { idx = i; break; }
+    }
+    return idx;
+  }
+
   getComboMult() {
-    const m = CONFIG.combo.multipliers;
-    return m[Math.min(this.combo, m.length - 1)];
+    const tiers = CONFIG.combo.tiers;
+    for (let i = tiers.length - 1; i >= 0; i--) {
+      if (this.combo >= tiers[i][0]) return tiers[i][1];
+    }
+    return 1;
   }
 
   getAttackRange(arenaSize) {
@@ -159,22 +174,23 @@ class Player {
   }
 
   addKill() {
-    const inCombo = this.combo >= CONFIG.combo.minKills;
+    const prevTier = this._getComboTierIndex();
     this.combo++;
     this.comboTimer = CONFIG.combo.decayMs + this.comboDecayBonus;
 
-    // combo sounds
+    // combo sounds — only after minKills reached
     if (this.combo >= CONFIG.combo.minKills) {
-      const m = CONFIG.combo.multipliers;
-      const prevMult = m[Math.min(this.combo - 1, m.length - 1)];
-      const currMult = m[Math.min(this.combo, m.length - 1)];
-      if (currMult > prevMult) {
-        if (typeof SFX !== 'undefined') SFX.comboThreshold(currMult);
-      } else if (this.combo >= CONFIG.combo.soundStartKills) {
-        if (typeof SFX !== 'undefined') SFX.comboTick(this.combo);
+      const currTier = this._getComboTierIndex();
+      if (currTier > prevTier) {
+        // tier changed — play threshold sound with tier index
+        if (typeof SFX !== 'undefined') SFX.comboThreshold(currTier);
+      } else {
+        // same tier — play tick with combo count and tier index
+        if (typeof SFX !== 'undefined') SFX.comboTick(this.combo, currTier);
       }
     }
 
+    const inCombo = this.combo >= CONFIG.combo.minKills;
     const baseCharge = inCombo
       ? CONFIG.combo.chargePerComboKill
       : CONFIG.combo.chargePerKill;

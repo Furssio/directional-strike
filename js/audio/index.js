@@ -25,8 +25,8 @@ const SFX = {
   hitEthereal:  () => SfxCombat.hitEthereal(),
   hitThunder:   () => SfxCombat.hitThunder(),
   hitDemon:     () => SfxCombat.hitDemon(),
-  comboTick:      (combo) => SfxCombat.comboTick(combo),
-  comboThreshold: (mult)  => SfxCombat.comboThreshold(mult),
+  comboTick:      (combo, tierIndex) => SfxCombat.comboTick(combo, tierIndex),
+  comboThreshold: (tierIndex)        => SfxCombat.comboThreshold(tierIndex),
   comboLost:      (combo) => SfxCombat.comboLost(combo),
 
   // dispatch by enemy material type

@@ -36,11 +36,22 @@ const CONFIG = {
   ─────────────────────────────────────── */
   combo: {
     minKills:           3,
-    soundStartKills:    5,
-    multipliers:        [1, 1, 1, 1.2, 1.2, 1.5, 1.5, 1.5, 2, 2, 2, 2, 2.5, 2.5, 2.5, 3],
     decayMs:            3000,
     chargePerKill:      8,
     chargePerComboKill: 14,
+
+    // color tiers — each entry: [minKills, multiplier]
+    // combo tick sound plays from minKills onward
+    // combo threshold sound plays at each tier change
+    tiers: [
+      [3,  1.0],   // white
+      [6,  1.2],   // blue
+      [12, 1.5],   // yellow
+      [20, 2.0],   // orange
+      [30, 2.5],   // red
+      [40, 3.0],   // purple
+      [50, 4.0],   // rainbow
+    ],
   },
   /* ── ATTACK ─────────────────────────────
      hitCooldownMs:   ms between attacks on a successful hit

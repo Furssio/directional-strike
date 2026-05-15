@@ -143,24 +143,26 @@ let _comboAnimating = false;
 let _comboFadeTimer = null;
 let _comboEl = null;
 
+// color classes mapped to tier index from CONFIG.combo.tiers
+const COMBO_COLORS = ['c-white', 'c-blue', 'c-yellow', 'c-orange', 'c-red', 'c-purple', 'c-rainbow'];
+const COMBO_TIERS  = ['', 't2', 't3', 't4', 't5', 't6', 't7'];
+
 function getComboColor(kills) {
-  if (kills >= 50) return 'c-rainbow';
-  if (kills >= 40) return 'c-purple';
-  if (kills >= 30) return 'c-red';
-  if (kills >= 20) return 'c-orange';
-  if (kills >= 12) return 'c-yellow';
-  if (kills >= 6)  return 'c-blue';
-  return 'c-white';
+  const tiers = CONFIG.combo.tiers;
+  let idx = 0;
+  for (let i = tiers.length - 1; i >= 0; i--) {
+    if (kills >= tiers[i][0]) { idx = i; break; }
+  }
+  return COMBO_COLORS[idx] || 'c-white';
 }
 
 function getComboTier(kills) {
-  if (kills >= 50) return 't7';
-  if (kills >= 40) return 't6';
-  if (kills >= 30) return 't5';
-  if (kills >= 20) return 't4';
-  if (kills >= 12) return 't3';
-  if (kills >= 6)  return 't2';
-  return '';
+  const tiers = CONFIG.combo.tiers;
+  let idx = 0;
+  for (let i = tiers.length - 1; i >= 0; i--) {
+    if (kills >= tiers[i][0]) { idx = i; break; }
+  }
+  return COMBO_TIERS[idx] || '';
 }
 
 function _getComboEl() {
