@@ -238,6 +238,7 @@ updateProgress();
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
         if (!e.isAlive()) {
           spawnParticles(e.x, e.y, player.color, e.isElite);
+          SFX.shieldAbsorb();
           triggerShieldRipple();
           e.el.remove();
           registerKill(e);
@@ -253,6 +254,7 @@ updateProgress();
       if (player.specialActive && player.ability.blocksBullets) {
         e.hp = 0;
         spawnParticles(e.x, e.y, player.color, e.isElite);
+        SFX.shieldAbsorb();
         triggerShieldRipple();
         registerKill(e);
         continue;

@@ -157,6 +157,8 @@ function showSlashTrail(dir) {
   const a = document.getElementById('arena');
   if (!a) return;
 
+  SFX.slashAttack();
+
   const { w, h } = getArenaSize();
   const cx = w / 2;
   const cy = h / 2;

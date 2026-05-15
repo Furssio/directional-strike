@@ -194,7 +194,8 @@ function handleDir(dir) {
         if (!player.slashActive && dist > attackRange) continue;
 
         anyHit = true;
-        SFX.hitByType(e.def.hitSound || 'flesh');
+        if (player.oneHitActive) SFX.oneHitSmash();
+        else SFX.hitByType(e.def.hitSound || 'flesh');
         e.flashHit();
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
@@ -250,7 +251,8 @@ function handleDir(dir) {
         if (dist > attackRange) continue;
 
         anyHit = true;
-        SFX.hitByType(e.def.hitSound || 'flesh');
+        if (player.oneHitActive) SFX.oneHitSmash();
+        else SFX.hitByType(e.def.hitSound || 'flesh');
         e.flashHit();
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';

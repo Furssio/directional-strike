@@ -188,7 +188,20 @@ const SfxCombat = (() => {
       // noise crunch layer
       n({ duration: 0.15, gain: 0.35, highpass: 400, lowpass: 2500 });
     },
-
+oneHitSmash() {
+      // devastating body blow — deep slam + bone crunch + dark ring
+      const rnd = 1 + (Math.random() - 0.5) * 0.06;
+      // deep body slam
+      t({ type: 'sine', freq: 70 * rnd, freq2: 35, duration: 0.3, attack: 0.002, decay: 0.08, sustain: 0.4, release: 0.15, gain: 0.65 });
+      // bone crunch mid
+      t({ type: 'triangle', freq: 250 * rnd, freq2: 130, duration: 0.2, attack: 0.002, decay: 0.06, sustain: 0.3, release: 0.1, gain: 0.5 });
+      // dark heavy noise
+      n({ duration: 0.18, gain: 0.35, highpass: 150, lowpass: 2000 });
+      // ominous low ring — delayed
+      setTimeout(() =>
+        t({ type: 'sine', freq: 140 * rnd, freq2: 90, duration: 0.2, attack: 0.005, decay: 0.06, sustain: 0.25, release: 0.1, gain: 0.3 })
+      , 40);
+    },
     freeze() {
       AudioCore.playFile('assets/audio/sfx/combat/freeze.mp3', { volume: 0.15 });
     },

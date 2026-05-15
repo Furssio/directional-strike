@@ -57,6 +57,11 @@ const SFX = {
   specialReady:    () => SfxAbilities.specialReady(),
   bulletTimeStart: () => SfxAbilities.bulletTimeStart(),
   bulletTimeStop:  () => SfxAbilities.bulletTimeStop(),
+  explosionStart:  () => SfxAbilities.explosionStart(),
+  shieldAbsorb:    () => SfxAbilities.shieldAbsorb(),
+  rangeBoostStart: () => SfxAbilities.rangeBoostStart(),
+ slashAttack:     () => SfxAbilities.slashAttack(),
+  oneHitSmash:     () => SfxCombat.oneHitSmash(),
 
   /* ── UI ── */
   levelUp:      () => SfxUi.levelUp(),

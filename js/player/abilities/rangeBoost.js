@@ -266,6 +266,7 @@ AbilityRegistry.register({
       player.rangePctMultiplier = 1.5;
       updateRangeCircle();
     }
+    SFX.rangeBoostStart();
     RangeBoostFX.start();
   },
 

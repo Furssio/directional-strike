@@ -45,6 +45,7 @@ AbilityRegistry.register({
       }
     }
 
+    SFX.explosionStart();
     SFX.kill();
 
     const a = document.getElementById('arena');

@@ -10,8 +10,12 @@
 
 const SfxAbilities = (() => {
 
-  const PATHS = {
+const PATHS = {
     bulletTime: 'assets/audio/sfx/abilities/bullet_time.mp3',
+    explosion:  'assets/audio/sfx/abilities/explosion.mp3',
+    shield:     'assets/audio/sfx/abilities/shield.mp3',
+    rangeBoost: 'assets/audio/sfx/abilities/range_boost.mp3',
+    slash:      'assets/audio/sfx/abilities/slash.mp3',
   };
 
   let _btAudio = null;
@@ -63,6 +67,19 @@ const SfxAbilities = (() => {
           _killBtAudio();
         }
       }, interval);
+    },
+    explosionStart() {
+      AudioCore.playFile(PATHS.explosion, { volume: 0.18 });
+    },
+shieldAbsorb() {
+      AudioCore.playFile(PATHS.shield, { volume: 0.15 });
+    },
+
+    rangeBoostStart() {
+      AudioCore.playFile(PATHS.rangeBoost, { volume: 0.18 });
+    },
+    slashAttack() {
+      AudioCore.playFile(PATHS.slash, { volume: 0.15 });
     },
 
     pauseAll() {
