@@ -88,7 +88,7 @@ class Player {
         const { w, h } = getArenaSize();
         showActionPop('up', 'BLOCKED!', '#44ffaa');
       }
-      if (typeof SFX !== 'undefined') SFX.hit();
+      if (typeof SFX !== 'undefined') SFX.luckyShield();
       return;
     }
 
@@ -165,10 +165,6 @@ class Player {
   /* ── COMBO ──────────────────────────── */
 
   resetCombo() {
-    // combo lost sound — only if we had an active combo
-    if (this.combo >= CONFIG.combo.minKills) {
-      if (typeof SFX !== 'undefined') SFX.comboLost(this.combo);
-    }
     this.combo      = 0;
     this.comboTimer = 0;
   }

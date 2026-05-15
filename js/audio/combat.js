@@ -134,10 +134,29 @@ const SfxCombat = (() => {
     },
 
     damage() {
-      t({ type: 'sawtooth', freq: 120, freq2: 60, duration: 0.18, attack: 0.002, decay: 0.08, sustain: 0.2, release: 0.08, gain: 0.7 });
-      n({ duration: 0.12, gain: 0.4, highpass: 200, lowpass: 1500 });
+      // player hit — sharp pain impact + body thud, punishing but not annoying
+      const rnd = 1 + (Math.random() - 0.5) * 0.06;
+      // sharp pain sting
+      t({ type: 'sine', freq: 700 * rnd, freq2: 350, duration: 0.14, attack: 0.001, decay: 0.04, sustain: 0.3, release: 0.08, gain: 0.5 });
+      // deep body impact
+      t({ type: 'sine', freq: 120 * rnd, freq2: 60, duration: 0.2, attack: 0.003, decay: 0.07, sustain: 0.25, release: 0.1, gain: 0.45 });
+      // dull thud noise
+      n({ duration: 0.12, gain: 0.25, highpass: 200, lowpass: 2000 });
     },
-
+    berserker() {
+      // rage awakening — deep growl surge + rising power
+      const rnd = 1 + (Math.random() - 0.5) * 0.04;
+      // deep rumble surge
+      t({ type: 'sine', freq: 80 * rnd, freq2: 140, duration: 0.35, attack: 0.005, decay: 0.1, sustain: 0.4, release: 0.15, gain: 0.5 });
+      // mid growl rising
+      t({ type: 'triangle', freq: 200 * rnd, freq2: 400, duration: 0.3, attack: 0.004, decay: 0.08, sustain: 0.35, release: 0.12, gain: 0.35 });
+      // power noise swell
+      n({ duration: 0.25, gain: 0.2, highpass: 150, lowpass: 2500 });
+      // high ring — delayed, rage confirmed
+      setTimeout(() =>
+        t({ type: 'sine', freq: 600 * rnd, freq2: 800, duration: 0.18, attack: 0.005, decay: 0.06, sustain: 0.25, release: 0.1, gain: 0.25 })
+      , 120);
+    },
     miss() {
       // whiff — airy slash that hits nothing, unsatisfying but not annoying
       const rnd = 1 + (Math.random() - 0.5) * 0.08;
@@ -170,10 +189,49 @@ const SfxCombat = (() => {
       n({ duration: 0.15, gain: 0.35, highpass: 400, lowpass: 2500 });
     },
 
+    freeze() {
+      AudioCore.playFile('assets/audio/sfx/combat/freeze.mp3', { volume: 0.15 });
+    },
+
      slash() {
       const path = SLASH_PATHS[Math.floor(Math.random() * SLASH_PATHS.length)];
       AudioCore.playFile(path, { volume: 0.05 });
     },
+multiKill(count) {
+      // escalating power chord — 2=double, 3=triple, 4+=mega/ultra
+      const rnd = 1 + (Math.random() - 0.5) * 0.04;
+      const intensity = Math.min(1, (count - 1) / 3);
+      const base = 500 + intensity * 300;
+      const vol = 0.35 + intensity * 0.2;
+      // impact hit
+      t({ type: 'sine', freq: base * rnd, freq2: base * 1.3, duration: 0.2, attack: 0.002, decay: 0.05, sustain: 0.4, release: 0.1, gain: vol });
+      // power fifth
+      setTimeout(() =>
+        t({ type: 'sine', freq: base * 1.5 * rnd, freq2: base * 1.8, duration: 0.18, attack: 0.003, decay: 0.05, sustain: 0.35, release: 0.08, gain: vol * 0.8 })
+      , 35);
+      // octave ring for 3+
+      if (count >= 3) {
+        setTimeout(() =>
+          t({ type: 'sine', freq: base * 2 * rnd, duration: 0.16, attack: 0.004, decay: 0.05, sustain: 0.3, release: 0.08, gain: vol * 0.6 })
+        , 75);
+      }
+      // epic shimmer for 4+
+      if (count >= 4) {
+        n({ duration: 0.15, gain: 0.18, highpass: 3000, lowpass: 9000 });
+      }
+    },
+
+    luckyShield() {
+      // magic barrier deflect — warm resonant block + sparkle
+      const rnd = 1 + (Math.random() - 0.5) * 0.05;
+      // barrier resonance
+      t({ type: 'sine', freq: 600 * rnd, freq2: 800, duration: 0.2, attack: 0.002, decay: 0.05, sustain: 0.35, release: 0.1, gain: 0.4 });
+      // bright deflect ping
+      t({ type: 'sine', freq: 1400 * rnd, freq2: 1800, duration: 0.14, attack: 0.001, decay: 0.03, sustain: 0.25, release: 0.08, gain: 0.3 });
+      // soft sparkle noise
+      n({ duration: 0.1, gain: 0.12, highpass: 2500, lowpass: 8000 });
+    },
+
 
     orbCollect() {
       // crystal chime — bright ping + harmonic overtone

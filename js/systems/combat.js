@@ -204,6 +204,7 @@ function handleDir(dir) {
           e.frozen = true;
           e.speed = 0;
           if (e.el) e.el.classList.add('frozen');
+          SFX.freeze();
           showActionPop(d, 'FREEZE!', '#44ddff');
         }
 
@@ -230,6 +231,7 @@ function handleDir(dir) {
         const label  = labels[_killsThisSwing] || 'ULTRA KILL';
         const colors = { 2: '#ffdd44', 3: '#ff8844', 4: '#ff44ff' };
         const color  = colors[_killsThisSwing] || '#ff44ff';
+        SFX.multiKill(_killsThisSwing);
         showActionPop(d, label, color);
         triggerComboBump();
       }
@@ -258,6 +260,7 @@ function handleDir(dir) {
           e.frozen = true;
           e.speed = 0;
           if (e.el) e.el.classList.add('frozen');
+          SFX.freeze();
           showActionPop(d, 'FREEZE!', '#44ddff');
         }
 
@@ -296,7 +299,6 @@ function handleDir(dir) {
   }
 
   if (!anyHit) {
-    SFX.miss();
     showActionPop(dir, 'MISS', '#ff4444');
     player.resetCombo();
     updateComboDisplay();

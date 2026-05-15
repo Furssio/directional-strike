@@ -28,6 +28,10 @@ const SFX = {
   comboTick:      (combo, tierIndex) => SfxCombat.comboTick(combo, tierIndex),
   comboThreshold: (tierIndex)        => SfxCombat.comboThreshold(tierIndex),
   comboLost:      (combo) => SfxCombat.comboLost(combo),
+   freeze:    () => SfxCombat.freeze(),
+   multiKill: (count) => SfxCombat.multiKill(count),
+   luckyShield: () => SfxCombat.luckyShield(),
+   berserker: () => SfxCombat.berserker(),
 
   // dispatch by enemy material type
   hitByType(type) {
