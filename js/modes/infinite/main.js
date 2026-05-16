@@ -64,10 +64,6 @@ const SCRIPTS = [
   'js/state.js',
 
   /* ── INFINITE MODE ── */
-  'js/modes/infinite/waves.js',
-  'js/modes/infinite/stress/calculator.js',
-  'js/modes/infinite/stress/events.js',
-  'js/modes/infinite/spawner.js',
   'js/modes/infinite/director.js',
 
   /* ── UI ── */
@@ -93,6 +89,7 @@ const SCRIPTS = [
   
   /* ── ADVENTURE (entry, does not auto-run) ── */
   'js/modes/adventure/main.js',
+'js/audio/ambience.js',
 
   /* ── DEBUG (must be last) ── */
   'js/debug.js',

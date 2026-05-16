@@ -101,6 +101,5 @@ const SFX = {
 
   stopAll() {
     SfxAbilities.stopAll();
-    Music.stop();
   },
 };

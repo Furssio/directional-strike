@@ -7,6 +7,7 @@ MapRegistry.register({
   icon:  '🌲',
   background: 'assets/maps/map01_forest/background_01.png',
 
+
   totalWaves: 11,
   minEnemiesAlive: 1,
   maxPerDirection: 4,

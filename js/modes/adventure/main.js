@@ -103,7 +103,7 @@ function startAdventureMap(mapId, delayLoop) {
   // load equipped ability (same as infinite mode)
   equippedAbilityId = getEquippedAbility();
 
-  // reuse the common startGame() from loop.js
+ // reuse the common startGame() from loop.js
   // delayLoop passed through from caller
   startGame(delayLoop);
 

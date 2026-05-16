@@ -231,7 +231,9 @@ function _shiftCarousel(dir) {
 function onMapSelected(mapId) {
   if (Transition.isPlaying()) return;
   selectedMapId = mapId;
- SFX.mapConfirm();
+  SFX.mapConfirm();
+  // fade out menu music during transition
+  Music.fadeOut(500);
   Transition.play('normal', () => {
     startAdventureMap(mapId, true);
   }, () => {

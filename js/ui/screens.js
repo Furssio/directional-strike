@@ -24,6 +24,11 @@ function showScreen(s) {
   // fireflies only on menu
   if (s === sMenu) startMenuFireflies();
   else stopMenuFireflies();
+
+  // menu music: play on any non-game screen, let it continue across screens
+  if (s !== sGame && typeof Music !== 'undefined') {
+    Music.playMenu();
+  }
 }
 
 /* ── HIGH SCORE ── */
@@ -198,3 +203,4 @@ function stopMenuFireflies() {
   menuFireflies = [];
 }
 startMenuFireflies();
+Music.playMenu();

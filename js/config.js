@@ -228,4 +228,105 @@ const CONFIG = {
     inputIdleThreshold:   1,
     inputIdleSpawnMs:     600,
   },
+
+/* ── CHALLENGE ─────────────────────────
+     Challenge Mode — infinite survival.
+     Maps rotate, difficulty scales with caps.
+     Two choice types alternate: stat & ability.
+
+     wavePerMap:        waves before map changes
+     waveDuration:      base (ms), increment, cap, slowdownAfterWave
+     spawn:             base interval/maxAlive/minAlive, scaling, caps
+     choiceSchedule:    array of {untilWave, every} — how often choices appear
+     choicePattern:     alternating types: 'stat' and 'ability'
+     abilityChoiceCount: how many abilities shown per choice (pick 1)
+     mapPool:           map ids available for rotation
+     dimensionEvent:    every X map changes, chance to trigger dimension map
+     difficultyCap:     wave number where scaling stops
+  ─────────────────────────────────────── */
+  challenge: {
+
+    /* — map rotation — */
+    wavesPerMap: 10,
+
+    /* — wave duration curve (ms) —
+       Starts at base, grows by increment each wave.
+       Growth slows after slowdownAfterWave (increment halves).
+       Stops growing at cap. */
+    waveDuration: {
+      base:               15000,
+      incrementPerWave:   800,
+      slowdownAfterWave:  20,
+      slowdownFactor:     0.5,
+      cap:                45000,
+    },
+
+    /* — spawn scaling —
+       spawnInterval shrinks each wave (faster spawns).
+       maxAlive grows each wave (more enemies).
+       Everything has a cap so it never breaks. */
+    spawn: {
+      baseInterval:         1800,
+      intervalDecayPerWave: 30,
+      intervalCap:          600,
+
+      baseMaxAlive:         4,
+      maxAliveGrowPerWave:  0.2,
+      maxAliveCap:          12,
+
+      baseMinAlive:         2,
+      minAliveGrowPerWave:  0.1,
+      minAliveCap:          6,
+
+      baseBurstChance:      0.0,
+      burstChanceGrow:      0.02,
+      burstChanceCap:       0.35,
+      burstSize:            2,
+    },
+
+    /* — choice schedule —
+       untilWave: this bracket applies up to wave X
+       every: choice appears every N waves
+       Last entry has no untilWave = applies forever */
+    choiceSchedule: [
+      { untilWave: 10, every: 2 },
+      { untilWave: 20, every: 3 },
+      { untilWave: 30, every: 4 },
+      { every: 5 },
+    ],
+
+    /* — choice types —
+       Alternate between these. First choice is ALWAYS 'ability'.
+       'stat' = normal upgrade cards (attack, speed, hp, etc.)
+       'ability' = 4 random abilities, must pick one (swap current) */
+    choiceTypes: ['ability', 'stat'],
+
+    /* how many ability cards shown per ability choice */
+    abilityChoiceCount: 4,
+
+    /* — map pool — playable map ids (no boss maps) */
+    mapPool: [
+      'map01_forest', 'map02_dungeon', 'map03_desert',
+      'map05_snow', 'map06_beach', 'map07_clouds',
+      'map09_volcano', 'map10_sakura', 'map12_moon',
+    ],
+
+    /* — dimension event —
+       Special map with mixed enemies from all maps.
+       afterMaps: can't appear before this many map changes
+       chance: probability each map change (after afterMaps) */
+    dimensionEvent: {
+      afterMaps: 3,
+      chance:    0.2,
+    },
+
+    /* — difficulty cap —
+       After this wave, spawn params stop scaling.
+       Wave duration also stops growing (separate cap above).
+       Game continues infinitely at this difficulty. */
+    difficultyCap: 60,
+  },
+
+
+
 };
