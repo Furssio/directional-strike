@@ -267,7 +267,7 @@ const CONFIG = {
        Everything has a cap so it never breaks. */
     spawn: {
       baseInterval:         1800,
-      intervalDecayPerWave: 30,
+      intervalDecayPerWave: 25,
       intervalCap:          600,
 
       baseMaxAlive:         4,
