@@ -121,6 +121,11 @@ function endGame() {
   clearInterval(gameLoop);
   ActiveDirector.stop();
 
+  // challenge: save best wave
+  if (ActiveDirector === ChallengeDirector && typeof ChallengeDirector.onGameOver === 'function') {
+    ChallengeDirector.onGameOver();
+  }
+
   // DO NOT remove enemies/bullets — they stay visible behind overlay
   // cleanup happens when player presses a button
 
@@ -156,7 +161,8 @@ function tick() {
   const dt  = Math.min(now - lastTick, 50);
   lastTick  = now;
 
- if (!_choosingUpgrade && !_countdownActive && !_inputBlocked) {
+ if (!_choosingUpgrade && !_countdownActive && !_inputBlocked &&
+     !_challengeChoiceActive && !_challengeCountdown && !_challengeInputBlocked) {
   player.tickSpecial(dt);
 }
 updateProgress();

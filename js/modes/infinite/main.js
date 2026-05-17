@@ -89,7 +89,13 @@ const SCRIPTS = [
   
   /* ── ADVENTURE (entry, does not auto-run) ── */
   'js/modes/adventure/main.js',
-'js/audio/ambience.js',
+
+  /* ── CHALLENGE ── */
+  'js/modes/challenge/challengeDirector.js',
+  'js/modes/challenge/challengeUpgradeChoice.js',
+  'js/modes/challenge/challengeScreen.js',
+
+  'js/audio/ambience.js',
 
   /* ── DEBUG (must be last) ── */
   'js/debug.js',

@@ -99,6 +99,12 @@ function activateSpecial() {
 function handleDir(dir) {
   if (!running || choosingAbility || isAttacking) return;
 
+  // challenge upgrade choice — selecting with direction
+  if (typeof isChoosingChallengeUpgrade === 'function' && isChoosingChallengeUpgrade()) {
+    selectChallengeUpgrade(dir);
+    return;
+  }
+
   // upgrade choice — selecting with direction
   if (typeof isChoosingUpgrade === 'function' && isChoosingUpgrade()) {
     selectUpgrade(dir);

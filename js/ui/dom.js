@@ -6,10 +6,11 @@
    Depends on: nothing
    ═══════════════════════════════════════ */
 
-const sMenu    = document.getElementById('screen-menu');
-const sAbility = document.getElementById('screen-ability');
-const sGame    = document.getElementById('screen-game');
+const sMenu      = document.getElementById('screen-menu');
+const sAbility   = document.getElementById('screen-ability');
+const sGame      = document.getElementById('screen-game');
 const sMapSelect = document.getElementById('screen-map-select');
+const sChallenge = document.getElementById('screen-challenge');
 
 const overOverlay     = document.getElementById('over-overlay');
 const completeOverlay = document.getElementById('complete-overlay');

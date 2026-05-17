@@ -9,7 +9,7 @@
 /* ── SCREEN NAVIGATION ── */
 
 function showScreen(s) {
-  [sMenu, sGame, sAbility, sMapSelect].forEach(x => {
+  [sMenu, sGame, sAbility, sMapSelect, sChallenge].forEach(x => {
     if (x) x.style.display = 'none';
   });
   s.style.display = 'block';

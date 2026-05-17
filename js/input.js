@@ -15,6 +15,12 @@ document.getElementById('btn-restart').addEventListener('click', () => {
   overOverlay.classList.add('hidden');
   cleanupArena();
   Transition.play('fast', () => {
+    // challenge mode restart
+    if (ActiveDirector && ActiveDirector === ChallengeDirector) {
+      startChallengeGame();
+      return;
+    }
+    // adventure mode restart
     equippedAbilityId = getEquippedAbility();
     if (ActiveDirector && ActiveDirector === AdventureDirector) {
       if (!AdventureDirector.restart()) {
@@ -39,9 +45,14 @@ document.getElementById('btn-adventure').addEventListener('click', () => {
   });
 });
 
-// challenge mode — locked for now
+// challenge mode
 document.getElementById('btn-challenge').addEventListener('click', () => {
-  // TODO: unlock after adventure complete
+  if (Transition.isPlaying()) return;
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
+  Transition.play('fast', () => {
+    buildChallengeScreen();
+    showScreen(sChallenge);
+  });
 });
 
 // splash text on challenge hover
@@ -93,6 +104,13 @@ document.getElementById('btn-home').addEventListener('click', () => {
   overOverlay.classList.add('hidden');
   cleanupArena();
   Transition.play('fast', () => {
+    // challenge mode: go back to menu
+    if (ActiveDirector && ActiveDirector === ChallengeDirector) {
+      showScreen(sMenu);
+      if (typeof DemoMode !== 'undefined') DemoMode.start();
+      return;
+    }
+    // adventure mode: go back to map select
     showScreen(sMapSelect);
     if (typeof initMapSelect === 'function') initMapSelect();
   });
@@ -103,6 +121,29 @@ document.getElementById('btn-map-back').addEventListener('click', () => {
   Transition.play('fast', () => {
     showScreen(sMenu);
     if (typeof DemoMode !== 'undefined') DemoMode.start();
+  });
+});
+
+/* ── CHALLENGE SCREEN BUTTONS ── */
+
+document.getElementById('btn-challenge-back').addEventListener('click', () => {
+  if (Transition.isPlaying()) return;
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
+  Transition.play('fast', () => {
+    showScreen(sMenu);
+    if (typeof DemoMode !== 'undefined') DemoMode.start();
+  });
+});
+
+document.getElementById('btn-challenge-play').addEventListener('click', () => {
+  if (Transition.isPlaying()) return;
+  SFX.mapConfirm();
+  Music.fadeOut(500);
+  if (typeof DemoMode !== 'undefined') DemoMode.stop();
+  Transition.play('normal', () => {
+    startChallengeGame();
+  }, () => {
+    startGameLoop();
   });
 });
 
@@ -266,5 +307,28 @@ document.addEventListener('keydown', e => {
     return;
   }
 });
+
+/* ── CHALLENGE GAME START ── */
+
+function startChallengeGame() {
+  // ensure adventure scripts (MapRegistry, etc.) are loaded
+  loadAdventureMode(() => {
+    ActiveDirector = ChallengeDirector;
+    ChallengeDirector.init();
+
+    // reset upgrade tier tracking for new run
+    if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
+    if (typeof resetChallengeChoices === 'function') resetChallengeChoices();
+
+    // start game with temporary ability — player picks in first choice
+    equippedAbilityId = 'shield';
+    startGame(true);
+
+    // immediately show ability choice
+    _isFirstAbilityChoice = true;
+    startChallengeChoice('ability');
+  });
+}
+
 
 updateMenuBest();

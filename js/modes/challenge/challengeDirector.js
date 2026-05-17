@@ -339,9 +339,14 @@ const ChallengeDirector = (() => {
       active = false;
     },
 
-    /* ── INPUT TRACKING ──────────────── */
+   /* ── INPUT TRACKING ──────────────── */
     trackInput() {
       _trackInput();
+    },
+
+    /* ── COUNT CHOICE (used by first ability pick) ── */
+    countChoice() {
+      choiceCount++;
     },
 
     /* ── EVENTS ───────────────────────── */
