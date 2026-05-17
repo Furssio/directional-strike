@@ -325,6 +325,22 @@ const CONFIG = {
        Wave duration also stops growing (separate cap above).
        Game continues infinitely at this difficulty. */
     difficultyCap: 60,
+
+    /* — map theme colors —
+       Used by map transition effect.
+       Each map id maps to [color, colorDark]. */
+    mapColors: {
+      map01_forest:  ['#44aa66', '#226633'],
+      map02_dungeon: ['#8888aa', '#555577'],
+      map03_desert:  ['#ddaa55', '#997733'],
+      map05_snow:    ['#88ccff', '#4488bb'],
+      map06_beach:   ['#55ccbb', '#228877'],
+      map07_clouds:  ['#aaccff', '#5577aa'],
+      map09_volcano: ['#ff6644', '#aa3311'],
+      map10_sakura:  ['#ff88aa', '#aa4466'],
+      map12_moon:    ['#aa88ff', '#6644bb'],
+      dimension:     ['#ff00ff', '#880088'],
+    },
   },
 
 

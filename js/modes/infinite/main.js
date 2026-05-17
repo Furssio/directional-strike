@@ -82,6 +82,7 @@ const SCRIPTS = [
   'js/systems/orbs.js',
   'js/systems/demoMode.js',
   'js/systems/transition.js',
+  'js/systems/mapTransition.js',
 
   /* ── INPUT ── */
   'js/input.js',

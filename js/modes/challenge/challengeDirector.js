@@ -355,9 +355,11 @@ const ChallengeDirector = (() => {
 
     /* ── NEXT WAVE ────────────────────── */
     nextWave() {
-      // check map change
+      // check map change — async transition
       if (_isMapChangeWave(wave)) {
+        active = false;
         this._changeMap();
+        return; // transition will call _afterMapChange()
       }
 
       // check if choice triggers
@@ -398,13 +400,60 @@ const ChallengeDirector = (() => {
     _changeMap() {
       mapsCompleted++;
       const newMap = _pickNextMap();
-      currentMap   = newMap;
-      mapHistory.push(newMap.id);
+      const self   = this;
 
-      setArenaBackground(newMap.background || null);
-      resetAdventureSpawner();
+      // get theme colors
+      const colors = CONFIG.challenge.mapColors;
+      const isDim  = !!newMap.isDimension;
+      const mapId  = newMap.id;
 
-      // TODO: trigger map change transition effect
+      const themeColor = colors[mapId]
+        ? colors[mapId][0] : '#ffffff';
+      const themeDark  = colors[mapId]
+        ? colors[mapId][1] : '#888888';
+
+      const displayName = (newMap.name || mapId)
+        .toUpperCase();
+
+      // swap callback — called mid-transition
+      function onSwapBg() {
+        currentMap = newMap;
+        mapHistory.push(newMap.id);
+        setArenaBackground(newMap.background || null);
+        resetAdventureSpawner();
+      }
+
+      // play transition then resume
+      if (isDim) {
+        MapTransition.playDimension(onSwapBg).then(() => {
+          self._afterMapChange();
+        });
+      } else {
+        MapTransition.playNormal(
+          displayName, themeColor, themeDark, onSwapBg
+        ).then(() => {
+          self._afterMapChange();
+        });
+      }
+    },
+
+/* ── AFTER MAP CHANGE ─────────────
+       Called when transition finishes.
+       Resumes wave progression. */
+    _afterMapChange() {
+      // check if choice triggers on this wave
+      if (_isChoiceWave(wave)) {
+        const type = _getNextChoiceType();
+        choiceCount++;
+        if (typeof startChallengeChoice === 'function') {
+          startChallengeChoice(type);
+        }
+        return;
+      }
+
+      // otherwise start next wave
+      active = true;
+      this._startWave(wave + 1);
     },
 
     /* ── GAME OVER ────────────────────── */
