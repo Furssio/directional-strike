@@ -10,18 +10,34 @@
 
    Hotkeys:
      Q — skip wave timer to 10s remaining
+     G — toggle Frost Touch III
 
    Depends on: config.js, state.js,
-               adventureDirector.js, orbs.js
+               adventureDirector.js,
+               challengeDirector.js, orbs.js
    ═══════════════════════════════════════ */
 
 (() => {
   if (!CONFIG.debug) return;
 
+  /* ── HELPERS ────────────────────────── */
+
+  // Returns true if ActiveDirector is adventure or challenge
+  function isDirectorActive() {
+    if (typeof ActiveDirector === 'undefined' || !ActiveDirector) return false;
+    if (typeof AdventureDirector !== 'undefined' && ActiveDirector === AdventureDirector) return true;
+    if (typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector) return true;
+    return false;
+  }
+
+  function isChallenge() {
+    return typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector;
+  }
+
   /* ── PANEL DOM ─────────────────────── */
   const panel = document.createElement('div');
   panel.id = 'debug-panel';
- panel.style.cssText =
+  panel.style.cssText =
     'position:fixed;top:8px;right:8px;' +
     'background:rgba(0,0,0,0.88);color:#0f0;' +
     'font-family:"Courier New",monospace;font-size:11px;' +
@@ -31,12 +47,13 @@
     'image-rendering:auto;display:flex;gap:12px;';
   document.body.appendChild(panel);
 
-  /* ── HOTKEY ─────────────────────────── */
+  /* ── HOTKEYS ────────────────────────── */
   document.addEventListener('keydown', (e) => {
+    // Q — skip wave to 10s remaining
     if (e.key === 'q' || e.key === 'Q') {
       if (!running) return;
-      if (typeof AdventureDirector === 'undefined' || ActiveDirector !== AdventureDirector) return;
-      AdventureDirector.debugSkipTimer();
+      if (!isDirectorActive()) return;
+      ActiveDirector.debugSkipTimer();
     }
 
     // G — toggle Frost Touch III (45% freeze chance)
@@ -73,7 +90,7 @@
 
   function buildWaveSection(d) {
     let s = '═══ WAVE ═══════════════════\n';
-    s += 'Wave:      ' + d.wave + ' / ' + d.totalWaves + '\n';
+    s += 'Wave:      ' + d.wave + (d.totalWaves ? ' / ' + d.totalWaves : ' (∞)') + '\n';
     s += 'Timer:     ' + ms2s(d.waveTimeLeft) + ' / ' + ms2s(d.waveDuration) + '\n';
     s += 'Elapsed:   ' + ms2s(d.waveElapsed) + '\n';
     s += 'Draining:  ' + fmtBool(d.draining) + '\n';
@@ -112,7 +129,6 @@
       s += '(none)\n';
       return s;
     }
-    // count by type
     const counts = {};
     for (const e of enemies) {
       const n = e.name || e.def.id || '?';
@@ -193,20 +209,31 @@
     return s;
   }
 
+  // Challenge-specific section
+  function buildChallengeSection(d) {
+    let s = '═══ CHALLENGE ══════════════\n';
+    s += 'MapIdx:    ' + (d.mapIndex !== undefined ? d.mapIndex : '?') + '\n';
+    s += 'MapsCompl: ' + (d.mapsCompleted !== undefined ? d.mapsCompleted : '?') + '\n';
+    s += 'Choices:   ' + (d.choiceCount !== undefined ? d.choiceCount : '?') + '\n';
+    s += 'NextChoice:' + (d.nextChoiceType || '?') + '\n';
+    s += 'BestWave:  ' + (d.bestWave !== undefined ? d.bestWave : '?') + '\n';
+    return s;
+  }
+
   /* ── UPDATE LOOP ───────────────────── */
 
   function update() {
     if (!CONFIG.debug) return;
 
-    // clear panel
     panel.innerHTML = '';
 
-    if (running && typeof AdventureDirector !== 'undefined' && ActiveDirector === AdventureDirector) {
-      const d = AdventureDirector._debug();
-      const map = AdventureDirector.getCurrentMap();
+    if (running && isDirectorActive()) {
+      const d = ActiveDirector._debug();
+      const map = ActiveDirector.getCurrentMap();
+      const challenge = isChallenge();
 
       // column 1
-      let c1 = '⚙ DEBUG\n';
+      let c1 = '⚙ DEBUG' + (challenge ? ' [CHALLENGE]' : '') + '\n';
       c1 += 'Map: ' + (map ? map.name : '?') + '\n\n';
       c1 += buildWaveSection(d);
       c1 += '\n';
@@ -225,6 +252,10 @@
       c2 += buildOrbSection();
       c2 += '\n';
       c2 += buildPlayerSection();
+      if (challenge) {
+        c2 += '\n';
+        c2 += buildChallengeSection(d);
+      }
       c2 += '\n[Q] skip to 10s';
       c2 += '\n[G] frost ' + (player && player._frostChance > 0 ? 'ON ' + Math.round(player._frostChance * 100) + '%' : 'off');
 

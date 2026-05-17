@@ -293,7 +293,7 @@ document.addEventListener('keydown', e => {
   // M = skip entire wave (clear field + advance to next)
   if (e.code === 'KeyM') {
     e.preventDefault();
-    if (ActiveDirector === AdventureDirector) {
+    if (ActiveDirector === AdventureDirector || ActiveDirector === ChallengeDirector) {
       for (let i = enemies.length - 1; i >= 0; i--) {
         if (enemies[i].el) enemies[i].el.remove();
         enemies.splice(i, 1);
@@ -302,7 +302,7 @@ document.addEventListener('keydown', e => {
         bullets[i].el.remove();
         bullets.splice(i, 1);
       }
-      AdventureDirector.nextWave();
+      ActiveDirector.nextWave();
     }
     return;
   }
