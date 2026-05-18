@@ -1,0 +1,231 @@
+/* ═══════════════════════════════════════
+   SLOT MACHINE OVERLAY
+   Reusable ability unlock slot.
+   ═══════════════════════════════════════ */
+
+/* ── CONTAINER ── */
+#slot-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: slotOverlayIn 0.3s ease-out;
+}
+#slot-overlay.hidden { display: none; }
+
+#slot-darken {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+/* ── CARD ── */
+#slot-card {
+  position: relative;
+  z-index: 1;
+  width: 78%;
+  max-width: 300px;
+  background-image: url('../../assets/ui/menu_bg.png');
+  background-size: 128px 128px;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
+  padding: 24px 18px 20px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ── TITLE ── */
+#slot-title {
+  font-size: 12px;
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  margin: 0 0 4px;
+  letter-spacing: 1px;
+}
+#slot-subtitle {
+  font-size: 7px;
+  color: #8888aa;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+/* ── SLOT WINDOW ── */
+#slot-window {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+/* reel — vertical strip of icons */
+#slot-reel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: none;
+}
+#slot-reel img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+/* center highlight line */
+#slot-highlight {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 68px;
+  transform: translateY(-50%);
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── SLOT WINDOW GLOW (on result) ── */
+#slot-window.glow-rare {
+  border-color: #4488ff;
+  box-shadow: 0 0 20px rgba(68, 136, 255, 0.6),
+              inset 0 0 15px rgba(68, 136, 255, 0.2);
+}
+#slot-window.glow-epic {
+  border-color: #aa44ff;
+  box-shadow: 0 0 20px rgba(170, 68, 255, 0.6),
+              inset 0 0 15px rgba(170, 68, 255, 0.2);
+}
+#slot-window.glow-legendary {
+  border-color: #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.7),
+              inset 0 0 20px rgba(255, 215, 0, 0.3);
+  animation: legendaryPulse 0.8s ease-in-out infinite;
+}
+
+/* ── RESULT ── */
+#slot-result {
+  margin-bottom: 14px;
+  animation: resultIn 0.4s ease-out;
+}
+#slot-result.hidden { display: none; }
+
+#slot-result-icon {
+  margin-bottom: 6px;
+}
+#slot-result-icon img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+#slot-result-name {
+  font-size: 10px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+#slot-result-rarity {
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+#slot-result-rarity.rarity-rare      { color: #4488ff; }
+#slot-result-rarity.rarity-epic      { color: #aa44ff; }
+#slot-result-rarity.rarity-legendary { color: #ffd700; }
+
+#slot-result-desc {
+  font-size: 7px;
+  color: #8888aa;
+  line-height: 1.6;
+}
+
+/* ── NEAR MISS ── */
+#slot-near-miss {
+  margin-bottom: 14px;
+  animation: nearMissShake 0.5s ease-out;
+}
+#slot-near-miss.hidden { display: none; }
+
+#slot-near-text {
+  font-size: 11px;
+  color: #ff4444;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+  letter-spacing: 1px;
+}
+
+/* ── SPIN COUNT ── */
+#slot-spin-count {
+  font-size: 7px;
+  color: #8888aa;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  min-height: 12px;
+}
+
+/* ── BUTTON ── */
+.slot-btn {
+  width: 100%;
+  padding: 14px 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: background 0.15s, transform 0.1s;
+}
+.slot-btn:hover {
+  background: rgba(255, 215, 0, 0.2);
+}
+.slot-btn:active {
+  transform: scale(0.96);
+}
+.slot-btn.slot-btn-done {
+  color: #51eefc;
+  border-color: rgba(81, 238, 252, 0.4);
+  background: rgba(81, 238, 252, 0.1);
+}
+.slot-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes slotOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes resultIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes legendaryPulse {
+  0%, 100% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.7), inset 0 0 20px rgba(255, 215, 0, 0.3); }
+  50%      { box-shadow: 0 0 40px rgba(255, 215, 0, 0.9), inset 0 0 30px rgba(255, 215, 0, 0.5); }
+}
+
+@keyframes nearMissShake {
+  0%, 100% { transform: translateX(0); }
+  15%      { transform: translateX(-6px); }
+  30%      { transform: translateX(5px); }
+  45%      { transform: translateX(-4px); }
+  60%      { transform: translateX(3px); }
+  75%      { transform: translateX(-2px); }
+}

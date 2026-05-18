@@ -13,7 +13,14 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
-  debug: true,
+ debug: true,
+
+  /* ── DEV MODE ───────────────────────────
+     devUnlockAll: true = all maps + abilities
+     unlocked. Set false to test real progression.
+     Toggle with debug overlay (T key).
+  ─────────────────────────────────────── */
+  devUnlockAll: true,
 
   /* ── PLAYER ─────────────────────────────
      maxHp:            base max HP
@@ -343,6 +350,54 @@ const CONFIG = {
     },
   },
 
+  /* ── ABILITIES UNLOCK SYSTEM ────────────
+     Slot machine progression for unlocking
+     special abilities.
 
+     defaultAbility:  always unlocked from start
+     rarities:        rarity tier per ability
+     weights:         slot probability per rarity
+     slotAfterMaps:   maps that trigger guaranteed slot
+     menuSlots:       rewarded ad slot config
+  ─────────────────────────────────────── */
+
+abilities: {
+    defaultAbility: 'bullet_time',
+    
+    rarities: {
+        bullet_time:    'epic',
+        double_strike:  'rare',
+        explosion:      'rare',
+        full_heal:      'legendary',
+        one_hit:        'rare',
+        range_boost:    'rare',
+        shield:         'epic',
+        slash:          'legendary'
+    },
+    
+    // Weights for slot probability
+    weights: {
+        rare:      35,
+        epic:      20,
+        legendary: 10
+    },
+    
+    // Maps that trigger guaranteed slot after completion
+    slotAfterMaps: [
+        'map01_forest',   // after map 1
+        'map03_desert',   // after map 3
+        'map06_beach',    // after map 5
+        'map09_volcano',  // after map 7
+        'map10_sakura'    // after map 8 — legendary guaranteed
+    ],
+    
+    // Menu slot machine (rewarded ad)
+    menuSlots: {
+        maxVideos:       3,
+        spinsPerVideo:   3,
+        // Last video guarantees ability if none found in first 2
+        guaranteedLastVideo: true
+    }
+},
 
 };
