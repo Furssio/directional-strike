@@ -67,8 +67,41 @@
         console.log('[DEBUG] Frost Touch III ON (45%)');
       }
     }
-  });
+// R — full reset (clear all localStorage game data)
+    if (e.key === 'r' || e.key === 'R') {
+      if (running) return; // only from menu/map select
+      if (typeof Progress !== 'undefined') {
+        Progress.reset();
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith('ds_')) localStorage.removeItem(k);
+        });
+        localStorage.removeItem('ds_equipped_ability');
+        console.log('[DEBUG] FULL RESET — all progress cleared');
+        if (typeof buildMapSelectScreen === 'function') {
+          buildMapSelectScreen();
+        }
+      }
+    }
 
+  });
+// R — full reset (clear all localStorage game data)
+    if (e.key === 'r' || e.key === 'R') {
+      if (running) return; // only from menu/map select
+      if (typeof Progress !== 'undefined') {
+        Progress.reset();
+        // also clear best scores
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith('ds_')) localStorage.removeItem(k);
+        });
+        // clear equipped ability
+        localStorage.removeItem('ds_equipped_ability');
+        console.log('[DEBUG] FULL RESET — all progress cleared');
+        // refresh map select if visible
+        if (typeof buildMapSelectScreen === 'function') {
+          buildMapSelectScreen();
+        }
+      }
+    }
   /* ── FORMAT HELPERS ─────────────────── */
 
   function ms2s(ms) {
@@ -257,6 +290,7 @@
         c2 += buildChallengeSection(d);
       }
       c2 += '\n[Q] skip to 10s';
+      c2 += '\n[R] reset all (menu only)';
       c2 += '\n[G] frost ' + (player && player._frostChance > 0 ? 'ON ' + Math.round(player._frostChance * 100) + '%' : 'off');
 
       const col1 = document.createElement('div');

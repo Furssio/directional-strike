@@ -72,6 +72,7 @@ const SCRIPTS = [
   'js/ui/screens.js',
   'js/ui/abilityScreen.js',
   'js/ui/slotMachine.js',
+  'js/ui/slotReels.js',
 
   /* ── SYSTEMS ── */
   'js/systems/juice.js',

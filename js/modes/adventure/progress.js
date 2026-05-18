@@ -106,7 +106,7 @@ const Progress = (() => {
     },
 
     isMapUnlocked(mapId) {
-      if (CONFIG.devUnlockAll) return true;
+  if (CONFIG.devUnlockAll || CONFIG.devUnlockMapsOnly) return true;
 
       const map = MapRegistry.get(mapId);
       if (!map) return false;
@@ -136,10 +136,10 @@ const Progress = (() => {
     },
 
     isAbilityUnlocked(abilityId) {
-      if (CONFIG.devUnlockAll) return true;
-      if (abilityId === CONFIG.abilities.defaultAbility) return true;
-      return _load(KEY_ABILITIES).includes(abilityId);
-    },
+  if (CONFIG.devUnlockAll && !CONFIG.devUnlockMapsOnly) return true;
+  if (abilityId === CONFIG.abilities.defaultAbility) return true;
+  return _load(KEY_ABILITIES).includes(abilityId);
+},
 
     unlockAbility(abilityId) {
       const list = _load(KEY_ABILITIES);
@@ -191,17 +191,17 @@ const Progress = (() => {
      * guaranteed = false → ~1/6 chance per spin, can return null
      */
     rollSlot(guaranteed) {
-      const pool = _getWeightedPool();
-      if (pool.length === 0) return null;
+  const pool = _getWeightedPool();
+  if (pool.length === 0) return null;
 
-      if (guaranteed) {
-        return _pickFromPool(pool);
-      }
+  if (guaranteed) {
+    return _pickFromPool(pool);
+  }
 
-      // Non-guaranteed: ~1/6 chance to hit
-      if (Math.random() > (1 / 6)) return null;
-      return _pickFromPool(pool);
-    },
+  // Non-guaranteed: ~1/9 chance per spin
+  if (Math.random() > (1 / 9)) return null;
+  return _pickFromPool(pool);
+},
 
     /* ── MENU VIDEOS (REWARDED AD) ────── */
 

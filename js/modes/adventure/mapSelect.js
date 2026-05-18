@@ -77,6 +77,7 @@ function buildMapSelectScreen() {
   _renderCarousel();
   _bindCarouselButtons();
   _buildAbilityPicker();
+  _buildSlotButton();
 
   // set initial map preview background
   const map = _carouselMaps[_carouselIndex];
@@ -339,7 +340,47 @@ function _renderEnemyCard(map) {
   });
 }
 
+/* ── SLOT BUTTON (menu) ── */
+function _buildSlotButton() {
+  const btn = document.getElementById('slot-menu-btn');
+  if (!btn) return;
 
+  // hide if all abilities unlocked OR all 3 videos used
+  const hasLocked = Progress.getLockedAbilities().length > 0;
+  const canVideo  = Progress.canUseMenuVideo();
+
+  if (!hasLocked || !canVideo) {
+    btn.classList.add('hidden');
+    return;
+  }
+
+  // update counter: show videos USED / MAX
+  const used = Progress.getMenuVideosUsed();
+  const max  = CONFIG.abilities.menuSlots.maxVideos;
+  document.getElementById('slot-menu-count').textContent = used + '/' + max;
+
+  btn.classList.remove('hidden');
+  btn.onclick = _onSlotMenuClick;
+}
+
+function _onSlotMenuClick(e) {
+  if (e) { e.stopPropagation(); e.preventDefault(); }
+
+  if (typeof SlotMachine === 'undefined') return;
+  if (!Progress.canUseMenuVideo()) return;
+  if (Progress.getLockedAbilities().length === 0) return;
+
+  // DON'T consume video here — SlotMachine handles it internally
+  SlotMachine.open({
+    mode: 'menu',
+    onResult: (_abilityId) => {
+      _buildAbilityPicker();
+    },
+    onClose: () => {
+      _buildSlotButton();
+    },
+  });
+}
 /* ═══════════════════════════════════════
    ABILITY PICKER — mini carousel
    ═══════════════════════════════════════ */
@@ -347,9 +388,25 @@ let _abilityList  = [];
 let _abilityIndex = 0;
 
 function _buildAbilityPicker() {
-  _abilityList = AbilityRegistry.all();
+  // unlocked first, locked after
+  const all      = AbilityRegistry.all();
+  const unlocked = all.filter(a => Progress.isAbilityUnlocked(a.id));
+  const locked   = all.filter(a => !Progress.isAbilityUnlocked(a.id));
+  _abilityList   = [...unlocked, ...locked];
+
+  // start on equipped ability
   const equipped = getEquippedAbility();
-  _abilityIndex = Math.max(0, _abilityList.findIndex(a => a.id === equipped));
+  const eqIdx    = _abilityList.findIndex(a => a.id === equipped);
+  _abilityIndex  = eqIdx >= 0 ? eqIdx : 0;
+
+  // if equipped is locked, reset to default
+  if (!Progress.isAbilityUnlocked(equipped)) {
+    const def = CONFIG.abilities.defaultAbility;
+    saveEquippedAbility(def);
+    _abilityIndex = _abilityList.findIndex(a => a.id === def);
+    if (_abilityIndex < 0) _abilityIndex = 0;
+  }
+
   _renderAbilityPicker();
 
   const prev = document.getElementById('ability-prev');
@@ -366,15 +423,37 @@ function _buildAbilityPicker() {
 
 function _applyAbilityPick() {
   const ab = _abilityList[_abilityIndex];
-  saveEquippedAbility(ab.id);
+  if (!ab) return;
+  // only equip if unlocked
+  if (Progress.isAbilityUnlocked(ab.id)) {
+    saveEquippedAbility(ab.id);
+  }
   _renderAbilityPicker();
 }
 
 function _renderAbilityPicker() {
   const ab = _abilityList[_abilityIndex];
   if (!ab) return;
-  const img  = document.getElementById('ability-pick-img');
-  const name = document.getElementById('ability-pick-name');
-  if (img)  img.src = 'assets/abilities/' + ab.id + '.png';
-  if (name) name.textContent = ab.name;
+
+  const img      = document.getElementById('ability-pick-img');
+  const nameEl   = document.getElementById('ability-pick-name');
+  const wrap     = document.getElementById('ability-card-select');
+  const isLocked = !Progress.isAbilityUnlocked(ab.id);
+
+  if (img) {
+    img.src = 'assets/abilities/' + ab.id + '.png';
+    img.style.filter = isLocked ? 'brightness(0.3) grayscale(1)' : 'none';
+  }
+
+  if (nameEl) {
+    nameEl.textContent = isLocked ? '🔒 ' + ab.name : ab.name;
+  }
+
+  // rarity border color
+  if (wrap) {
+    const rarity = CONFIG.abilities.rarities[ab.id] || 'rare';
+    const colors = { rare: '#4488ff', epic: '#aa44ff', legendary: '#ffd700' };
+    wrap.style.borderColor = colors[rarity] || '#4488ff';
+    wrap.style.opacity = isLocked ? '0.6' : '1';
+  }
 }
