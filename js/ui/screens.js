@@ -65,7 +65,7 @@ function showScorePop(x, y, pts) {
 
 /* ── MAP COMPLETE ── */
 
-function showMapComplete(map, newlyUnlocked) {
+function showMapComplete(map, hasSlot) {
   // stop game loop
   running = false;
   clearInterval(gameLoop);
@@ -75,25 +75,86 @@ function showMapComplete(map, newlyUnlocked) {
   document.getElementById('complete-score').textContent =
     (player ? player.score : 0).toLocaleString();
 
-  // ability unlock section
+  // hide ability section + buttons initially
   const abilitySection = document.getElementById('complete-ability');
-  if (newlyUnlocked && map.unlocksAbility) {
-    const aDef = AbilityRegistry.get(map.unlocksAbility);
-    if (aDef) {
-      document.getElementById('complete-ability-icon').innerHTML =
-        '<img src="assets/abilities/' + aDef.id + '.png" width="48" height="48" style="image-rendering:pixelated">';
-      document.getElementById('complete-ability-name').textContent = aDef.name || aDef.id;
-      document.getElementById('complete-ability-desc').textContent = aDef.desc || '';
-      abilitySection.classList.remove('hidden');
-    }
-  } else {
-    abilitySection.classList.add('hidden');
-  }
+  abilitySection.classList.add('hidden');
+  const btnCol = document.querySelector('.complete-btn-col');
+  if (btnCol) btnCol.style.display = 'none';
 
-  // show overlay (game screen stays visible behind)
+  // show overlay
   completeOverlay.classList.remove('hidden');
 
-  // button handlers (clone to clean old listeners)
+  // setup button handlers now (they stay hidden until ready)
+  _setupCompleteButtons();
+
+  if (hasSlot && typeof SlotMachine !== 'undefined') {
+    // short delay so player sees score first, then open slot
+    setTimeout(() => {
+      SlotMachine.open({
+        mode: 'guaranteed',
+        isLastVideo: false,
+        onResult: (abilityId) => {
+          // ability already unlocked by SlotMachine internally
+          if (abilityId) {
+            const aDef = AbilityRegistry.get(abilityId);
+            if (aDef) {
+              document.getElementById('complete-ability-icon').innerHTML =
+                '<img src="assets/abilities/' + aDef.id + '.png" width="48" height="48" style="image-rendering:pixelated">';
+              document.getElementById('complete-ability-name').textContent = aDef.name || aDef.id;
+              document.getElementById('complete-ability-desc').textContent = aDef.desc || '';
+              abilitySection.classList.remove('hidden');
+            }
+          }
+        },
+        onClose: () => {
+          // show buttons after slot closes
+          if (btnCol) btnCol.style.display = '';
+        },
+      });
+    }, 800);
+  } else {
+    // no slot — show buttons immediately
+    if (btnCol) btnCol.style.display = '';
+  }
+}
+
+function _setupCompleteButtons() {
+  const btnAgain = document.getElementById('btn-play-again');
+  const btnMaps  = document.getElementById('btn-complete-maps');
+
+  const newAgain = btnAgain.cloneNode(true);
+  btnAgain.parentNode.replaceChild(newAgain, btnAgain);
+  newAgain.addEventListener('click', () => {
+    if (Transition.isPlaying()) return;
+    completeOverlay.classList.add('hidden');
+    cleanupArena();
+    Transition.play('fast', () => {
+      equippedAbilityId = getEquippedAbility();
+      if (AdventureDirector.restart()) {
+        startGame(true);
+      } else {
+        showScreen(sMapSelect);
+        if (typeof initMapSelect === 'function') initMapSelect();
+      }
+    }, () => {
+      startGameLoop();
+    });
+  });
+
+  const newMaps = btnMaps.cloneNode(true);
+  btnMaps.parentNode.replaceChild(newMaps, btnMaps);
+  newMaps.addEventListener('click', () => {
+    if (Transition.isPlaying()) return;
+    completeOverlay.classList.add('hidden');
+    cleanupArena();
+    Transition.play('fast', () => {
+      showScreen(sMapSelect);
+      if (typeof initMapSelect === 'function') initMapSelect();
+    });
+  });
+}
+
+function _setupCompleteButtons() {
   const btnAgain = document.getElementById('btn-play-again');
   const btnMaps  = document.getElementById('btn-complete-maps');
 

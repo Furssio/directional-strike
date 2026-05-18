@@ -291,16 +291,14 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
   completed = true;
   active    = false;
 
-  // DO NOT remove enemies/bullets — they stay visible behind overlay
-  // cleanup happens when player presses a button
-
   Progress.markMapCompleted(currentMap.id);
-  const newlyUnlocked = currentMap.unlocksAbility
-    ? Progress.unlockAbility(currentMap.unlocksAbility)
-    : false;
+
+  // check if this map triggers guaranteed slot
+  const hasSlot = Progress.shouldTriggerSlot(currentMap.id);
+  if (hasSlot) Progress.markSlotGiven(currentMap.id);
 
   if (typeof showMapComplete === 'function') {
-    showMapComplete(currentMap, newlyUnlocked);
+    showMapComplete(currentMap, hasSlot);
   }
 },
     /* ── TICK ─────────────────────────── */

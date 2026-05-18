@@ -1,12 +1,11 @@
 /* ═══════════════════════════════════════
    SLOTMACHINE.JS
-   Reusable slot machine component for
-   ability unlocks.
+   3-reel slot machine for ability unlocks.
 
    Two modes:
-   - 'guaranteed': 1 spin, always finds ability
-   - 'menu': 3 spins, ~1/6 each, near-miss
-     on 3rd if all empty, guaranteed last video
+   - 'guaranteed': 1 spin, always match (3 equal)
+   - 'menu': 3 spins per video, ~1/6 each,
+     near-miss on 3rd if all empty
 
    Usage:
      SlotMachine.open({
@@ -36,19 +35,36 @@ const SlotMachine = (() => {
 
   /* ── DOM REFS ──────────────────────── */
   let _overlay, _card, _title, _subtitle;
-  let _window, _reel, _highlight;
+  let _reelWindow, _reels, _highlight;
   let _resultEl, _resultIcon, _resultName;
   let _resultRarity, _resultDesc;
   let _nearMissEl, _nearText;
   let _spinCount, _btn;
+
+  /* ── REEL CONFIG ───────────────────── */
+  const REEL_COUNT    = 3;
+  const ICONS_PER_REEL = 20;
+  const ICON_SIZE     = 48;
+  const ICON_GAP      = 6;
+  const ICON_STEP     = ICON_SIZE + ICON_GAP; // 54px per icon
+  const VISIBLE_ROWS  = 3; // show 3 rows in window
+  const WINDOW_H      = ICON_STEP * VISIBLE_ROWS - ICON_GAP; // 156px
+
+  // stagger delay between reels stopping (ms)
+  const REEL_STAGGER  = 350;
+  const BASE_DURATION = 1800;
 
   function _cacheDom() {
     _overlay      = document.getElementById('slot-overlay');
     _card         = document.getElementById('slot-card');
     _title        = document.getElementById('slot-title');
     _subtitle     = document.getElementById('slot-subtitle');
-    _window       = document.getElementById('slot-window');
-    _reel         = document.getElementById('slot-reel');
+    _reelWindow   = document.getElementById('slot-window');
+    _reels        = [
+      document.getElementById('slot-reel-0'),
+      document.getElementById('slot-reel-1'),
+      document.getElementById('slot-reel-2'),
+    ];
     _highlight    = document.getElementById('slot-highlight');
     _resultEl     = document.getElementById('slot-result');
     _resultIcon   = document.getElementById('slot-result-icon');
@@ -63,13 +79,28 @@ const SlotMachine = (() => {
 
   /* ── RARITY HELPERS ────────────────── */
   const RARITY_COLORS = {
-    rare:      { main: '#4488ff', glow: 'rgba(68,136,255,0.5)', label: 'RARE' },
-    epic:      { main: '#aa44ff', glow: 'rgba(170,68,255,0.5)', label: 'EPIC' },
-    legendary: { main: '#ffd700', glow: 'rgba(255,215,0,0.5)',  label: 'LEGENDARY' },
+    rare:      { main: '#4488ff', glow: 'rgba(68,136,255,0.5)',  label: 'RARE' },
+    epic:      { main: '#aa44ff', glow: 'rgba(170,68,255,0.5)',  label: 'EPIC' },
+    legendary: { main: '#ffd700', glow: 'rgba(255,215,0,0.5)',   label: 'LEGENDARY' },
   };
 
   function _getRarity(id) {
     return CONFIG.abilities.rarities[id] || 'rare';
+  }
+
+  /* ── ALL ABILITY IDS ───────────────── */
+  function _allIds() {
+    return Object.keys(CONFIG.abilities.rarities);
+  }
+
+  function _randomId() {
+    const ids = _allIds();
+    return ids[Math.floor(Math.random() * ids.length)];
+  }
+
+  function _randomIdExcept(excludeId) {
+    const ids = _allIds().filter(id => id !== excludeId);
+    return ids[Math.floor(Math.random() * ids.length)];
   }
 
   /* ── ROLL LOGIC ────────────────────── */
@@ -78,10 +109,12 @@ const SlotMachine = (() => {
     const locked = Progress.getLockedAbilities();
     if (locked.length === 0) return { result: null, nearMiss: false };
 
+    // guaranteed mode: always match
     if (_mode === 'guaranteed') {
       return { result: Progress.rollSlot(true), nearMiss: false };
     }
 
+    // menu mode
     const isThirdSpin = (_spins === _maxSpins - 1);
 
     // last video + last spin + nothing found = guaranteed
@@ -108,60 +141,65 @@ const SlotMachine = (() => {
     return legs[Math.floor(Math.random() * legs.length)];
   }
 
-  /* ── BUILD REEL ────────────────────── */
+  /* ── BUILD REELS ───────────────────── */
 
   /**
-   * Build the icon strip for animation.
-   * totalIcons spinning, last one is the target.
-   * For near-miss: second-to-last and third-to-last
-   * are the legendary, last is something else.
+   * Build 3 reels with random icons.
+   * Returns array of 3 target icon ids
+   * (what each reel lands on in center row).
    */
-  function _buildReel(rollData) {
-    _reel.innerHTML = '';
-    const locked  = Progress.getLockedAbilities();
-    const allIds  = Object.keys(CONFIG.abilities.rarities);
-    const count   = 18; // total icons in reel
-
-    // decide final icon
-    let finalId;
-    let nearMissLeg = null;
+  function _buildReels(rollData) {
+    const allIds = _allIds();
+    let targets = []; // what the center row shows
 
     if (rollData.result) {
-      finalId = rollData.result;
+      // match: all 3 same
+      targets = [rollData.result, rollData.result, rollData.result];
     } else if (rollData.nearMiss) {
-      nearMissLeg = _pickNearMissLegendary();
-      // final icon = anything NOT legendary
-      const nonLeg = allIds.filter(id =>
-        CONFIG.abilities.rarities[id] !== 'legendary');
-      finalId = nonLeg[Math.floor(Math.random() * nonLeg.length)];
+      // 2 match + 3rd different
+      const legId = _pickNearMissLegendary();
+      const diffId = _randomIdExcept(legId);
+      targets = [legId, legId, diffId];
     } else {
-      // empty spin — random icon
-      finalId = allIds[Math.floor(Math.random() * allIds.length)];
+      // no match: all different (make sure no accidental 3-match)
+      targets[0] = _randomId();
+      targets[1] = _randomId();
+      targets[2] = _randomId();
+      // prevent accidental triple match
+      while (targets[0] === targets[1] && targets[1] === targets[2]) {
+        targets[2] = _randomId();
+      }
     }
 
-    // fill reel with random icons
-    for (let i = 0; i < count; i++) {
-      let iconId;
+    // build each reel
+    for (let r = 0; r < REEL_COUNT; r++) {
+      const reel = _reels[r];
+      reel.innerHTML = '';
 
-      if (i === count - 1) {
-        // last = final target
-        iconId = finalId;
-      } else if (rollData.nearMiss && i >= count - 3 && i < count - 1) {
-        // near miss: 2 legendaries before final
-        iconId = nearMissLeg;
-      } else {
-        // random from all abilities
-        iconId = allIds[Math.floor(Math.random() * allIds.length)];
+      for (let i = 0; i < ICONS_PER_REEL; i++) {
+        let iconId;
+
+        // target is at index ICONS_PER_REEL - 2 (second to last)
+        // so center row in window lands on it
+        if (i === ICONS_PER_REEL - 2) {
+          iconId = targets[r];
+        } else {
+          iconId = allIds[Math.floor(Math.random() * allIds.length)];
+        }
+
+        const img = document.createElement('img');
+        img.src = 'assets/abilities/' + iconId + '.png';
+        img.alt = iconId;
+        img.dataset.id = iconId;
+        reel.appendChild(img);
       }
 
-      const img = document.createElement('img');
-      img.src = 'assets/abilities/' + iconId + '.png';
-      img.alt = iconId;
-      img.dataset.id = iconId;
-      _reel.appendChild(img);
+      // reset position
+      reel.style.transition = 'none';
+      reel.style.top = '0px';
     }
 
-    return count;
+    return targets;
   }
 
   /* ── ANIMATION ─────────────────────── */
@@ -170,44 +208,47 @@ const SlotMachine = (() => {
     _spinning = true;
     _btn.disabled = true;
 
-    const count = _buildReel(rollData);
-
-    // reset reel position to top
-    _reel.style.transition = 'none';
-    _reel.style.top = '0px';
+    const targets = _buildReels(rollData);
 
     // force reflow
-    _reel.offsetHeight;
+    _reels.forEach(r => r.offsetHeight);
 
-    // calculate target: center last icon in window
-    // each icon = 64px + 8px gap = 72px
-    const iconStep  = 72;
-    const windowH   = 80;
-    const targetIdx = count - 1;
-    const targetTop = -(targetIdx * iconStep) + (windowH / 2) - 32;
+    // target position: land icon at index (ICONS_PER_REEL - 2) in center row
+    // center row = row index 1 (of 0,1,2 visible)
+    // top of window shows row 0, center is row 1
+    // we want targetIdx icon at vertical center of window
+    const targetIdx = ICONS_PER_REEL - 2;
+    const centerOffset = Math.floor(VISIBLE_ROWS / 2) * ICON_STEP;
+    const targetTop = -(targetIdx * ICON_STEP) + centerOffset;
 
-    // animate with CSS transition — ease-out for slot feel
-    const duration = 2200;
-    _reel.style.transition = `top ${duration}ms cubic-bezier(0.15, 0.85, 0.35, 1.0)`;
+    // animate each reel with stagger
+    _reels.forEach((reel, i) => {
+      const duration = BASE_DURATION + (i * REEL_STAGGER);
+      const delay = i * 150; // start delay
 
-    // small delay then start
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        _reel.style.top = targetTop + 'px';
-      });
+      setTimeout(() => {
+        reel.style.transition = `top ${duration}ms cubic-bezier(0.15, 0.85, 0.35, 1.0)`;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            reel.style.top = targetTop + 'px';
+          });
+        });
+      }, delay);
     });
 
+    // callback after last reel stops
+    const totalTime = 150 * (REEL_COUNT - 1) + BASE_DURATION + (REEL_COUNT - 1) * REEL_STAGGER + 300;
     setTimeout(() => {
       _spinning = false;
       callback(rollData);
-    }, duration + 200);
+    }, totalTime);
   }
 
   /* ── SHOW RESULT ───────────────────── */
 
   function _showResult(rollData) {
     if (rollData.result) {
-      // found ability!
+      // match! unlock ability
       Progress.unlockAbility(rollData.result);
       _foundAny   = true;
       _lastResult = rollData.result;
@@ -217,7 +258,7 @@ const SlotMachine = (() => {
       const rc     = RARITY_COLORS[rarity];
 
       // glow on window
-      _window.className = 'glow-' + rarity;
+      _reelWindow.className = 'glow-' + rarity;
 
       // show result
       _resultIcon.innerHTML = '<img src="assets/abilities/' +
@@ -230,23 +271,21 @@ const SlotMachine = (() => {
       _resultEl.classList.remove('hidden');
       _nearMissEl.classList.add('hidden');
 
-      // sfx
       if (typeof SFX !== 'undefined') SFX.abilityPick();
 
     } else if (rollData.nearMiss) {
-      // near miss
-      _window.className = '';
+      // near miss — 2 match, 3rd different
+      _reelWindow.className = '';
       _resultEl.classList.add('hidden');
       _nearMissEl.classList.remove('hidden');
 
-      // shake the card
       _card.style.animation = 'none';
       _card.offsetHeight;
       _card.style.animation = 'nearMissShake 0.5s ease-out';
 
     } else {
       // empty
-      _window.className = '';
+      _reelWindow.className = '';
       _resultEl.classList.add('hidden');
       _nearMissEl.classList.add('hidden');
     }
@@ -257,7 +296,6 @@ const SlotMachine = (() => {
   }
 
   function _afterSpin() {
-    // guaranteed mode = 1 spin, done
     if (_mode === 'guaranteed') {
       _btn.textContent = 'CONTINUE';
       _btn.classList.add('slot-btn-done');
@@ -268,16 +306,10 @@ const SlotMachine = (() => {
 
     // menu mode: more spins?
     if (_spins < _maxSpins) {
-      _btn.textContent = 'SPIN';
+      _btn.textContent = _foundAny ? 'SPIN AGAIN' : 'SPIN';
       _btn.disabled = false;
       _btn.onclick  = _startSpin;
-
-      // if found something, change button
-      if (_foundAny) {
-        _btn.textContent = 'SPIN AGAIN';
-      }
     } else {
-      // all spins done
       _btn.textContent = _foundAny ? 'CONTINUE' : 'CLOSE';
       _btn.classList.add('slot-btn-done');
       _btn.disabled = false;
@@ -306,7 +338,7 @@ const SlotMachine = (() => {
     // reset visual state
     _resultEl.classList.add('hidden');
     _nearMissEl.classList.add('hidden');
-    _window.className = '';
+    _reelWindow.className = '';
 
     const rollData = _rollSpin();
     _animateSpin(rollData, _showResult);
@@ -318,11 +350,13 @@ const SlotMachine = (() => {
     _active = false;
     _overlay.classList.add('hidden');
 
-    // clean up reel
-    _reel.innerHTML = '';
-    _reel.style.transition = 'none';
-    _reel.style.top = '0px';
-    _window.className = '';
+    // clean up reels
+    _reels.forEach(r => {
+      r.innerHTML = '';
+      r.style.transition = 'none';
+      r.style.top = '0px';
+    });
+    _reelWindow.className = '';
     _btn.classList.remove('slot-btn-done');
 
     if (_onResult) _onResult(_lastResult);
@@ -337,12 +371,14 @@ const SlotMachine = (() => {
     // reset state
     _resultEl.classList.add('hidden');
     _nearMissEl.classList.add('hidden');
-    _window.className = '';
-    _reel.innerHTML = '';
+    _reelWindow.className = '';
+    _reels.forEach(r => {
+      r.innerHTML = '';
+      r.style.top = '0px';
+    });
     _btn.classList.remove('slot-btn-done');
     _btn.disabled = false;
 
-    // configure text
     if (_mode === 'guaranteed') {
       _title.textContent    = 'NEW ABILITY!';
       _subtitle.textContent = 'Tap to reveal your reward';
@@ -355,8 +391,6 @@ const SlotMachine = (() => {
 
     _updateSpinCount();
     _btn.onclick = _startSpin;
-
-    // show overlay
     _overlay.classList.remove('hidden');
   }
 

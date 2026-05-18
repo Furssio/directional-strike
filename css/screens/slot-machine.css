@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════
    SLOT MACHINE OVERLAY
-   Reusable ability unlock slot.
+   3-reel ability unlock slot.
    ═══════════════════════════════════════ */
 
 /* ── CONTAINER ── */
@@ -25,8 +25,8 @@
 #slot-card {
   position: relative;
   z-index: 1;
-  width: 78%;
-  max-width: 300px;
+  width: 85%;
+  max-width: 320px;
   background-image: url('../../assets/ui/menu_bg.png');
   background-size: 128px 128px;
   background-repeat: repeat;
@@ -34,7 +34,7 @@
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
-  padding: 24px 18px 20px;
+  padding: 24px 14px 20px;
   text-align: center;
   font-family: 'Press Start 2P', monospace;
 }
@@ -54,52 +54,56 @@
   letter-spacing: 0.5px;
 }
 
-/* ── SLOT WINDOW ── */
+/* ── SLOT WINDOW — 3 REELS ── */
 #slot-window {
   position: relative;
-  width: 80px;
-  height: 80px;
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  max-width: 240px;
+  height: 156px; /* 3 rows: 48+6 + 48+6 + 48 */
   margin: 0 auto 16px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.6);
   overflow: hidden;
+  padding: 0 8px;
 }
 
-/* reel — vertical strip of icons */
-#slot-reel {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 64px;
+/* single reel column */
+.slot-reel {
+  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  top: 0;
   transition: none;
 }
-#slot-reel img {
-  width: 64px;
-  height: 64px;
+.slot-reel img {
+  width: 48px;
+  height: 48px;
   image-rendering: pixelated;
   flex-shrink: 0;
 }
 
-/* center highlight line */
+/* center highlight — horizontal band across all 3 reels */
 #slot-highlight {
   position: absolute;
-  top: 50%;
   left: 0;
   right: 0;
-  height: 68px;
+  top: 50%;
+  height: 52px;
   transform: translateY(-50%);
-  border-top: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid rgba(255, 215, 0, 0.35);
+  border-bottom: 2px solid rgba(255, 215, 0, 0.35);
+  background: rgba(255, 215, 0, 0.05);
   pointer-events: none;
   z-index: 2;
 }
 
-/* ── SLOT WINDOW GLOW (on result) ── */
+/* ── WINDOW GLOW (on match) ── */
 #slot-window.glow-rare {
   border-color: #4488ff;
   box-shadow: 0 0 20px rgba(68, 136, 255, 0.6),
@@ -155,7 +159,7 @@
 /* ── NEAR MISS ── */
 #slot-near-miss {
   margin-bottom: 14px;
-  animation: nearMissShake 0.5s ease-out;
+  animation: nearMissIn 0.4s ease-out;
 }
 #slot-near-miss.hidden { display: none; }
 
@@ -214,6 +218,11 @@
 @keyframes resultIn {
   from { opacity: 0; transform: scale(0.8); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nearMissIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes legendaryPulse {
