@@ -34,38 +34,38 @@ const UPGRADE_CHAINS = [
   ]},
 
   { id: 'iron_skin', icon: '🛡️', tiers: [
-    { name: 'Iron Skin I',   desc: '-10% damage taken',
+    { name: 'Iron Skin I',   desc: 'take 10% less damage',
       apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.90; } },
-    { name: 'Iron Skin II',  desc: '-20% damage taken',
+    { name: 'Iron Skin II',  desc: 'take 20% less damage',
       apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.80; } },
-    { name: 'Iron Skin III', desc: '-30% damage taken',
+    { name: 'Iron Skin III', desc: 'take 30% less damage',
       apply(p) { p._defenseMult = (p._defenseMult || 1) * 0.70; } },
   ]},
 
   { id: 'long_reach', icon: '📡', tiers: [
-    { name: 'Long Reach I',   desc: '+3% attack range',
+    { name: 'Long Reach I',   desc: 'hit enemies further away',
       apply(p) { p.attackRangePct *= 1.03; updateRangeCircle(); } },
-    { name: 'Long Reach II',  desc: '+5% attack range',
+    { name: 'Long Reach II',  desc: 'hit enemies even further',
       apply(p) { p.attackRangePct *= 1.05; updateRangeCircle(); } },
-    { name: 'Long Reach III', desc: '+8% attack range',
+    { name: 'Long Reach III', desc: 'hit enemies much further',
       apply(p) { p.attackRangePct *= 1.08; updateRangeCircle(); } },
   ]},
 
   { id: 'sharp_blade', icon: '🗡️', tiers: [
-    { name: 'Sharp Blade I',   desc: '+10% attack power',
+    { name: 'Sharp Blade I',   desc: 'deal 10% more damage',
       apply(p) { p.damageMult *= 1.10; } },
-    { name: 'Sharp Blade II',  desc: '+20% attack power',
+    { name: 'Sharp Blade II',  desc: 'deal 20% more damage',
       apply(p) { p.damageMult *= 1.20; } },
-    { name: 'Sharp Blade III', desc: '+30% attack power',
+    { name: 'Sharp Blade III', desc: 'deal 30% more damage',
       apply(p) { p.damageMult *= 1.30; } },
   ]},
 
   { id: 'critical_hit', icon: '💥', tiers: [
-    { name: 'Critical Hit I',   desc: '15% chance for 2x damage',
+    { name: 'Critical Hit I',   desc: '15% chance to deal double damage',
       apply(p) { p._critChance = 0.15; } },
-    { name: 'Critical Hit II',  desc: '30% chance for 2x damage',
+    { name: 'Critical Hit II',  desc: '30% chance to deal double damage',
       apply(p) { p._critChance = 0.30; } },
-    { name: 'Critical Hit III', desc: '45% chance for 2x damage',
+    { name: 'Critical Hit III', desc: '45% chance to deal double damage',
       apply(p) { p._critChance = 0.45; } },
   ]},
 
@@ -79,63 +79,63 @@ const UPGRADE_CHAINS = [
   ]},
 
   { id: 'lucky_shield', icon: '🍀', tiers: [
-    { name: 'Lucky Shield I',   desc: '15% chance to block a hit',
+    { name: 'Lucky Shield I',   desc: '15% chance to dodge a hit',
       apply(p) { p._luckyBlockChance = 0.15; } },
-    { name: 'Lucky Shield II',  desc: '30% chance to block a hit',
+    { name: 'Lucky Shield II',  desc: '30% chance to dodge a hit',
       apply(p) { p._luckyBlockChance = 0.30; } },
-    { name: 'Lucky Shield III', desc: '40% chance to block a hit',
+    { name: 'Lucky Shield III', desc: '40% chance to dodge a hit',
       apply(p) { p._luckyBlockChance = 0.40; } },
   ]},
 
   { id: 'vampiric', icon: '🩸', tiers: [
-    { name: 'Vampiric I',   desc: 'heal 2% HP every 5 kills',
+    { name: 'Vampiric I',   desc: 'heal on every 5 kills',
       apply(p) { p._vampKillInterval = 5; p._vampHealPct = 0.02; p._vampKillCount = 0; } },
-    { name: 'Vampiric II',  desc: 'heal 3% HP every 4 kills',
+    { name: 'Vampiric II',  desc: 'heal on every 4 kills',
       apply(p) { p._vampKillInterval = 4; p._vampHealPct = 0.03; p._vampKillCount = 0; } },
-    { name: 'Vampiric III', desc: 'heal 4% HP every 3 kills',
+    { name: 'Vampiric III', desc: 'heal on every 3 kills',
       apply(p) { p._vampKillInterval = 3; p._vampHealPct = 0.04; p._vampKillCount = 0; } },
   ]},
 
   { id: 'ability_boost', icon: '⏱️', tiers: [
-    { name: 'Ability Boost I',   desc: '+20% ability duration',
+    { name: 'Ability Boost I',   desc: 'special lasts 20% longer',
       apply(p) { p._abilityDurationMult = 1.20; } },
-    { name: 'Ability Boost II',  desc: '+40% ability duration',
+    { name: 'Ability Boost II',  desc: 'special lasts 40% longer',
       apply(p) { p._abilityDurationMult = 1.40; } },
-    { name: 'Ability Boost III', desc: '+60% ability duration',
+    { name: 'Ability Boost III', desc: 'special lasts 60% longer',
       apply(p) { p._abilityDurationMult = 1.60; } },
   ]},
 
   { id: 'orb_hunter', icon: '🔮', tiers: [
-    { name: 'Orb Hunter I',   desc: '+10% orb spawn chance',
+    { name: 'Orb Hunter I',   desc: 'orbs appear 10% more often',
       apply(p) { p._orbChanceBonus = 0.10; } },
-    { name: 'Orb Hunter II',  desc: '+20% orb spawn chance',
+    { name: 'Orb Hunter II',  desc: 'orbs appear 20% more often',
       apply(p) { p._orbChanceBonus = 0.20; } },
-    { name: 'Orb Hunter III', desc: '+30% orb spawn chance',
+    { name: 'Orb Hunter III', desc: 'orbs appear 30% more often',
       apply(p) { p._orbChanceBonus = 0.30; } },
   ]},
 
   { id: 'berserker_atk', icon: '🔥', tiers: [
-    { name: 'Berserker ATK I',   desc: 'below 30% HP: +30% attack',
+    { name: 'Berserker ATK I',   desc: 'low HP: +30% damage',
       apply(p) { p._berserkerAtkThreshold = 0.30; p._berserkerAtkBonus = 0.30; } },
-    { name: 'Berserker ATK II',  desc: 'below 30% HP: +50% attack',
+    { name: 'Berserker ATK II',  desc: 'low HP: +50% damage',
       apply(p) { p._berserkerAtkThreshold = 0.30; p._berserkerAtkBonus = 0.50; } },
-    { name: 'Berserker ATK III', desc: 'below 30% HP: +75% attack',
+    { name: 'Berserker ATK III', desc: 'low HP: +75% damage',
       apply(p) { p._berserkerAtkThreshold = 0.30; p._berserkerAtkBonus = 0.75; } },
   ]},
 
   { id: 'berserker_def', icon: '🔥', tiers: [
-    { name: 'Berserker DEF I',   desc: 'below 30% HP: -20% damage',
+    { name: 'Berserker DEF I',   desc: 'low HP: take 20% less damage',
       apply(p) { p._berserkerDefThreshold = 0.30; p._berserkerDefBonus = 0.20; } },
-    { name: 'Berserker DEF II',  desc: 'below 30% HP: -35% damage',
+    { name: 'Berserker DEF II',  desc: 'low HP: take 35% less damage',
       apply(p) { p._berserkerDefThreshold = 0.30; p._berserkerDefBonus = 0.35; } },
-    { name: 'Berserker DEF III', desc: 'below 30% HP: -50% damage',
+    { name: 'Berserker DEF III', desc: 'low HP: take 50% less damage',
       apply(p) { p._berserkerDefThreshold = 0.30; p._berserkerDefBonus = 0.50; } },
   ]},
 
   { id: 'extra_slot', icon: '⚡', tiers: [
-    { name: 'Extra Slot I',  desc: '+1 special charge (max 2)',
+    { name: 'Extra Slot I',  desc: '+1 special charge',
       apply(p) { p._maxSpecialSlots = 2; } },
-    { name: 'Extra Slot II', desc: '+1 special charge (max 3)',
+    { name: 'Extra Slot II', desc: '+1 special charge',
       apply(p) { p._maxSpecialSlots = 3; } },
   ]},
 
@@ -184,6 +184,9 @@ function _buildAvailablePool() {
 
 function startUpgradeChoice() {
   _choosingUpgrade = true;
+
+  // hide wave timer during upgrade choice
+  if (_timerEl) _timerEl.style.display = 'none';
 
   // cancel any active ability and orb buffs
   if (typeof cleanupAbilityEffects === 'function') cleanupAbilityEffects();
@@ -353,9 +356,11 @@ function _showCountdown(from, callback) {
   const delayMs = 800;
 
   function showNext() {
-    if (count <= 0) {
+   if (count <= 0) {
       SFX.countdownGo();
       countEl.style.display = 'none';
+      // restore wave timer
+      if (_timerEl) _timerEl.style.display = 'block';
       callback();
       return;
     }

@@ -38,8 +38,7 @@ const btnMute        = document.getElementById('btn-mute');
 /* ── UTILITIES ── */
 
 function getArenaSize() {
-  const r = arena.getBoundingClientRect();
-  return { w: r.width, h: r.height };
+  return { w: arena.offsetWidth, h: arena.offsetHeight };
 }
 
 function hexToRgb(hex) {

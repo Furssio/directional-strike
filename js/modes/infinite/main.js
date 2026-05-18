@@ -6,6 +6,9 @@
 
 const SCRIPTS = [
 
+  /* ── SCALER ── */
+  'js/scaler.js',
+
   /* ── CONFIG ── */
   'js/config.js',
 

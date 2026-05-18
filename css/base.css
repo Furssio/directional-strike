@@ -12,7 +12,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;}
 body{background:#000 url('../assets/ui/menu_bg.png') center center / cover no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Press Start 2P',monospace;overflow:hidden;}
-#G{width:100%;max-width:620px;padding:0;}
+#G{width:620px;padding:0;transform-origin:center center;}
 
 #screen-menu,#screen-game,#screen-over{width:100%;}
 #screen-game,#screen-over,#screen-ability,#screen-map-select,#screen-map-complete{display:none;}

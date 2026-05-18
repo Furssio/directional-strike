@@ -77,8 +77,14 @@ function updateProgress() {
     const s    = secs % 60;
     const timeStr = mins + ':' + (s < 10 ? '0' : '') + s;
 
-    // update timer display
+   // update timer display
     if (!_timerEl) _createTimerEl();
+    // hide timer during upgrade choice and countdown
+    if (_choosingUpgrade || _countdownActive || _inputBlocked ||
+        _challengeChoiceActive || _challengeCountdown || _challengeInputBlocked) {
+      _timerEl.style.display = 'none';
+      return;
+    }
     _timerEl.textContent = timeStr;
 
     // color: white > yellow > red as time runs out

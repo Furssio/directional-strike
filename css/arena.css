@@ -376,7 +376,7 @@
   border: 2px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;
   padding: 8px 10px 6px;
-  min-width: 80px;
+  width: 150px;
   image-rendering: pixelated;
   box-shadow:
     0 0 0 1px rgba(0,0,0,0.8),
@@ -398,7 +398,7 @@
 
 .upgrade-card-name {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
+  font-size: 6px;
   color: #FFD700;
   text-shadow: 1px 1px 0 #000;
   margin-bottom: 4px;
