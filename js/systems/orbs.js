@@ -315,6 +315,16 @@ const OrbSystem = (() => {
       playerEl.classList.remove('orb-heal-effect', 'orb-attack-effect', 'orb-defense-effect');
     },
 
+    /* ── FORCE DEFENSE BUFF ──────────────
+       Used by ad continue system to apply
+       defense boost without spawning orb.
+       Duration in ms (default 8000).      */
+    _forceDefenseBuff(durationMs) {
+      _defenseBuffMs = durationMs || DEFENSE_DURATION;
+      playerEl.classList.add('orb-defense-effect');
+      _showOrbLabel('DEF BOOST x2', '#4488ff');
+    },
+
     /* ── DEBUG INTERFACE ─────────────────
        Only used by debug.js. */
     _debug() {

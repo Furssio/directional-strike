@@ -558,6 +558,16 @@ const ChallengeDirector = (() => {
       return this.init();
     },
 
+    /* ── RESTART CURRENT WAVE ────────────
+       Used by ad continue system.
+       Restarts the same wave from scratch
+       without advancing. Re-activates
+       the director.                       */
+    restartCurrentWave() {
+      this._startWave(wave);
+      active = true;
+    },
+
     /* ── DEBUG INTERFACE ─────────────── */
     _debug() {
       return {

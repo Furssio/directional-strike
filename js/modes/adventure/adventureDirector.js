@@ -407,6 +407,15 @@ if (waveTimeLeft <= 0) {
       return this.init(currentMap.id);
     },
 
+    /* ── RESTART CURRENT WAVE ────────────
+       Used by ad continue system.
+       Restarts the same wave from scratch
+       without advancing. Re-activates
+       the director.                       */
+    restartCurrentWave() {
+      this._startWave(wave);
+      active = true;
+    },
     /* ── DEBUG INTERFACE ─────────────────
        Only used by debug.js when CONFIG.debug = true.
        Returns snapshot of internal state. */

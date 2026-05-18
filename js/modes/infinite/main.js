@@ -60,6 +60,9 @@ const SCRIPTS = [
   'js/audio/index.js',
   'js/audio/uiBind.js',
   
+  /* ── AD SYSTEM ── */
+  'js/adPlaceholder.js',
+
   /* ── STATE ── */
   'js/state.js',
 

@@ -63,6 +63,9 @@ function cleanupAbilityEffects() {
 function startGame(delayLoop) {
   SFX.init();
 
+  // reset ad continue for new run
+  if (typeof AdPlaceholder !== 'undefined') AdPlaceholder.resetContinue();
+
   // cleanup any active ability effects from previous game
   cleanupAbilityEffects();
 
@@ -126,9 +129,6 @@ function endGame() {
     ChallengeDirector.onGameOver();
   }
 
-  // DO NOT remove enemies/bullets — they stay visible behind overlay
-  // cleanup happens when player presses a button
-
   const best  = getBestScore();
   const isNew = player.score > best;
   if (isNew) saveBestScore(player.score);
@@ -141,8 +141,124 @@ function endGame() {
 
   updateMenuBest();
 
-  // show game over overlay (game screen stays visible)
+  // ── AD CONTINUE BUTTON ──
+  _buildAdContinueButton();
+
+  // show game over overlay
   overOverlay.classList.remove('hidden');
+}
+
+/* ── AD CONTINUE BUTTON ──────────────
+   Builds the "watch ad to continue"
+   button inside #over-ad-slot.
+   Only shown once per run.
+   Challenge mode: hidden if past best. */
+
+function _buildAdContinueButton() {
+  const slot = document.getElementById('over-ad-slot');
+  if (!slot) return;
+  slot.innerHTML = '';
+
+  if (typeof AdPlaceholder === 'undefined') return;
+  if (!AdPlaceholder.canContinue()) return;
+
+  const btn = document.createElement('button');
+  btn.className = 'over-btn over-btn-ad';
+  btn.innerHTML = '▶ WATCH AD — CONTINUE';
+  slot.appendChild(btn);
+
+  btn.addEventListener('click', () => {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+
+    AdPlaceholder.showRewarded(() => {
+      AdPlaceholder.useContinue();
+      _executeContinue();
+    }, () => {
+      // ad failed — re-enable button
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    });
+  });
+}
+
+/* ── EXECUTE CONTINUE ────────────────
+   Resumes game from start of current
+   wave with full HP and defense boost.
+   Cleans arena, shows 3-2-1 countdown,
+   then restarts the game loop.          */
+
+function _executeContinue() {
+  // hide game over overlay
+  overOverlay.classList.add('hidden');
+
+  // clean arena (enemies, bullets, particles)
+  cleanupArena();
+
+  // restore player HP to full
+  player.hp = player.maxHp;
+  updateHpBar();
+
+  // apply defense boost (same as orb defense, 8s)
+  if (typeof OrbSystem !== 'undefined') {
+    // use orb system internal state for consistency
+    // we trigger it via the public effect
+    playerEl.classList.add('orb-defense-effect');
+  }
+
+  // reset spawner gates
+  if (typeof resetAdventureSpawner === 'function') resetAdventureSpawner();
+
+ // restart current wave (not wave+1)
+  ActiveDirector.restartCurrentWave();
+
+  // re-activate game loop flag
+  running = true;
+
+  // show countdown then start loop
+  _showContinueCountdown(() => {
+    // apply defense buff AFTER countdown
+    // so the 8s timer starts when gameplay begins
+    if (typeof OrbSystem !== 'undefined') {
+      OrbSystem._forceDefenseBuff(8000);
+    }
+    startGameLoop();
+  });
+}
+
+/* ── CONTINUE COUNTDOWN ──────────────
+   3-2-1 countdown overlay before
+   resuming gameplay after ad continue. */
+
+function _showContinueCountdown(onComplete) {
+  let count = 3;
+
+  const pop = document.createElement('div');
+  pop.className = 'continue-countdown';
+  pop.style.cssText =
+    'position:absolute;inset:0;display:flex;' +
+    'align-items:center;justify-content:center;z-index:80;' +
+    'pointer-events:none;';
+
+  const num = document.createElement('div');
+  num.style.cssText =
+    'font-family:"Press Start 2P",monospace;' +
+    'font-size:48px;color:#51eefc;' +
+    'text-shadow:0 0 20px rgba(81,238,252,0.5),2px 2px 0 #000;';
+  num.textContent = count;
+  pop.appendChild(num);
+  arena.appendChild(pop);
+
+  const iv = setInterval(() => {
+    count--;
+    if (count <= 0) {
+      clearInterval(iv);
+      pop.remove();
+      if (onComplete) onComplete();
+    } else {
+      num.textContent = count;
+    }
+  }, 800);
 }
 
 /* cleanup enemies/bullets — called when leaving game over */
