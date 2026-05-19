@@ -160,11 +160,11 @@ function _renderCarousel() {
   // visual level number (1-based index in display order)
   const visualLevel = DISPLAY_ORDER.indexOf(map.id) + 1;
   const isBoss      = _isBossMap(map.id);
-  const moonDone    = Progress.isMapCompleted('moon');
+  const moonDone    = Progress.isMapCompleted('map12_moon');
 
   // header
   document.getElementById('carousel-map-name').textContent =
-    (isBoss && !moonDone) ? map.name : map.name;
+    (isBoss && !moonDone) ? '???' : map.name;
 
   // sub text
   const sub = document.getElementById('carousel-map-sub');
@@ -173,7 +173,7 @@ function _renderCarousel() {
     sub.textContent = 'COMING SOON';
     sub.classList.add('coming-soon');
   } else if (isBoss) {
-    sub.textContent = 'LOCKED';
+    sub.textContent = 'BOSS FIGHT';
   } else {
     sub.textContent = `level ${visualLevel}`;
   }
@@ -196,10 +196,17 @@ function _renderCarousel() {
   const btn      = document.getElementById('btn-map-play');
   btn.disabled   = !unlocked;
 
-  // sync map preview background
+ // sync map preview background
   const demoEl = document.getElementById('mapselect-demo');
   if (demoEl && map.background) {
     demoEl.style.backgroundImage = `url(${map.background})`;
+    if (isBoss && !moonDone) {
+      demoEl.style.filter = 'brightness(0.05)';
+    } else if (isBoss) {
+      demoEl.style.filter = 'brightness(0.25)';
+    } else {
+      demoEl.style.filter = '';
+    }
   }
 
   // enemy card — hide for boss maps

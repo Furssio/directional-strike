@@ -447,13 +447,22 @@
   box-shadow: none;
 }
 
-/* ── Boss locked — slightly darker than normal locked ── */
+/* ── Boss locked — nearly invisible ── */
 .map-slide.is-boss.is-locked {
-  filter: brightness(0.15) !important;
+  filter: brightness(0.05) !important;
 }
 
 .map-slide.is-boss.is-locked.pos-center {
-  filter: brightness(0.35) !important;
+  filter: brightness(0.1) !important;
+}
+
+/* ── Boss revealed (moon completed) — dark but visible ── */
+.map-slide.is-boss.is-locked.is-glitch {
+  filter: brightness(0.15) saturate(0.5) !important;
+}
+
+.map-slide.is-boss.is-locked.is-glitch.pos-center {
+  filter: brightness(0.35) saturate(1.2) !important;
 }
 
 /* ── Glitch effect — after moon completed ── */

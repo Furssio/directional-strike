@@ -49,7 +49,7 @@ const Tutorial = (() => {
     el.id = 'tutorial-hint';
     el.style.cssText =
       'position:absolute;z-index:200;' +
-      'left:50%;top:50%;transform:translate(-50%,-50%);' +
+      'left:50%;top:50%;transform:translate(-50%,40px);' +
       'pointer-events:none;' +
       'animation:tutorialPulse 0.6s ease-in-out infinite alternate;';
 
@@ -140,7 +140,7 @@ const Tutorial = (() => {
     _phase = 1;
     _step  = 0;
     // step 0: spawn ravager from right
-    _phaseAEnemy = _spawnFromDir('ravager', 'right', 0.4);
+    _phaseAEnemy = _spawnFromDir('ravager', 'right', 0.8);
   }
 
   function _tickPhaseA() {
@@ -162,7 +162,7 @@ const Tutorial = (() => {
 
     // step 2: spawn ravager from up
     if (_step === 2) {
-      _phaseAEnemy = _spawnFromDir('ravager', 'up', 0.4);
+      _phaseAEnemy = _spawnFromDir('ravager', 'up', 0.8);
       _step = 3;
       return;
     }
@@ -184,8 +184,8 @@ const Tutorial = (() => {
 
     // step 5: spawn 2 ravagers (left + down) — no freeze, player handles alone
     if (_step === 5) {
-      _spawnFromDir('ravager', 'left', 0.5);
-      _spawnFromDir('ravager', 'down', 0.5);
+      _spawnFromDir('ravager', 'left', 0.9);
+      _spawnFromDir('ravager', 'down', 0.9);
       _step = 6;
       return;
     }
@@ -210,7 +210,7 @@ const Tutorial = (() => {
     _step  = 0;
     _phaseBWaiting = false;
     // spawn crusher from top, slow
-    _phaseBCrusher = _spawnFromDir('crusher', 'up', 0.3);
+    _phaseBCrusher = _spawnFromDir('crusher', 'up', 0.6);
   }
 
   function _tickPhaseB() {
@@ -266,10 +266,10 @@ const Tutorial = (() => {
     updateSpecialBar();
 
     // spawn 4 ravagers from all directions
-    _spawnFromDir('ravager', 'up',    0.35);
-    _spawnFromDir('ravager', 'down',  0.35);
-    _spawnFromDir('ravager', 'left',  0.35);
-    _spawnFromDir('ravager', 'right', 0.35);
+    _spawnFromDir('ravager', 'up',    0.8);
+    _spawnFromDir('ravager', 'down',  0.8);
+    _spawnFromDir('ravager', 'left',  0.8);
+    _spawnFromDir('ravager', 'right', 0.8);
   }
 
   function _tickPhaseC() {
