@@ -114,15 +114,19 @@ devUnlockMapsOnly: true,  // unlock maps but NOT abilities (for slot testing)
      Visual feedback parameters.
   ─────────────────────────────────────── */
   juice: {
-    particles: {
-      killCount:      10,
-      killCountElite: 18,
-      minSize:        3,
-      maxSize:        7,
-      minSpeed:       1.8,
-      maxSpeed:       4.5,
-      lifetime:       420,
-    },
+  particles: {
+  killCount:      12,
+  killCountElite: 20,
+  minSize:        3,
+  maxSize:        8,
+  minSpeed:       2.5,
+  maxSpeed:       6.0,
+  friction:       0.92,
+  minLifetime:    300,
+  maxLifetime:    600,
+  flash:          true,
+  flashDuration:  60,
+},
     hitFlashMs:       110,
     shakeOnDamage:    true,
     shakeOnKillElite: true,

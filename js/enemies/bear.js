@@ -19,6 +19,7 @@ EnemyRegistry.register({
   points:    4538,
   hitSound:  'flesh',
   shoots:    false,
+  deathColors: ['#885533', '#aa7744', '#664422'],
 
   onTick(e, cx, cy, attackRange) {
     const dx   = e.x - cx;

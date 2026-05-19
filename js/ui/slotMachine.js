@@ -152,7 +152,7 @@ const SlotMachine = (() => {
       _resultDesc.textContent   = aDef ? (aDef.desc || '') : '';
       _resultEl.classList.remove('hidden');
       _nearMissEl.classList.add('hidden');
-      if (typeof SFX !== 'undefined') SFX.abilityPick();
+      if (typeof SFX !== 'undefined') SFX.slotWin();
 
     } else if (rollData.nearMiss) {
       // NEAR MISS
@@ -160,6 +160,7 @@ const SlotMachine = (() => {
       _resultEl.classList.add('hidden');
       _nearMissEl.classList.remove('hidden');
       _nearText.textContent = 'SO CLOSE!';
+      if (typeof SFX !== 'undefined') SFX.slotNearMiss();
       _card.style.animation = 'none';
       _card.offsetHeight;
       _card.style.animation = 'nearMissShake 0.5s ease-out';
@@ -284,7 +285,7 @@ const SlotMachine = (() => {
 
   /* ── SHOW UI ───────────────────────── */
 
-  function _showUI() {
+ function _showUI() {
     _cacheDom();
 
     // reset everything
@@ -292,6 +293,8 @@ const SlotMachine = (() => {
     _nearMissEl.classList.add('hidden');
     _reelWindow.className = '';
     SlotReels.reset(_reels);
+    // pre-fill reels with random icons (not empty)
+    SlotReels.showInitial(_reels);
     _btn.classList.remove('slot-btn-done');
     _btn.disabled = false;
     if (_closeBtn) _closeBtn.classList.add('hidden');

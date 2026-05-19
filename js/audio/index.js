@@ -80,8 +80,12 @@ const SFX = {
   countdown:    () => SfxUi.countdown(),
   countdownGo:  () => SfxUi.countdownGo(),
   mapComplete:  () => SfxUi.mapComplete(),
-  transIn:      () => SfxUi.transIn(),
+ transIn:      () => SfxUi.transIn(),
   transOut:     () => SfxUi.transOut(),
+  slotTick:     () => SfxUi.slotTick(),
+  slotStop:     () => SfxUi.slotStop(),
+  slotWin:      () => SfxUi.slotWin(),
+  slotNearMiss: () => SfxUi.slotNearMiss(),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),

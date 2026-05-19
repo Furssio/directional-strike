@@ -350,7 +350,7 @@ updateProgress();
     }
 
    if (!e.underground && !e.def.customOpacity) {
-      e.el.style.opacity = dist <= attackRange ? '1' : '0.5';
+      e.el.style.opacity = dist <= attackRange ? '1' : '0.70';
     }
     if (e.def.onTick && !e.frozen) e.def.onTick(e, cx, cy, attackRange);
 

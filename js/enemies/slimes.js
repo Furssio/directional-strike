@@ -22,6 +22,7 @@ EnemyRegistry.register({
   points:      855,
   hitSound:  'slime',
   shoots:      false,
+  deathColors: ['#44cc55', '#22aa33', '#88ff77'],
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 28;
     if (distToCenter <= 160) return 20;
@@ -111,6 +112,7 @@ EnemyRegistry.register({
   points:      300,
   hitSound:  'slime',
   shoots:      false,
+  deathColors: ['#44cc55', '#22aa33', '#88ff77'],
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 12;
     if (distToCenter <= 160) return 6;

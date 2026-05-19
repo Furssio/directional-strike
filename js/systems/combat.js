@@ -157,7 +157,7 @@ function handleDir(dir) {
 
       anyHit = true;
       SFX.parry();
-      spawnParticles(b.x, b.y, '#378ADD', false);
+      spawnParticles(b.x, b.y, { size: 24, deathColors: ['#378ADD', '#55aaff', '#2266bb'] });
       showActionPop(d, 'PARRY', '#44ddff');
       b.el.remove();
       if (b.owner) b.owner.hasBullet = false;
@@ -178,7 +178,7 @@ function handleDir(dir) {
 
       anyHit = true;
       SFX.parry();
-      spawnParticles(e.x, e.y, '#aaaaff', false);
+      spawnParticles(e.x, e.y, e.def);
       showActionPop(d, 'PARRY', '#44ddff');
       e.el.remove();
       enemies.splice(i, 1);
@@ -226,7 +226,7 @@ function handleDir(dir) {
 
         if (!e.isAlive()) {
           _killsThisSwing++;
-          spawnParticles(e.x, e.y, player.color, e.isElite);
+          spawnParticles(e.x, e.y, e.def);
           e.el.remove();
           enemies.splice(i, 1);
           registerKill(e, _killsThisSwing);
@@ -288,7 +288,7 @@ function handleDir(dir) {
 
         if (!e.isAlive()) {
           _killsThisSwing++;
-          spawnParticles(e.x, e.y, player.color, e.isElite);
+          spawnParticles(e.x, e.y, e.def);
           e.el.remove();
           enemies.splice(i, 1);
           registerKill(e, _killsThisSwing);

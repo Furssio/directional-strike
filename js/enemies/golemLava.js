@@ -19,6 +19,7 @@ EnemyRegistry.register({
   points:    1476,
   hitSound:  'rock',
   shoots:    false,
+   deathColors: ['#ff4400', '#cc6633', '#884422', '#ffaa33'],
 
   onDeath(parent) {
     const childDef = EnemyRegistry.get('golem_lava_small');
@@ -104,6 +105,7 @@ EnemyRegistry.register({
   points:    800,
   hitSound:  'rock',
   shoots:    false,
+  deathColors: ['#ff4400', '#cc6633', '#ffaa33'],
 
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 15;

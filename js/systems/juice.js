@@ -7,40 +7,126 @@
    Depends on: dom.js, config.js
    ═══════════════════════════════════════ */
 
-function spawnParticles(x, y, color, isElite) {
-  const cfg   = CONFIG.juice.particles;
-  const count = isElite ? cfg.killCountElite : cfg.killCount;
+/* ── DEFAULT DEATH COLORS ─────────────
+   Used when enemy has no deathColors.
+   Based on enemy size bracket.
+──────────────────────────────────────── */
+const _defaultDeathColors = {
+  small:  ['#ffffff', '#cccccc', '#999999'],
+  medium: ['#ffffff', '#dddddd', '#aaaaaa'],
+  large:  ['#ffffff', '#eeeeee', '#bbbbbb'],
+};
 
+/* ── KILL FLASH ───────────────────────── */
+function _spawnKillFlash(x, y) {
+  const cfg = CONFIG.juice.particles;
+  if (!cfg.flash) return;
+
+  const fl = document.createElement('div');
+  fl.style.cssText = `
+    position:absolute;left:${x}px;top:${y}px;
+    width:24px;height:24px;
+    background:radial-gradient(circle,rgba(255,255,255,0.9),rgba(255,255,255,0) 70%);
+    border-radius:50%;pointer-events:none;
+    transform:translate(-50%,-50%);z-index:90;
+  `;
+  arena.appendChild(fl);
+  setTimeout(() => fl.remove(), cfg.flashDuration);
+}
+
+/* ── MAIN PARTICLE SYSTEM ─────────────── */
+function spawnParticles(x, y, enemyDef) {
+  const cfg = CONFIG.juice.particles;
+
+  // resolve death config from enemy def
+  const dp = (enemyDef && enemyDef.deathParticles) || {};
+  const enemySize = (enemyDef && enemyDef.size) || 48;
+
+  // pick color palette
+  let colors;
+  if (dp.colors && dp.colors.length) {
+    colors = dp.colors;
+  } else if (enemyDef && enemyDef.deathColors && enemyDef.deathColors.length) {
+    colors = enemyDef.deathColors;
+  } else {
+    if (enemySize <= 48)       colors = _defaultDeathColors.small;
+    else if (enemySize <= 72)  colors = _defaultDeathColors.medium;
+    else                       colors = _defaultDeathColors.large;
+  }
+
+  // count
+  const isElite = enemySize >= 80;
+  const baseCount = isElite ? cfg.killCountElite : cfg.killCount;
+  const count = dp.count || baseCount;
+
+  // physics overrides
+  const fric = dp.friction != null ? dp.friction : cfg.friction;
+
+  // flash
+  _spawnKillFlash(x, y);
+
+  // spawn particles
   for (let i = 0; i < count; i++) {
-    const p     = document.createElement('div');
+    const p = document.createElement('div');
     p.className = 'particle';
 
-    const size  = cfg.minSize + Math.random() * (cfg.maxSize - cfg.minSize);
+    const size = cfg.minSize + Math.random() * (cfg.maxSize - cfg.minSize);
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    // explode outward — random direction
     const angle = Math.random() * Math.PI * 2;
     const speed = cfg.minSpeed + Math.random() * (cfg.maxSpeed - cfg.minSpeed);
-    const vx    = Math.cos(angle) * speed;
-    const vy    = Math.sin(angle) * speed;
+    let vx = Math.cos(angle) * speed;
+    let vy = Math.sin(angle) * speed;
 
-    p.style.cssText = `width:${size}px;height:${size}px;background:${color};left:${x}px;top:${y}px;opacity:1;`;
+    // lifetime variance
+    const lifetime = cfg.minLifetime + Math.random() * (cfg.maxLifetime - cfg.minLifetime);
+
+    // offset from origin
+    let px = 0;
+    let py = 0;
+
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      background:${color};
+      left:${x}px;top:${y}px;
+      opacity:1;border-radius:0;
+      pointer-events:none;
+    `;
     arena.appendChild(p);
 
     const start = performance.now();
 
     function animParticle(now) {
-      const t = (now - start) / cfg.lifetime;
+      const elapsed = now - start;
+      const t = elapsed / lifetime;
       if (t >= 1) { p.remove(); return; }
 
-      p.style.left      = (x + vx * speed * t * 18) + 'px';
-      p.style.top       = (y + vy * speed * t * 18) + 'px';
-      p.style.opacity   = 1 - t;
-      p.style.transform = `translate(-50%,-50%) scale(${1 - t * 0.5})`;
+      // friction slows them down — they stop naturally
+      vx *= fric;
+      vy *= fric;
+
+      px += vx;
+      py += vy;
+
+      // fade out in last 40%
+      const opacity = t > 0.6 ? 1 - ((t - 0.6) / 0.4) : 1;
+
+      // scale down in last 25%
+      const scale = t > 0.75 ? 1 - ((t - 0.75) / 0.25) * 0.5 : 1;
+
+      p.style.left = (x + px) + 'px';
+      p.style.top = (y + py) + 'px';
+      p.style.opacity = opacity;
+      p.style.transform = `translate(-50%,-50%) scale(${scale})`;
+
       requestAnimationFrame(animParticle);
     }
 
     requestAnimationFrame(animParticle);
   }
 }
-
+/* ── SCREEN SHAKE ─────────────────────── */
 let shakeTimeout = null;
 function triggerShake() {
   if (!CONFIG.juice.shakeOnDamage) return;
@@ -50,6 +136,8 @@ function triggerShake() {
   clearTimeout(shakeTimeout);
   shakeTimeout = setTimeout(() => arena.classList.remove('shake'), 300);
 }
+
+/* ── SAND PARTICLES (desert map) ──────── */
 function spawnSandParticle(x, y) {
   const p = document.createElement('div');
   p.className = 'particle';

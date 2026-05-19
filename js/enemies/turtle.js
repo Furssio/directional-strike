@@ -15,6 +15,7 @@ EnemyRegistry.register({
   points:    3553,
   hitSound:  'shell',
   shoots:    false,
+   deathColors: ['#448844', '#669944', '#336633', '#88aa66'],
 
   onHit(e) {
     if (e._exposed) return;

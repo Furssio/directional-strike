@@ -18,6 +18,7 @@ EnemyRegistry.register({
   points:    2500,
   hitSound:  'rock',
   shoots:    false,
+  deathColors: ['#888888', '#666666', '#aaaaaa', '#555555'],
   calcStress(distToCenter) {
   if (distToCenter <= 80)  return 40;
   if (distToCenter <= 160) return 30;

@@ -18,7 +18,8 @@ EnemyRegistry.register({
   points:    899,
   hitSound:  'flesh',
   shoots:    false,
+  deathColors: ['#cc3333', '#ff5544', '#881111'],
   calcStress(distToCenter) {
-    return 0; // handled as group in calculator
+    return 0;
   },
 });

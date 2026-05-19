@@ -20,7 +20,7 @@ EnemyRegistry.register({
   underground:     true,
   undergroundSpeed: 0.5,
   customOpacity:   true,
-
+deathColors: ['#cc5533', '#ff7744', '#993322'],
   onTick(e, cx, cy, attackRange) {
     const dx   = e.x - cx;
     const dy   = e.y - cy;
@@ -102,6 +102,7 @@ EnemyRegistry.register({
   hitSound:  'shell',
   shoots:    false,
   noHpBar:   true,
+  deathColors: ['#cc5533', '#ff7744', '#993322'],
 
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 10;

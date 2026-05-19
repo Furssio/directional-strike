@@ -538,7 +538,7 @@
   50%      { opacity: 1; }
 }
 /* ══════════════════════════════════════
-   SLOT BUTTON — above ability card
+   SLOT BUTTON — watch ad for spins
    ══════════════════════════════════════ */
 .slot-menu-btn {
   position: absolute;
@@ -548,44 +548,105 @@
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
-  background: rgba(255, 215, 0, 0.08);
+  gap: 8px;
+  padding: 10px 10px;
+  background: rgba(255, 215, 0, 0.06);
   border: 1px solid rgba(255, 215, 0, 0.25);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .slot-menu-btn:hover {
   background: rgba(255, 215, 0, 0.15);
-  border-color: rgba(255, 215, 0, 0.45);
+  border-color: rgba(255, 215, 0, 0.5);
 }
 
 .slot-menu-btn.hidden { display: none; }
 
 .slot-menu-icon {
-  font-size: 16px;
-  line-height: 1;
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
 }
 
 .slot-menu-label {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 3px;
 }
 
 .slot-menu-ad {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
+  font-size: 7px;
   color: #ffd700;
   letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
+
+.slot-menu-detail {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: var(--c-text-dim);
+  opacity: 0.8;
 }
 
 #slot-menu-count {
   font-family: 'Press Start 2P', monospace;
   font-size: 5px;
   color: var(--c-text-dim);
+  opacity: 0.6;
+}
+
+/* ══════════════════════════════════════
+   SLOT BADGE — corner tag on map slides
+   that give a guaranteed free spin
+   ══════════════════════════════════════ */
+.slide-slot-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.85) 60%, transparent);
+  padding: 6px 10px 6px 6px;
+  border-radius: 0 8px 0 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.slide-slot-badge img {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+}
+
+.slide-slot-badge span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: #ffd700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+}
+
+/* hide on non-center slides */
+.map-slide:not(.pos-center) .slide-slot-badge {
+  opacity: 0;
+}
+
+/* bigger on center slide */
+.map-slide.pos-center .slide-slot-badge {
+  padding: 8px 14px 8px 8px;
+}
+
+.map-slide.pos-center .slide-slot-badge img {
+  width: 28px;
+  height: 28px;
+}
+
+.map-slide.pos-center .slide-slot-badge span {
+  font-size: 7px;
 }

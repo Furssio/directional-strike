@@ -19,6 +19,7 @@ EnemyRegistry.register({
   points:    2222,
   hitSound:  'ethereal',
   shoots:    false,
+  deathColors: ['#4488ff', '#2255cc', '#aaddff'],
   
 
   onHit(e) {

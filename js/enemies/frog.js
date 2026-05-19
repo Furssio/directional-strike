@@ -21,7 +21,7 @@ EnemyRegistry.register({
   shoots:    false,
   noHpBar:   true,
   customMovement: true,
-
+deathColors: ['#55aa44', '#88cc66', '#337722'],
   onTick(e, cx, cy) {
     if (e._jumpCount === undefined) {
       e._jumpCount = 0;

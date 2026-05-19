@@ -21,6 +21,7 @@ EnemyRegistry.register({
   hitSound:  'flesh',
   bulletDamagePct: 0.20,
   bulletSpeed:     4.5,
+  deathColors: ['#7766aa', '#554488', '#9988cc'],
   calcStress(distToCenter) {
     return 25;
   },

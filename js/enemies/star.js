@@ -16,6 +16,7 @@ EnemyRegistry.register({
   shoots:    false,
   noHpBar:   true,
   parryable: true,
+  deathColors: ['#ffdd44', '#ffaa22', '#ffffff'],
 
   calcStress(distToCenter) {
     if (distToCenter <= 120) return 16;

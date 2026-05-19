@@ -21,6 +21,7 @@ const SlotReels = (() => {
   const VISIBLE_ROWS   = 3;
   const REEL_STAGGER   = 350;
   const BASE_DURATION  = 1800;
+  const SPIN_DELAYS    = [0, 150, 300]; // delay before each reel starts
 
   /* ── HELPERS ───────────────────────── */
 
@@ -53,6 +54,8 @@ const SlotReels = (() => {
 
     if (rollData.nearMiss) {
       // 2 match + 1 different (legendary tease)
+      // first 2 reels show same legendary, third ALMOST lands
+      // on it but stops on something different
       const legs = Object.entries(CONFIG.abilities.rarities)
         .filter(([, r]) => r === 'legendary')
         .map(([id]) => id);
@@ -87,9 +90,19 @@ const SlotReels = (() => {
       reel.innerHTML = '';
 
       for (let i = 0; i < ICONS_PER_REEL; i++) {
-        const iconId = (i === ICONS_PER_REEL - 2)
-          ? targets[r]
-          : allIds[Math.floor(Math.random() * allIds.length)];
+        let iconId;
+
+        if (i === ICONS_PER_REEL - 2) {
+          // target position
+          iconId = targets[r];
+        } else if (rollData.nearMiss && r === 2 && i === ICONS_PER_REEL - 3) {
+          // near miss: icon JUST ABOVE target on reel 3
+          // is the same as reels 0 & 1 — player sees it
+          // scroll past and land on the wrong one
+          iconId = targets[0];
+        } else {
+          iconId = allIds[Math.floor(Math.random() * allIds.length)];
+        }
 
         const img = document.createElement('img');
         img.src = 'assets/abilities/' + iconId + '.png';
@@ -136,13 +149,58 @@ const SlotReels = (() => {
       }, delay);
     });
 
-    // total time until last reel stops
-    const totalMs = 150 * (REEL_COUNT - 1)
+    // tick sound during spin
+    const totalSpinMs = 150 * (REEL_COUNT - 1)
       + BASE_DURATION
-      + (REEL_COUNT - 1) * REEL_STAGGER
-      + 300;
+      + (REEL_COUNT - 1) * REEL_STAGGER;
+    let tickElapsed = 0;
+    const tickInterval = 90;
+    const tickTimer = setInterval(() => {
+      tickElapsed += tickInterval;
+      if (tickElapsed >= totalSpinMs) {
+        clearInterval(tickTimer);
+        return;
+      }
+      if (typeof SFX !== 'undefined') SFX.slotTick();
+    }, tickInterval);
 
+    // stop sound when each reel lands
+    reelEls.forEach((reel, i) => {
+      const stopTime = SPIN_DELAYS[i] + BASE_DURATION + (i * REEL_STAGGER);
+      setTimeout(() => {
+        if (typeof SFX !== 'undefined') SFX.slotStop();
+      }, stopTime);
+    });
+
+    const totalMs = totalSpinMs + 300;
     setTimeout(callback, totalMs);
+  }
+
+  /* ── SHOW INITIAL (pre-fill reels) ── */
+
+  /**
+   * Fill reels with random icons so they
+   * are not empty when slot opens.
+   * Called by SlotMachine before first spin.
+   */
+  function showInitial(reelEls) {
+    const allIds = _allIds();
+    for (let r = 0; r < REEL_COUNT; r++) {
+      const reel = reelEls[r];
+      reel.innerHTML = '';
+      reel.style.transition = 'none';
+      reel.style.top = '0px';
+
+      // just enough icons to fill visible rows
+      for (let i = 0; i < VISIBLE_ROWS + 2; i++) {
+        const iconId = allIds[Math.floor(Math.random() * allIds.length)];
+        const img = document.createElement('img');
+        img.src = 'assets/abilities/' + iconId + '.png';
+        img.alt = iconId;
+        img.dataset.id = iconId;
+        reel.appendChild(img);
+      }
+    }
   }
 
   /* ── RESET ─────────────────────────── */
@@ -156,6 +214,6 @@ const SlotReels = (() => {
   }
 
   /* ── PUBLIC ────────────────────────── */
-  return { build, animate, reset };
+  return { build, animate, reset, showInitial };
 
 })();

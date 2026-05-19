@@ -16,6 +16,7 @@ EnemyRegistry.register({
   hitSound:  'slime',
   shoots:    false,
   wobble:    { frequency: 1.8, amplitude: 18 },
+  deathColors: ['#ff6622', '#ffaa33', '#cc3300'],
 
   onTick(e, cx, cy) {
     if (e._hasSpit) return;
@@ -94,6 +95,7 @@ EnemyRegistry.register({
   hitSound:  'slime',
   shoots:    false,
   wobble:    { frequency: 2.8, amplitude: 10 },
+  deathColors: ['#ff6622', '#ffaa33', '#cc3300'],
 
   calcStress(distToCenter) {
     if (distToCenter <= 80)  return 12;

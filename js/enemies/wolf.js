@@ -19,6 +19,7 @@ EnemyRegistry.register({
   points:    2234,
   hitSound:  'flesh',
   shoots:    false,
+   deathColors: ['#777777', '#999999', '#555555'],
 
   onTick(e, cx, cy, attackRange) {
     if (e._wolfState === undefined) {

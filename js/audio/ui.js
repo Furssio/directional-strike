@@ -209,6 +209,46 @@ const SfxUi = (() => {
           attack: 0.01, decay: 0.06, sustain: 0.4, release: 0.12, gain: 0.12 });
     },
 
+    /* ── SLOT TICK: mechanical click during spin ── */
+    slotTick() {
+      t({ type: 'triangle', freq: 1200, freq2: 800, duration: 0.03,
+          attack: 0.002, decay: 0.01, sustain: 0.15, release: 0.01, gain: 0.06 });
+      n({ duration: 0.015, gain: 0.03, highpass: 3000, lowpass: 8000 });
+    },
+
+    /* ── SLOT STOP: thunk when reel lands ── */
+    slotStop() {
+      t({ type: 'triangle', freq: 300, freq2: 180, duration: 0.12,
+          attack: 0.004, decay: 0.04, sustain: 0.4, release: 0.06, gain: 0.2 });
+      t({ type: 'sine', freq: 600, duration: 0.08, attack: 0.003,
+          decay: 0.03, sustain: 0.2, release: 0.04, gain: 0.08 });
+      n({ duration: 0.06, gain: 0.08, highpass: 200, lowpass: 1500 });
+    },
+
+    /* ── SLOT WIN: triumphant fanfare ── */
+    slotWin() {
+      t({ type: 'sine', freq: 523, duration: 0.1, attack: 0.005,
+          decay: 0.03, sustain: 0.45, release: 0.04, gain: 0.2 });
+      td(100, { type: 'sine', freq: 659, duration: 0.1, attack: 0.005,
+          decay: 0.03, sustain: 0.45, release: 0.04, gain: 0.18 });
+      td(200, { type: 'sine', freq: 784, duration: 0.1, attack: 0.005,
+          decay: 0.03, sustain: 0.45, release: 0.04, gain: 0.18 });
+      td(300, { type: 'sine', freq: 1047, duration: 0.25, attack: 0.005,
+          decay: 0.05, sustain: 0.4, release: 0.12, gain: 0.22 });
+      td(300, { type: 'sine', freq: 1568, duration: 0.2, attack: 0.008,
+          decay: 0.04, sustain: 0.15, release: 0.1, gain: 0.07 });
+      nd(350, { duration: 0.15, gain: 0.08, highpass: 3000, lowpass: 10000 });
+    },
+
+    /* ── SLOT NEAR MISS: tense descending whiff ── */
+    slotNearMiss() {
+      t({ type: 'sine', freq: 600, freq2: 250, duration: 0.35,
+          attack: 0.008, decay: 0.08, sustain: 0.4, release: 0.15, gain: 0.18 });
+      td(50, { type: 'sine', freq: 900, freq2: 375, duration: 0.3,
+          attack: 0.008, decay: 0.06, sustain: 0.25, release: 0.12, gain: 0.08 });
+      nd(100, { duration: 0.15, gain: 0.06, highpass: 200, lowpass: 1200 });
+    },
+
   };
 
 })();

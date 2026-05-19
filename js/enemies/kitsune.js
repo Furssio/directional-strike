@@ -20,6 +20,7 @@ EnemyRegistry.register({
   hitSound:  'flesh',
   shoots:    false,
   noHpBar:   true,
+  deathColors: ['#ffaa33', '#ff7711', '#ffffff'],
 
   onTick(e, cx, cy, attackRange) {
     if (e._lunging) return;

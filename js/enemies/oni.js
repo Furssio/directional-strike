@@ -19,6 +19,7 @@ EnemyRegistry.register({
   points:    4890,
   hitSound:  'demon',
   shoots:    false,
+  deathColors: ['#cc2222', '#881111', '#ff4444', '#440000'],
 
   onHit(e) {
     // bounce back to edge of arena

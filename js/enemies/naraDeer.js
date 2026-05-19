@@ -21,6 +21,7 @@ EnemyRegistry.register({
   shoots:    false,
   noHpBar:   true,
   customOpacity: true,
+  deathColors: ['#ddbb88', '#bb9966', '#ffffff'],
 
   onTick(e, cx, cy, attackRange) {
     if (e._fadePhase === undefined) {

@@ -123,6 +123,17 @@ function _buildCarouselTrack() {
       slide.appendChild(lock);
     }
 
+    // slot badge for maps that give guaranteed free spin
+    const hasSlot = CONFIG.abilities.slotAfterMaps.includes(map.id);
+    if (hasSlot && !isBoss) {
+      const badge = document.createElement('div');
+      badge.className = 'slide-slot-badge';
+      badge.innerHTML =
+        '<img src="assets/ui/slot_icon.png" alt="slot">' +
+        '<span>FREE SPIN!</span>';
+      slide.appendChild(badge);
+    }
+
     track.appendChild(slide);
   });
 }

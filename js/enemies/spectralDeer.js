@@ -22,6 +22,7 @@ EnemyRegistry.register({
   shoots:    false,
   noHpBar:   true,
   customOpacity: true,
+  deathColors: ['#aabbff', '#8899dd', '#ccddff'],
 
   onTick(e, cx, cy, attackRange) {
     // init fade state

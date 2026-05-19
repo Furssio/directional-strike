@@ -9,6 +9,7 @@ EnemyRegistry.register({
   hitSound:  'flesh',
   shoots:    false,
   noHpBar:   true,
+  deathColors: ['#554433', '#776644', '#998855'],
 
   // while underground: not visible, not hittable
   underground:      true,

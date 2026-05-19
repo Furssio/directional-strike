@@ -18,6 +18,7 @@ EnemyRegistry.register({
   shoots:    false,
   bulletDamagePct: 0.15,
   bulletSpeed:     4.0,
+  deathColors: ['#dddddd', '#aaaaaa', '#776633'],
 
   onHit(e) {
     if (e._phase2) return;
