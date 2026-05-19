@@ -77,9 +77,22 @@ if (_challengeCard && _splashEl) {
   });
 }
 
-// how to play — placeholder
+// how to play — info popup
 document.getElementById('btn-howtoplay').addEventListener('click', () => {
-  // TODO: show how to play screen
+  const popup = document.getElementById('info-popup');
+  if (popup) popup.classList.remove('hidden');
+});
+
+document.getElementById('info-close').addEventListener('click', () => {
+  const popup = document.getElementById('info-popup');
+  if (popup) popup.classList.add('hidden');
+});
+
+// close info on click outside card
+document.getElementById('info-popup').addEventListener('click', (e) => {
+  if (e.target.id === 'info-popup') {
+    e.target.classList.add('hidden');
+  }
 });
 
 const _btnAbilities = document.getElementById('btn-abilities');

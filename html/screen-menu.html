@@ -32,7 +32,6 @@
         </div>
         <div class="mode-card-name">CHALLENGE</div>
         <div class="mode-card-tooltip">Endless waves<br>Play Adventure first!<br>Test your skills</div>
-
       </button>
 
     </div>
@@ -51,5 +50,52 @@
   </div>
 
   <div id="btn-infinite" style="display:none;"></div>
+
+  <!-- ── INFO POPUP (after menu-player, z-index 10 covers everything) ── -->
+  <div id="info-popup" class="info-popup hidden">
+    <div class="info-popup-card">
+      <button class="info-close" id="info-close">✕</button>
+
+      <div class="info-section">
+        <div class="info-title">HOW TO PLAY</div>
+        <div class="info-row">
+          <img src="assets/ui/keys_arrow_up.png" class="info-key">
+          <img src="assets/ui/keys_arrow_down.png" class="info-key">
+          <img src="assets/ui/keys_arrow_left.png" class="info-key">
+          <img src="assets/ui/keys_arrow_right.png" class="info-key">
+          <span class="info-text">Attack in 4 directions</span>
+        </div>
+        <div class="info-row">
+          <img src="assets/ui/key_space.png" class="info-key-space">
+          <span class="info-text">Special ability</span>
+        </div>
+        <div class="info-row">
+          <span class="info-text">⚔️ Survive waves, pick upgrades, conquer maps</span>
+        </div>
+        <div class="info-row">
+          <span class="info-text">🔮 Collect orbs for temporary buffs</span>
+        </div>
+      </div>
+
+      <div class="info-divider"></div>
+
+      <div class="info-section">
+        <div class="info-title">CHALLENGE MODE</div>
+        <div class="info-row">
+          <span class="info-text">♾️ Endless waves — how far can you go?</span>
+        </div>
+        <div class="info-row">
+          <span class="info-text">🗺️ Map changes every 10 waves</span>
+        </div>
+        <div class="info-row">
+          <span class="info-text">📈 Difficulty never stops growing</span>
+        </div>
+        <div class="info-row">
+          <span class="info-text-dim">Recommended after beating Adventure mode</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 </div>
