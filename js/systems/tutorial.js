@@ -140,7 +140,7 @@ const Tutorial = (() => {
     _phase = 1;
     _step  = 0;
     // step 0: spawn ravager from right
-    _phaseAEnemy = _spawnFromDir('ravager', 'right', 0.8);
+    _phaseAEnemy = _spawnFromDir('ravager', 'right', 0.9);
   }
 
   function _tickPhaseA() {
@@ -184,8 +184,8 @@ const Tutorial = (() => {
 
     // step 5: spawn 2 ravagers (left + down) — no freeze, player handles alone
     if (_step === 5) {
-      _spawnFromDir('ravager', 'left', 0.9);
-      _spawnFromDir('ravager', 'down', 0.9);
+      _spawnFromDir('ravager', 'left', 1.2);
+      _spawnFromDir('ravager', 'down', 1.2);
       _step = 6;
       return;
     }
@@ -266,10 +266,10 @@ const Tutorial = (() => {
     updateSpecialBar();
 
     // spawn 4 ravagers from all directions
-    _spawnFromDir('ravager', 'up',    0.8);
-    _spawnFromDir('ravager', 'down',  0.8);
-    _spawnFromDir('ravager', 'left',  0.8);
-    _spawnFromDir('ravager', 'right', 0.8);
+    _spawnFromDir('ravager', 'up',    1.3);
+    _spawnFromDir('ravager', 'down',  1.3);
+    _spawnFromDir('ravager', 'left',  1.3);
+    _spawnFromDir('ravager', 'right', 1.3);
   }
 
   function _tickPhaseC() {

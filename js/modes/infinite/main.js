@@ -104,7 +104,6 @@ const SCRIPTS = [
   'js/modes/challenge/challengeUpgradeChoice.js',
   'js/modes/challenge/challengeScreen.js',
 
-  'js/audio/ambience.js',
 
   /* ── DEBUG (must be last) ── */
   'js/debug.js',

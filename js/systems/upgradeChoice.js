@@ -266,21 +266,28 @@ function startUpgradeChoice() {
   titleEl.style.opacity   = '0';
   titleEl.style.animation = 'upgradeTitleIn 0.6s ease-out forwards';
 
-  // arrow hint at bottom
+  // arrow hint — under player (in arena, not overlay)
   let hintEl = document.getElementById('upgrade-arrow-hint');
   if (!hintEl) {
     hintEl = document.createElement('div');
     hintEl.id = 'upgrade-arrow-hint';
-    hintEl.textContent = 'use arrow keys';
-    overlay.appendChild(hintEl);
+    arena.appendChild(hintEl);
   }
+  hintEl.innerHTML =
+    '<img src="assets/ui/keyboard_arrows.png" alt="" class="upgrade-hint-img" />' +
+    '<div class="upgrade-hint-text">use arrows to select</div>';
 
   // block input for 1.5s so player can read
   _inputBlocked = true;
-  hintEl.style.visibility = 'hidden';
+  hintEl.style.opacity = '0';
+  hintEl.style.animation = 'none';
   setTimeout(() => {
     _inputBlocked = false;
-    hintEl.style.visibility = 'visible';
+    const h = document.getElementById('upgrade-arrow-hint');
+    if (h) {
+      h.style.opacity = '';
+      h.style.animation = '';
+    }
   }, 1500);
 }
 
@@ -315,7 +322,7 @@ function selectUpgrade(dir) {
 
   // hide arrow hint
   const hintEl = document.getElementById('upgrade-arrow-hint');
-  if (hintEl) hintEl.style.opacity = '0';
+  if (hintEl) hintEl.remove();
 
   // start countdown
   _countdownActive = true;
@@ -333,7 +340,7 @@ function selectUpgrade(dir) {
       el.style.animationDelay = '';
     }
 
-    if (hintEl) hintEl.style.opacity = '';
+    // hintEl already removed
     _countdownActive = false;
     AdventureDirector.resumeAfterChoice();
   });

@@ -108,8 +108,8 @@ devUnlockMapsOnly: true,  // unlock maps but NOT abilities (for slot testing)
   audio: {
     enabled: true,
     volume:  0.4,
-  },
-
+    muted:   localStorage.getItem('ds_muted') === 'true',
+},
   /* ── JUICE ──────────────────────────────
      Visual feedback parameters.
   ─────────────────────────────────────── */

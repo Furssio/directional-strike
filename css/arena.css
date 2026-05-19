@@ -299,23 +299,37 @@
 /* ── ARROW HINT (bottom) ── */
 #upgrade-arrow-hint {
   position: absolute;
-  bottom: 3%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
-  color: #aaaaaa;
-  text-shadow: 1px 1px 0 #000;
+  transform: translate(-50%, 48px);
   z-index: 41;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   animation: hintPulse 2s ease-in-out infinite alternate;
   transition: opacity 0.3s;
 }
+
+.upgrade-hint-img {
+  width: 64px;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+}
+
+.upgrade-hint-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: #aaaaaa;
+  text-shadow: 1px 1px 0 #000;
+}
+
 @keyframes hintPulse {
   from { opacity: 0.4; }
   to   { opacity: 0.8; }
 }
-
 /* ── OPTION CONTAINERS — positioned on the 4 paths ── */
 .upgrade-option {
   position: absolute;

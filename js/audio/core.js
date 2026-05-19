@@ -3,6 +3,8 @@
    Web Audio API context with auto-init on
    first user gesture. Provides tone(), noise(),
    playFile(), stopFile() utilities.
+   Global mute via toggleMute() — persisted
+   in localStorage.
 
    Depends on: config.js (CONFIG.audio)
    ═══════════════════════════════════════ */
@@ -40,12 +42,37 @@ const AudioCore = (() => {
   function getCtx() { return ctx; }
   const vol = () => CONFIG.audio.volume;
 
+  /* ── MUTE CHECK ── */
+  function _isMuted() {
+    return CONFIG.audio.muted || !CONFIG.audio.enabled;
+  }
+
+  /* ── TOGGLE MUTE ──
+     Returns new muted state. Persists to localStorage.
+     When muting: stops all active ability audio + music. */
+  function toggleMute() {
+    CONFIG.audio.muted = !CONFIG.audio.muted;
+    localStorage.setItem('ds_muted', CONFIG.audio.muted);
+
+    if (CONFIG.audio.muted) {
+      // stop everything currently playing
+      SfxAbilities.stopAll();
+      Music.stop();
+    }
+
+    return CONFIG.audio.muted;
+  }
+
+  function isMuted() {
+    return CONFIG.audio.muted;
+  }
+
   function tone({
     type = 'sine', freq = 440, freq2 = null,
     duration = 0.15, attack = 0.005, decay = 0.05,
     sustain = 0.6, release = 0.1, gain = 1.0, detune = 0,
   } = {}) {
-    if (!ctx || !CONFIG.audio.enabled) return;
+    if (!ctx || _isMuted()) return;
     try {
       const g   = ctx.createGain();
       g.connect(ctx.destination);
@@ -74,7 +101,7 @@ const AudioCore = (() => {
     duration = 0.1, gain = 0.5,
     highpass = 0, lowpass = 4000,
   } = {}) {
-    if (!ctx || !CONFIG.audio.enabled) return;
+    if (!ctx || _isMuted()) return;
     try {
       const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
       const d   = buf.getChannelData(0);
@@ -107,7 +134,7 @@ const AudioCore = (() => {
 
   /* ── FILE PLAYBACK ── */
   function playFile(path, { loop = false, volume = 1.0 } = {}) {
-    if (!CONFIG.audio.enabled) return null;
+    if (_isMuted()) return null;
     try {
       const audio  = new Audio(path);
       audio.volume = volume * vol();
@@ -126,6 +153,6 @@ const AudioCore = (() => {
   // auto-bind on script load
   _autoInit();
 
-  return { init, getCtx, tone, noise, playFile, stopFile, vol };
+  return { init, getCtx, tone, noise, playFile, stopFile, vol, toggleMute, isMuted };
 
 })();

@@ -21,6 +21,13 @@ const Music = (() => {
      If same track already playing, do nothing.
      Otherwise stop current and start new. */
   function play(path, { volume = 0.4, loop = true } = {}) {
+    // muted — remember path but don't play
+    if (AudioCore.isMuted()) {
+      _kill();
+      _currentPath = path;
+      _baseVolume = volume;
+      return;
+    }
     // same track already playing — skip
     if (_currentPath === path && _current && !_current.paused) return;
     // same track paused (e.g. after pause()) — resume instead
@@ -72,7 +79,8 @@ const Music = (() => {
     if (_current && !_current.paused) _current.pause();
   }
 
-  function resume() {
+ function resume() {
+    if (AudioCore.isMuted()) return;
     if (_current && _current.paused && _current.currentTime > 0) _current.play();
   }
 

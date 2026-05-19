@@ -147,24 +147,44 @@ document.getElementById('btn-challenge-play').addEventListener('click', () => {
   });
 });
 
-/* ── AUDIO ── */
 
-// SFX toggle
-document.getElementById('btn-sfx').addEventListener('click', () => {
-  SFX.init();
-  CONFIG.audio.enabled = !CONFIG.audio.enabled;
-  document.getElementById('btn-sfx').classList.toggle('muted', !CONFIG.audio.enabled);
-  document.getElementById('btn-sfx').querySelector('.menu-btn-icon').textContent =
-    CONFIG.audio.enabled ? '🔊' : '🔇';
+
+/* ── AUDIO — GLOBAL SOUND TOGGLE ── */
+
+function _updateSoundButtons() {
+  const muted = AudioCore.isMuted();
+  const icon = muted ? '🔇' : '🔊';
+  const cls  = muted;
+
+  // menu button
+  const menuBtn = document.getElementById('btn-sound');
+  if (menuBtn) {
+    menuBtn.classList.toggle('muted', cls);
+    menuBtn.querySelector('.menu-btn-icon').textContent = icon;
+  }
+
+  // pause button
+  const pauseBtn = document.getElementById('pause-sound');
+  if (pauseBtn) {
+    pauseBtn.classList.toggle('muted', cls);
+    pauseBtn.querySelector('.pause-btn-icon').textContent = icon;
+  }
+}
+
+// menu sound button
+document.getElementById('btn-sound').addEventListener('click', () => {
+  AudioCore.toggleMute();
+  _updateSoundButtons();
 });
 
-// Music toggle — placeholder for now
-document.getElementById('btn-music').addEventListener('click', () => {
-  const btn = document.getElementById('btn-music');
-  btn.classList.toggle('muted');
-  btn.querySelector('.menu-btn-icon').textContent =
-    btn.classList.contains('muted') ? '🔇' : '🎵';
+// pause sound button
+document.getElementById('pause-sound').addEventListener('click', () => {
+  AudioCore.toggleMute();
+  _updateSoundButtons();
 });
+
+// sync icons on load (if muted was saved)
+_updateSoundButtons();
 
 /* ── DIRECTIONAL BUTTONS ── */
 
