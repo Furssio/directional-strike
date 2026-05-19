@@ -9,7 +9,7 @@
 EnemyRegistry.register({
   id:        'eagle',
   sprite:    'assets/enemies/eagle/idle.png',
-  size:      60,
+  size:      72,
   hpPct:     0.65,
   damagePct: 0.25,
   speedMult: 1.8,
@@ -18,6 +18,7 @@ EnemyRegistry.register({
   shoots:    false,
   bulletDamagePct: 0.15,
   bulletSpeed:     4.0,
+  rotateToDirection: true,
   deathColors: ['#dddddd', '#aaaaaa', '#776633'],
 
   onHit(e) {
@@ -49,12 +50,12 @@ EnemyRegistry.register({
     e.spawnDist     = Math.sqrt(dx * dx + dy * dy);
     e.firstShotDist = e.spawnDist * CONFIG.bullet.firstShotDistPct;
 
-    // update rotation
-    const rotMap = { down: 0, left: 90, up: 180, right: 270 };
+    // phase 2: change sprite + remove rotation
     if (e.el) {
       e.el.style.left = e.x + 'px';
       e.el.style.top  = e.y + 'px';
-      e.el.style.transform = `translate(-50%,-50%) rotate(${rotMap[newDir]}deg)`;
+      e.el.style.backgroundImage = 'url(assets/enemies/eagle/idle2.png)';
+      e.el.style.transform = 'translate(-50%,-50%)';
     }
   },
 

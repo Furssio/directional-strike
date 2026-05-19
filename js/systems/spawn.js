@@ -110,6 +110,11 @@ if (enemy.def.sprite) {
 
 // rotazione in base alla direzione
 el.style.transform = 'translate(-50%,-50%)';
+// rotate enemies that need direction-based rotation (e.g. eagle dive)
+if (enemy.def.rotateToDirection) {
+  const rotMap = { down: 0, left: 90, up: 180, right: 270 };
+  el.style.transform = `translate(-50%,-50%) rotate(${rotMap[dir]}deg)`;
+}
 
  if (!enemy.def.noHpBar) {
     const hpWrap = document.createElement('div');

@@ -118,7 +118,7 @@ function _spawnLavaSpit(enemy) {
   const spitDef = {
     id:        '_lava_spit',
     sprite:    'assets/enemies/bullet_rock/idle.png',
-    size:      14,
+    size:      22,
     hpPct:     0.01,
     damagePct: 0.20,
     speedMult: 2.5,

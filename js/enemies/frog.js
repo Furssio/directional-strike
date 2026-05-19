@@ -102,7 +102,7 @@ function _spawnFrogSpit(enemy) {
   const spitDef = {
     id:        '_frog_spit',
     sprite:    'assets/enemies/bullet_rock/idle.png',
-    size:      12,
+    size:      22,
     hpPct:     0.01,
     damagePct: 0.15,
     speedMult: 2.0,
