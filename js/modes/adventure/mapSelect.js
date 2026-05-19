@@ -270,27 +270,27 @@ function showBossAnnounce(map) {
 
 /* ── ENEMY HINTS ── */
 const ENEMY_HINTS = {
-  ravager:       'Fast rusher',
-  crusher:       'Shoots bullets',
-  golem:         'Tanky, 3 hits',
-  slime_large:   'Splits in two',
-  slime_lava:    'Spits lava',
-  golem_lava:    'Splits sideways',
-  bear:          'Charges attack',
-  crab:          'Emerges + spawns',
-  scorpion:      'Poison sting',
-  eagle:         'Rush then shoot',
-  frog:          'Parryable jumps',
-  kitsune:       'Lunges close',
-  nara_deer:     'Changes direction',
-  oni:           '4 hits, bounces',
-  parrot:        'Double shot',
-  spectral_deer: 'Fades in/out',
-  star:          'Very fast, parry',
-  thunder_hound: 'Dodges first hit',
-  tornado:       'Fast, parryable',
-  turtle:        'Shell then slow',
-  wolf:          'Bounces back',
+  ravager:       'Charges straight at you',
+  crusher:       'Slow but shoots at you',
+  golem:         'Very tough, hard to kill',
+  slime_large:   'Splits when defeated',
+  slime_lava:    'Spits fire, then splits',
+  golem_lava:    'Breaks into smaller ones',
+  bear:          'Stops and lunges at you',
+  crab:          'Pops up from underground',
+  scorpion:      'Emerges close, venomous',
+  eagle:         'Swoops in, then shoots',
+  frog:          'Jumps at you — deflect it!',
+  kitsune:       'Sneaks close, then strikes',
+  nara_deer:     'Zigzags unpredictably',
+  oni:           'Bounces off walls, gets faster',
+  parrot:        'Fires two shots in a row',
+  spectral_deer: 'Appears and vanishes',
+  star:          'Blazing fast — deflect it!',
+  thunder_hound: 'Teleports to dodge your first hit',
+  tornado:       'Fast spin — deflect it!',
+  turtle:        'Armored shell, slow without it',
+  wolf:          'Leaps back, charges again faster',
 };
 
 function _renderEnemyCard(map) {
@@ -449,6 +449,10 @@ function _renderAbilityPicker() {
     nameEl.textContent = isLocked ? '🔒 ' + ab.name : ab.name;
   }
 
+  const descEl = document.getElementById('ability-pick-desc');
+  if (descEl) {
+    descEl.textContent = ab.desc || '';
+  }
   // rarity border color
   if (wrap) {
     const rarity = CONFIG.abilities.rarities[ab.id] || 'rare';

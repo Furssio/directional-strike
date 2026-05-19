@@ -340,6 +340,17 @@
   min-height: 10px;
 }
 
+#ability-pick-desc {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: var(--c-text-dim);
+  opacity: 0.7;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  min-height: 8px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
 /* ── ENEMY CARD ── */
 #enemy-preview-list {
   display: flex;

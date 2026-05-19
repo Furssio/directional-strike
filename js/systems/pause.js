@@ -22,6 +22,10 @@ function pauseGame() {
   gameLoop = null;
   document.getElementById('pause-overlay').classList.remove('hidden');
 
+  // update maps/menu button text based on mode
+  const mapsBtn = document.getElementById('pause-maps');
+  mapsBtn.textContent = (ActiveDirector === ChallengeDirector) ? 'MENU' : 'MAPS';
+
   // sync toggle states with menu buttons
   _syncPauseToggles();
 
@@ -91,8 +95,12 @@ document.getElementById('pause-maps').addEventListener('click', () => {
   resumeGame();
   Transition.play('fast', () => {
     endGame();
-    showScreen(sMapSelect);
-    if (typeof initMapSelect === 'function') initMapSelect();
+    if (ActiveDirector === ChallengeDirector) {
+      showScreen(sMenu);
+    } else {
+      showScreen(sMapSelect);
+      if (typeof initMapSelect === 'function') initMapSelect();
+    }
   });
 });
 
