@@ -110,6 +110,7 @@ showScreen(sGame);
 
 
 function startGameLoop() {
+  if (paused) return;
   lastTick = performance.now();
   clearInterval(gameLoop);
   gameLoop = setInterval(tick, 16);
@@ -271,7 +272,7 @@ function cleanupArena() {
 /* ── TICK ── */
 
 function tick() {
-  if (!running) return;
+  if (!running || paused) return;
 
   const now = performance.now();
   const dt  = Math.min(now - lastTick, 50);
