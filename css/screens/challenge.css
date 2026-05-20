@@ -20,6 +20,103 @@
   overflow: hidden;
 }
 
+/* ── FLOATING PARTICLES ── */
+#challenge-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ch-particle {
+  position: absolute;
+  bottom: -10px;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  background: #b060ff;
+  opacity: var(--o);
+  image-rendering: pixelated;
+  animation: chFloat var(--d) linear infinite;
+  animation-delay: var(--delay);
+}
+
+.ch-particle:nth-child(odd) {
+  background: #ff4060;
+}
+
+.ch-particle:nth-child(3n) {
+  background: #8040c0;
+}
+
+@keyframes chFloat {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--o);
+  }
+  85% {
+    opacity: var(--o);
+  }
+  100% {
+    transform: translateY(-110vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* ── ENERGY PULSE (center glow) ── */
+#challenge-energy {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 40%;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(140, 40, 200, 0.25) 0%,
+    rgba(180, 30, 60, 0.12) 40%,
+    transparent 70%
+  );
+  animation: chEnergy 3s ease-in-out infinite;
+}
+
+@keyframes chEnergy {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+  }
+}
+
+/* ── BREATHING VIGNETTE ── */
+#challenge-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 16px;
+  animation: chVignette 5s ease-in-out infinite;
+}
+
+@keyframes chVignette {
+  0%, 100% {
+    box-shadow: inset 0 0 80px 30px rgba(0, 0, 0, 0.7);
+  }
+  50% {
+    box-shadow: inset 0 0 60px 20px rgba(0, 0, 0, 0.45);
+  }
+}
+
 /* ── TITLE ── */
 #challenge-title {
   position: relative;
