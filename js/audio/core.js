@@ -3,7 +3,7 @@
    Web Audio API context with auto-init on
    first user gesture. Provides tone(), noise(),
    playFile(), stopFile() utilities.
-   Global mute via toggleMute() — persisted
+   Master volume via setVolume() — persisted
    in localStorage.
 
    Depends on: config.js (CONFIG.audio)
@@ -44,27 +44,24 @@ const AudioCore = (() => {
 
   /* ── MUTE CHECK ── */
   function _isMuted() {
-    return CONFIG.audio.muted || !CONFIG.audio.enabled;
+    return !CONFIG.audio.enabled || CONFIG.audio.volume <= 0;
   }
 
-  /* ── TOGGLE MUTE ──
-     Returns new muted state. Persists to localStorage.
-     When muting: stops all active ability audio + music. */
-  function toggleMute() {
-    CONFIG.audio.muted = !CONFIG.audio.muted;
-    localStorage.setItem('ds_muted', CONFIG.audio.muted);
+  /* ── SET VOLUME ──
+     Sets master volume 0.0–1.0. Persists to localStorage.
+     When volume hits 0: stops all active ability audio + music. */
+  function setVolume(val) {
+    CONFIG.audio.volume = Math.max(0, Math.min(1, val));
+    localStorage.setItem('ds_volume', CONFIG.audio.volume.toFixed(2));
 
-    if (CONFIG.audio.muted) {
-      // stop everything currently playing
+    if (CONFIG.audio.volume <= 0) {
       SfxAbilities.stopAll();
       Music.stop();
     }
-
-    return CONFIG.audio.muted;
   }
 
   function isMuted() {
-    return CONFIG.audio.muted;
+    return _isMuted();
   }
 
   function tone({
@@ -153,6 +150,6 @@ const AudioCore = (() => {
   // auto-bind on script load
   _autoInit();
 
-  return { init, getCtx, tone, noise, playFile, stopFile, vol, toggleMute, isMuted };
+  return { init, getCtx, tone, noise, playFile, stopFile, vol, setVolume, isMuted };
 
 })();

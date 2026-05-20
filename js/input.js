@@ -162,42 +162,55 @@ document.getElementById('btn-challenge-play').addEventListener('click', () => {
 
 
 
-/* ── AUDIO — GLOBAL SOUND TOGGLE ── */
 
-function _updateSoundButtons() {
-  const muted = AudioCore.isMuted();
-  const icon = muted ? '🔇' : '🔊';
-  const cls  = muted;
+/* ── AUDIO — VOLUME SLIDER ── */
 
-  // menu button
-  const menuBtn = document.getElementById('btn-sound');
-  if (menuBtn) {
-    menuBtn.classList.toggle('muted', cls);
-    menuBtn.querySelector('.menu-btn-icon').textContent = icon;
-  }
+const _menuSlider  = document.getElementById('menu-volume-slider');
+const _pauseSlider = document.getElementById('pause-volume-slider');
+const _menuPopup   = document.getElementById('menu-volume-popup');
+const _menuSoundBtn = document.getElementById('btn-sound');
 
-  // pause button
-  const pauseBtn = document.getElementById('pause-sound');
-  if (pauseBtn) {
-    pauseBtn.classList.toggle('muted', cls);
-    pauseBtn.querySelector('.pause-btn-icon').textContent = icon;
+// sync all sliders + icon to current volume
+function _syncVolumeUI() {
+  const pct = Math.round(CONFIG.audio.volume * 100);
+  if (_menuSlider)  _menuSlider.value  = pct;
+  if (_pauseSlider) _pauseSlider.value = pct;
+
+  // update menu button icon
+  const icon = CONFIG.audio.volume <= 0 ? '🔇' : '🔊';
+  if (_menuSoundBtn) {
+    _menuSoundBtn.querySelector('.menu-btn-icon').textContent = icon;
+    _menuSoundBtn.classList.toggle('muted', CONFIG.audio.volume <= 0);
   }
 }
 
-// menu sound button
-document.getElementById('btn-sound').addEventListener('click', () => {
-  AudioCore.toggleMute();
-  _updateSoundButtons();
-});
+// handle slider input
+function _onVolumeChange(e) {
+  AudioCore.setVolume(parseInt(e.target.value) / 100);
+  _syncVolumeUI();
+}
 
-// pause sound button
-document.getElementById('pause-sound').addEventListener('click', () => {
-  AudioCore.toggleMute();
-  _updateSoundButtons();
-});
+if (_menuSlider)  _menuSlider.addEventListener('input', _onVolumeChange);
+if (_pauseSlider) _pauseSlider.addEventListener('input', _onVolumeChange);
 
-// sync icons on load (if muted was saved)
-_updateSoundButtons();
+// menu button toggles popup
+if (_menuSoundBtn && _menuPopup) {
+  _menuSoundBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    _menuPopup.classList.toggle('hidden');
+    _syncVolumeUI();
+  });
+
+  // close popup on click outside
+  document.addEventListener('click', (e) => {
+    if (!_menuPopup.contains(e.target) && e.target !== _menuSoundBtn && !_menuSoundBtn.contains(e.target)) {
+      _menuPopup.classList.add('hidden');
+    }
+  });
+}
+
+// sync on load
+_syncVolumeUI();
 
 /* ── DIRECTIONAL BUTTONS ── */
 

@@ -20,8 +20,19 @@ const CONFIG = {
      unlocked. Set false to test real progression.
      Toggle with debug overlay (T key).
   ─────────────────────────────────────── */
-  devUnlockAll: true,       // unlock all maps + abilities
+  devUnlockAll: false,       // unlock all maps + abilities
 devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
+
+  /* ── PLAYABLE MAP ORDER ─────────────────
+     Progression order for adventure mode.
+     Boss maps are excluded — always locked.
+     Used by Progress.isMapUnlocked().
+  ─────────────────────────────────────── */
+  playableOrder: [
+    'map01_forest', 'map02_dungeon', 'map03_desert',
+    'map05_snow', 'map06_beach', 'map07_clouds',
+    'map09_volcano', 'map10_sakura', 'map12_moon',
+  ],
 
   /* ── PLAYER ─────────────────────────────
      maxHp:            base max HP
@@ -105,10 +116,9 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
      enabled: global audio toggle
      volume:  master volume 0.0 → 1.0
   ─────────────────────────────────────── */
-  audio: {
+ audio: {
     enabled: true,
-    volume:  0.4,
-    muted:   localStorage.getItem('ds_muted') === 'true',
+    volume:  parseFloat(localStorage.getItem('ds_volume')) || 1.0,
 },
   /* ── JUICE ──────────────────────────────
      Visual feedback parameters.

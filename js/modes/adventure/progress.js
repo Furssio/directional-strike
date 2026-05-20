@@ -108,14 +108,16 @@ const Progress = (() => {
     isMapUnlocked(mapId) {
   if (CONFIG.devUnlockAll || CONFIG.devUnlockMapsOnly) return true;
 
-      const map = MapRegistry.get(mapId);
-      if (!map) return false;
-      if (map.order === 1) return true;
+  const order = CONFIG.playableOrder;
+  const idx = order.indexOf(mapId);
 
-      const prev = MapRegistry.all()
-        .find(m => m.order === map.order - 1);
-      return prev ? this.isMapCompleted(prev.id) : false;
-    },
+  // boss maps or unknown maps — always locked
+  if (idx < 0) return false;
+  // first map — always unlocked
+  if (idx === 0) return true;
+  // unlocked if previous map in playable order is completed
+  return this.isMapCompleted(order[idx - 1]);
+},
 
     markMapCompleted(mapId) {
       const list = this.getCompletedMaps();
