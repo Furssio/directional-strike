@@ -95,8 +95,8 @@ function updateProgress() {
 
     _timerEl.style.display = 'block';
 
-    // hide old progress bar
-    progressBar.style.width = '0%';
+    // progress bar removed from DOM
+  if (progressBar) progressBar.style.width = '0%';
     return;
   }
 
@@ -104,10 +104,12 @@ function updateProgress() {
   if (_timerEl) _timerEl.style.display = 'none';
 
   // infinite mode: kills progress
-  const needed = ActiveDirector.getKillsNeeded();
-  const pct    = Math.min(ActiveDirector.getKills() / needed, 1);
-  progressBar.style.width = Math.round(pct * 100) + '%';
-  progressBar.style.background = '#666';
+  if (progressBar) {
+    const needed = ActiveDirector.getKillsNeeded();
+    const pct    = Math.min(ActiveDirector.getKills() / needed, 1);
+    progressBar.style.width = Math.round(pct * 100) + '%';
+    progressBar.style.background = '#666';
+  }
 }
 
 /* ── TIMER ELEMENT ── */
@@ -243,19 +245,7 @@ function resetComboFloat() {
 }
 
 function updateComboDisplay() {
-  const c = player.combo;
-
-  if (c >= CONFIG.combo.minKills) {
-    comboEl.textContent   = 'x' + player.getComboMult().toFixed(1);
-    comboEl.style.opacity = '1';
-
-    comboTimerWrap.style.opacity = '1';
-    const maxDecay = CONFIG.combo.decayMs + player.comboDecayBonus;
-    comboTimerBar.style.width = Math.max(0, player.comboTimer / maxDecay * 100) + '%';
-
-  } else {
-    comboEl.style.opacity        = '0';
-    comboTimerWrap.style.opacity = '0';
+  if (player.combo < CONFIG.combo.minKills) {
     resetComboFloat();
   }
 }

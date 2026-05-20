@@ -5,15 +5,12 @@
 
 /* ── PAUSE BUTTON (inside arena) ── */
 #btn-pause {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   z-index: 60;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   background: rgba(17, 17, 34, 0.5);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--c-text-dim);
   cursor: pointer;
   display: flex;
@@ -22,6 +19,7 @@
   transition: background 0.15s, color 0.15s;
   padding: 0;
   line-height: 0;
+  flex-shrink: 0;
 }
 
 #btn-pause:hover {
