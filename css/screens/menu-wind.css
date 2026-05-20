@@ -1,0 +1,161 @@
+/* ══════════════════════════════════════
+   MENU WIND — dust particles + clouds
+   ══════════════════════════════════════ */
+
+#menu-wind {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+/* ── DUST PARTICLES ── */
+.wind-dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(210, 190, 160, 0.5);
+  border-radius: 50%;
+  image-rendering: pixelated;
+  will-change: transform, opacity;
+}
+
+.wd-1  { top: 12%; right: -4px; animation: dustDrift 4.0s linear 0.0s infinite, dustBob 1.8s ease-in-out 0.0s infinite alternate; }
+.wd-2  { top: 28%; right: -4px; animation: dustDrift 5.2s linear 0.8s infinite, dustBob 2.2s ease-in-out 0.3s infinite alternate; width: 2px; height: 2px; }
+.wd-3  { top: 45%; right: -4px; animation: dustDrift 4.5s linear 1.5s infinite, dustBob 1.6s ease-in-out 0.7s infinite alternate; }
+.wd-4  { top: 62%; right: -4px; animation: dustDrift 5.8s linear 0.3s infinite, dustBob 2.4s ease-in-out 1.0s infinite alternate; width: 4px; height: 4px; background: rgba(210, 190, 160, 0.35); }
+.wd-5  { top: 78%; right: -4px; animation: dustDrift 4.2s linear 2.0s infinite, dustBob 1.9s ease-in-out 0.5s infinite alternate; width: 2px; height: 2px; }
+.wd-6  { top: 20%; right: -4px; animation: dustDrift 6.0s linear 1.2s infinite, dustBob 2.6s ease-in-out 0.2s infinite alternate; width: 2px; height: 2px; background: rgba(180, 165, 140, 0.4); }
+.wd-7  { top: 52%; right: -4px; animation: dustDrift 4.8s linear 2.5s infinite, dustBob 2.0s ease-in-out 1.3s infinite alternate; }
+.wd-8  { top: 85%; right: -4px; animation: dustDrift 5.5s linear 0.6s infinite, dustBob 1.7s ease-in-out 0.8s infinite alternate; width: 4px; height: 4px; background: rgba(210, 190, 160, 0.3); }
+.wd-9  { top: 35%; right: -4px; animation: dustDrift 4.3s linear 3.0s infinite, dustBob 2.1s ease-in-out 0.4s infinite alternate; width: 2px; height: 2px; }
+.wd-10 { top: 70%; right: -4px; animation: dustDrift 5.0s linear 1.8s infinite, dustBob 2.3s ease-in-out 1.1s infinite alternate; }
+.wd-11 { top:  8%; right: -4px; animation: dustDrift 5.4s linear 2.2s infinite, dustBob 1.5s ease-in-out 0.6s infinite alternate; width: 2px; height: 2px; background: rgba(180, 165, 140, 0.45); }
+.wd-12 { top: 92%; right: -4px; animation: dustDrift 4.6s linear 0.9s infinite, dustBob 2.5s ease-in-out 0.9s infinite alternate; width: 3px; height: 3px; }
+
+@keyframes dustDrift {
+  0%   { transform: translateX(0); opacity: 0; }
+  5%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(-650px); opacity: 0; }
+}
+
+@keyframes dustBob {
+  0%   { margin-top: 0; }
+  100% { margin-top: -8px; }
+}
+
+/* ── CLOUDS ── */
+.wind-cloud {
+  position: absolute;
+  background: rgba(220, 215, 200, 0.12);
+  will-change: transform, opacity;
+  image-rendering: pixelated;
+}
+
+/* Cloud shape: stacked pixel-art boxes */
+.wind-cloud::before,
+.wind-cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  image-rendering: pixelated;
+}
+
+/* ── Cloud 1 — large, high ── */
+.wc-1 {
+  width: 180px;
+  height: 24px;
+  top: 10%;
+  right: -200px;
+  border-radius: 4px;
+  animation: cloudDrift1 28s linear 0s infinite;
+}
+.wc-1::before {
+  width: 120px;
+  height: 20px;
+  top: -14px;
+  left: 30px;
+  border-radius: 4px;
+}
+.wc-1::after {
+  width: 60px;
+  height: 16px;
+  top: -24px;
+  left: 60px;
+  border-radius: 4px;
+}
+
+/* ── Cloud 2 — medium, middle ── */
+.wc-2 {
+  width: 140px;
+  height: 20px;
+  top: 40%;
+  right: -160px;
+  border-radius: 4px;
+  background: rgba(220, 215, 200, 0.09);
+  animation: cloudDrift2 34s linear 8s infinite;
+}
+.wc-2::before {
+  width: 90px;
+  height: 16px;
+  top: -12px;
+  left: 25px;
+  border-radius: 4px;
+}
+.wc-2::after {
+  width: 45px;
+  height: 12px;
+  top: -20px;
+  left: 48px;
+  border-radius: 4px;
+}
+
+/* ── Cloud 3 — large, low ── */
+.wc-3 {
+  width: 200px;
+  height: 22px;
+  top: 68%;
+  right: -220px;
+  border-radius: 4px;
+  background: rgba(220, 215, 200, 0.10);
+  animation: cloudDrift3 32s linear 16s infinite;
+}
+.wc-3::before {
+  width: 130px;
+  height: 18px;
+  top: -14px;
+  left: 35px;
+  border-radius: 4px;
+}
+.wc-3::after {
+  width: 70px;
+  height: 14px;
+  top: -22px;
+  left: 65px;
+  border-radius: 4px;
+}
+
+/* Cloud drift animations — slow and gentle */
+@keyframes cloudDrift1 {
+  0%   { transform: translateX(0); opacity: 0; }
+  3%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(-850px); opacity: 0; }
+}
+
+@keyframes cloudDrift2 {
+  0%   { transform: translateX(0); opacity: 0; }
+  3%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(-850px); opacity: 0; }
+}
+
+@keyframes cloudDrift3 {
+  0%   { transform: translateX(0); opacity: 0; }
+  3%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(-850px); opacity: 0; }
+}

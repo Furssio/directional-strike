@@ -1,0 +1,69 @@
+/* ═══════════════════════════════════════
+   BEAR — charge + strike visual FX
+   ═══════════════════════════════════════ */
+
+/* --- Phase 1: charging (gentle tremor + slow red tint) --- */
+.bear-charging {
+  animation: bearTremor 0.12s steps(2) infinite;
+  filter: brightness(1.0) sepia(0.2) saturate(1.5) hue-rotate(-10deg);
+  transition: filter 0.6s ease-in;
+}
+
+/* --- Phase 2: critical (last ~500ms, intense shake + deep red) --- */
+.bear-charge-critical {
+  animation: bearTremorHard 0.06s steps(2) infinite;
+  filter: brightness(1.1) sepia(0.5) saturate(2.5) hue-rotate(-20deg);
+}
+
+/* --- Phase 3: strike moment (flash + scale burst) --- */
+.bear-strike {
+  animation: bearStrikeBurst 0.3s steps(4) forwards;
+  filter: brightness(1.8) sepia(0.6) saturate(3.0) hue-rotate(-30deg);
+}
+
+/* --- Strike particles --- */
+.bear-particle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #cc2200;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 50;
+  animation: bearParticleFly 0.4s steps(6) forwards;
+}
+
+.bear-particle:nth-child(odd) {
+  width: 8px;
+  height: 8px;
+  background: #ff4422;
+}
+
+/* ---- Keyframes ---- */
+
+@keyframes bearTremor {
+  0%   { transform: translate(-50%, -50%) translate(-1px, 0); }
+  50%  { transform: translate(-50%, -50%) translate(1px, 0); }
+  100% { transform: translate(-50%, -50%) translate(-1px, 0); }
+}
+
+@keyframes bearTremorHard {
+  0%   { transform: translate(-50%, -50%) translate(-2px, -1px); }
+  25%  { transform: translate(-50%, -50%) translate(2px, 1px); }
+  50%  { transform: translate(-50%, -50%) translate(-2px, 1px); }
+  75%  { transform: translate(-50%, -50%) translate(2px, -1px); }
+  100% { transform: translate(-50%, -50%) translate(-2px, -1px); }
+}
+
+@keyframes bearStrikeBurst {
+  0%   { transform: translate(-50%, -50%) scale(1.0); }
+  30%  { transform: translate(-50%, -50%) scale(1.15); }
+  60%  { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1.0); }
+}
+
+@keyframes bearParticleFly {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+  50%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translate(var(--bpx), var(--bpy)) scale(0.3); }
+}

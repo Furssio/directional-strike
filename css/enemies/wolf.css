@@ -1,0 +1,60 @@
+/* ═══════════════════════════════════════
+   WOLF — leap wind + lunge dash FX
+   ═══════════════════════════════════════ */
+
+/* --- Wind particles on leap back --- */
+.wolf-wind {
+  position: absolute;
+  width: 14px;
+  height: 6px;
+  background: #ccccaa;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.9;
+  animation: wolfWindFly 0.4s steps(6) forwards;
+}
+
+.wolf-wind:nth-child(odd) {
+  width: 10px;
+  height: 4px;
+  background: #aaaaaa;
+}
+
+.wolf-wind:nth-child(3n) {
+  width: 8px;
+  height: 8px;
+  background: #ddddbb;
+}
+
+/* --- Dash lines on lunge --- */
+.wolf-dash {
+  position: absolute;
+  width: 18px;
+  height: 3px;
+  background: #bbbbbb;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 49;
+  opacity: 0.8;
+  animation: wolfDashFade 0.35s steps(5) forwards;
+}
+
+.wolf-dash:nth-child(odd) {
+  width: 12px;
+  height: 3px;
+  background: #999999;
+}
+
+/* ---- Keyframes ---- */
+
+@keyframes wolfWindFly {
+  0%   { opacity: 0.9; transform: translate(0, 0) scale(1); }
+  50%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translate(var(--wx), var(--wy)) scale(0.3); }
+}
+
+@keyframes wolfDashFade {
+  0%   { opacity: 0.8; transform: translate(0, 0) scaleX(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scaleX(0.2); }
+}

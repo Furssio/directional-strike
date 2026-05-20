@@ -151,8 +151,6 @@ const SlashFX = (() => {
 
 /* ── SLASH TRAIL — blended energy blade ── */
 
-/* ── SLASH TRAIL — blue projectile slash ── */
-
 function showSlashTrail(dir) {
   const a = document.getElementById('arena');
   if (!a) return;
@@ -163,9 +161,7 @@ function showSlashTrail(dir) {
   const cx = w / 2;
   const cy = h / 2;
 
-  const isHoriz = (dir === 'left' || dir === 'right');
-  const travelDist = isHoriz ? w / 2 : h / 2;
-  const duration = 300; // ms to reach arena edge
+  const duration = 300;
 
   // rotation based on direction
   let rot = 0;
@@ -174,34 +170,35 @@ function showSlashTrail(dir) {
   if (dir === 'up')    rot = -90;
   if (dir === 'down')  rot = 90;
 
-  // create slash projectile
-  const el = document.createElement('div');
-  el.className = 'slash-trail-projectile';
-  el.style.left = cx + 'px';
-  el.style.top  = cy + 'px';
-  el.style.transform = `translate(-50%,-50%) rotate(${rot}deg) scale(1.8)`;
-
-  a.appendChild(el);
-
-  // target position
+  // target position (off-screen)
   let tx = cx, ty = cy;
   if (dir === 'right') tx = w + 32;
   if (dir === 'left')  tx = -32;
   if (dir === 'up')    ty = -32;
   if (dir === 'down')  ty = h + 32;
 
-  // particle trail — spawn particles along the path
-  const trailInterval = 25; // ms between particles
+  // create slash projectile
+  const el = document.createElement('div');
+  el.className = 'slash-trail-projectile';
+  el.style.left = cx + 'px';
+  el.style.top  = cy + 'px';
+  el.style.transform = `translate(-50%,-50%) rotate(${rot}deg) scale(1.8)`;
+  a.appendChild(el);
+
+  // particle trail — track position with lerp instead of getBoundingClientRect
+  const startTime = performance.now();
+  const trailInterval = 20;
   const trailTimer = setInterval(() => {
-    const rect = el.getBoundingClientRect();
-    const arenaRect = a.getBoundingClientRect();
-    // particle position relative to arena
-    const px = rect.left - arenaRect.left + rect.width / 2;
-    const py = rect.top - arenaRect.top + rect.height / 2;
-    _spawnSlashParticle(a, px, py);
+    const elapsed = performance.now() - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    // current projectile position via lerp
+    const px = cx + (tx - cx) * t;
+    const py = cy + (ty - cy) * t;
+    // spawn particles behind the projectile along the travel axis
+    _spawnSlashParticle(a, px, py, dir);
   }, trailInterval);
 
-  // start movement after one frame (so transition triggers)
+  // start movement after one frame
   requestAnimationFrame(() => {
     el.style.transition = `left ${duration}ms linear, top ${duration}ms linear`;
     el.style.left = tx + 'px';
@@ -225,14 +222,27 @@ function showSlashTrail(dir) {
 
 /* ── SLASH PARTICLE ── */
 
-function _spawnSlashParticle(container, x, y) {
-  const count = 2 + Math.floor(Math.random() * 2); // 2-3 particles
+function _spawnSlashParticle(container, x, y, dir) {
+  const count = 3 + Math.floor(Math.random() * 3); // 3-5 particles
+  const isHoriz = (dir === 'left' || dir === 'right');
+
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'slash-trail-particle';
-    const ox = (Math.random() - 0.5) * 16;
-    const oy = (Math.random() - 0.5) * 16;
-    const size = 2 + Math.floor(Math.random() * 3); // 2-4px
+
+    // offset behind projectile (along travel axis) + small perpendicular spread
+    let ox, oy;
+    if (isHoriz) {
+      // behind: opposite of travel direction, spread on Y axis (small)
+      ox = (dir === 'right' ? -1 : 1) * (4 + Math.random() * 14);
+      oy = (Math.random() - 0.5) * 10;
+    } else {
+      // behind: opposite of travel direction, spread on X axis (small)
+      ox = (Math.random() - 0.5) * 10;
+      oy = (dir === 'down' ? -1 : 1) * (4 + Math.random() * 14);
+    }
+
+    const size = 3 + Math.floor(Math.random() * 4); // 3-6px
     p.style.cssText = `
       left: ${x + ox}px;
       top: ${y + oy}px;
@@ -240,10 +250,9 @@ function _spawnSlashParticle(container, x, y) {
       height: ${size}px;
     `;
     container.appendChild(p);
-    setTimeout(() => p.remove(), 300);
+    setTimeout(() => p.remove(), 350);
   }
 }
-
 /* ── ABILITY REGISTRATION ── */
 
 AbilityRegistry.register({

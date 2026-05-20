@@ -1,0 +1,78 @@
+/* ═══════════════════════════════════════
+   THUNDER HOUND — teleport lightning FX
+   ═══════════════════════════════════════ */
+
+/* --- Brief flash on hound after teleport --- */
+.thound-flash {
+  filter: brightness(2.5) saturate(0.3);
+  animation: thoundFlicker 0.08s steps(2) 4 forwards;
+}
+
+/* --- Lightning burst (spawned at old + new pos) --- */
+.thound-bolt {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #66ccff;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 1;
+  animation: thoundBoltPop 0.35s steps(5) forwards;
+}
+
+.thound-bolt:nth-child(odd) {
+  width: 10px;
+  height: 10px;
+  background: #ffee44;
+}
+
+.thound-bolt:nth-child(3n) {
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+}
+
+/* --- Static zap cross at teleport origin/destination --- */
+.thound-zap {
+  position: absolute;
+  width: 4px;
+  height: 32px;
+  background: #aaeeff;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 51;
+  opacity: 1;
+  animation: thoundZapFade 0.25s steps(4) forwards;
+}
+
+.thound-zap::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 4px;
+  background: #aaeeff;
+  transform: translate(-50%, -50%);
+}
+
+/* ---- Keyframes ---- */
+
+@keyframes thoundFlicker {
+  0%   { filter: brightness(2.5) saturate(0.3); }
+  50%  { filter: brightness(1.0) saturate(1.0); }
+  100% { filter: brightness(1.0) saturate(1.0); }
+}
+
+@keyframes thoundBoltPop {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+  40%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.2); }
+}
+
+@keyframes thoundZapFade {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  50%  { opacity: 0.6; transform: translate(-50%, -50%) scale(0.7); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+}

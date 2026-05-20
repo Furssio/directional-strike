@@ -10,7 +10,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  box-shadow: inset 0 0 60px rgba(18, 105, 204, 0.25);
+  box-shadow: inset 0 0 60px rgba(10, 60, 160, 0.25);
 }
 
 /* ── SLASH PROJECTILE ── */
@@ -24,18 +24,18 @@
   pointer-events: none;
   z-index: 15;
   animation: slashAnim 0.25s steps(1) forwards;
-  filter: sepia(1) saturate(5) hue-rotate(200deg) brightness(0.7);
+  filter: brightness(0.5) sepia(1) saturate(8) hue-rotate(190deg);
 }
 
 /* ── CENTER FLASH ── */
 .slash-center-flash {
   position: absolute;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle,
-    rgba(80, 160, 255, 0.7) 0%,
-    rgba(18, 60, 160, 0.3) 50%,
+    rgba(30, 100, 220, 0.8) 0%,
+    rgba(10, 40, 140, 0.4) 45%,
     transparent 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -49,20 +49,22 @@
   pointer-events: none;
   z-index: 14;
   image-rendering: pixelated;
-  animation: slashParticleFade 300ms ease-out forwards;
+  animation: slashParticleFade 350ms ease-out forwards;
 }
 
 @keyframes slashParticleFade {
   0% {
-    opacity: 0.9;
-    background-color: rgba(81, 200, 252, 0.9);
+    opacity: 1;
+    background-color: rgba(40, 160, 255, 0.95);
+    box-shadow: 0 0 4px rgba(30, 120, 220, 0.6);
   }
-  40% {
-    opacity: 0.7;
-    background-color: rgba(40, 120, 220, 0.8);
+  35% {
+    opacity: 0.8;
+    background-color: rgba(20, 80, 200, 0.85);
   }
   100% {
     opacity: 0;
-    background-color: rgba(12, 40, 120, 0);
+    background-color: rgba(8, 30, 100, 0);
+    box-shadow: none;
   }
 }

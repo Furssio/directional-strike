@@ -20,8 +20,8 @@ const CONFIG = {
      unlocked. Set false to test real progression.
      Toggle with debug overlay (T key).
   ─────────────────────────────────────── */
-  devUnlockAll: false,       // unlock all maps + abilities
-devUnlockMapsOnly: true,  // unlock maps but NOT abilities (for slot testing)
+  devUnlockAll: true,       // unlock all maps + abilities
+devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
 
   /* ── PLAYER ─────────────────────────────
      maxHp:            base max HP

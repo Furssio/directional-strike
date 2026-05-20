@@ -1,0 +1,70 @@
+/* ═══════════════════════════════════════
+   TURTLE — shell crack + exposed FX
+   ═══════════════════════════════════════ */
+
+/* --- Shell crack flash on first hit --- */
+.turtle-crack {
+  filter: brightness(2.0) saturate(0.4);
+  animation: turtleCrackShake 0.3s steps(4) forwards;
+}
+
+/* --- Exposed wobble (vulnerable, slow) --- */
+.turtle-exposed {
+  animation: turtleWobble 0.5s steps(4) ease-out forwards;
+}
+
+/* --- Shell fragment particles --- */
+.turtle-shell-piece {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #448844;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 1;
+  animation: turtleShellFly 0.5s steps(6) forwards;
+}
+
+.turtle-shell-piece:nth-child(odd) {
+  width: 10px;
+  height: 10px;
+  background: #669944;
+}
+
+.turtle-shell-piece:nth-child(3n) {
+  width: 8px;
+  height: 8px;
+  background: #336633;
+}
+
+.turtle-shell-piece:nth-child(4n) {
+  width: 14px;
+  height: 6px;
+  background: #88aa66;
+}
+
+/* ---- Keyframes ---- */
+
+@keyframes turtleCrackShake {
+  0%   { transform: translate(-50%, -50%) translate(0, 0); filter: brightness(2.0) saturate(0.4); }
+  25%  { transform: translate(-50%, -50%) translate(-3px, 2px); }
+  50%  { transform: translate(-50%, -50%) translate(3px, -2px); filter: brightness(1.5) saturate(0.7); }
+  75%  { transform: translate(-50%, -50%) translate(-2px, -1px); }
+  100% { transform: translate(-50%, -50%) translate(0, 0); filter: brightness(1.0) saturate(1.0); }
+}
+
+@keyframes turtleWobble {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  20%  { transform: translate(-50%, -50%) rotate(8deg); }
+  40%  { transform: translate(-50%, -50%) rotate(-6deg); }
+  60%  { transform: translate(-50%, -50%) rotate(4deg); }
+  80%  { transform: translate(-50%, -50%) rotate(-2deg); }
+  100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes turtleShellFly {
+  0%   { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+  50%  { opacity: 0.7; }
+  100% { opacity: 0; transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.3); }
+}
