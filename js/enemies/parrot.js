@@ -22,6 +22,7 @@ EnemyRegistry.register({
   bulletSpeed:     4.0,
   noHpBar:         true,
   deathColors: ['#33cc44', '#ff4444', '#3388ff'],
+  bulletType: 'bullet-coconut',
 
   onTick(e, cx, cy) {
     if (e._shotsFired === undefined) {

@@ -20,6 +20,7 @@ EnemyRegistry.register({
   bulletSpeed:     4.0,
   rotateToDirection: true,
   deathColors: ['#dddddd', '#aaaaaa', '#776633'],
+   bulletType: 'bullet-dark',
 
   onHit(e) {
     if (e._phase2) return;

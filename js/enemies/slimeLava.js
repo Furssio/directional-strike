@@ -117,8 +117,8 @@ function _spawnLavaSpit(enemy) {
 
   const spitDef = {
     id:        '_lava_spit',
-    sprite:    'assets/enemies/bullet_rock/idle.png',
-    size:      22,
+    sprite: 'assets/enemies/bullet_lava/idle.png',
+    size:      32,
     hpPct:     0.01,
     damagePct: 0.20,
     speedMult: 2.5,
@@ -142,6 +142,7 @@ function _spawnLavaSpit(enemy) {
   el.style.backgroundSize  = 'cover';
   el.style.imageRendering  = 'pixelated';
   el.style.transform  = 'translate(-50%,-50%)';
+  el.classList.add('bullet-lava');
 
   arena.appendChild(el);
   spit.el    = el;

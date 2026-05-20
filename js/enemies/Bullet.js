@@ -9,16 +9,17 @@
 
 class Bullet {
 
-  constructor(x, y, vx, vy, dmgPct) {
-    this.x         = x;
-    this.y         = y;
-    this.vx        = vx;
-    this.vy        = vy;
-    this.vxBase    = vx;
-    this.vyBase    = vy;
-    this.damagePct = dmgPct;
-    this.el        = null;
-    this.sprite = 'assets/enemies/bullet_rock/idle.png';
+  constructor(x, y, vx, vy, dmgPct, bulletType) {
+    this.x          = x;
+    this.y          = y;
+    this.vx         = vx;
+    this.vy         = vy;
+    this.vxBase     = vx;
+    this.vyBase     = vy;
+    this.damagePct  = dmgPct;
+    this.bulletType = bulletType || null;
+    this.el         = null;
+    this.sprite     = 'assets/enemies/bullet_rock/idle.png';
   }
 
 }

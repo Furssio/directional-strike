@@ -155,8 +155,7 @@ function spawnBullet(enemy) {
   const vx = dx / dist * enemy.bulletSpeed;
   const vy = dy / dist * enemy.bulletSpeed;
 
-  const b = new Bullet(enemy.x, enemy.y, vx, vy, enemy.bulletDamagePct);
-// salva sempre velocità piena come base per onDeactivate
+const b = new Bullet(enemy.x, enemy.y, vx, vy, enemy.bulletDamagePct, enemy.def.bulletType);// salva sempre velocità piena come base per onDeactivate
 b.vxBase = vx;
 b.vyBase = vy;
   const el = document.createElement('div');
@@ -168,6 +167,9 @@ b.vyBase = vy;
   el.style.imageRendering  = 'pixelated';
   el.style.backgroundColor = 'transparent';
   el.style.border          = 'none';
+
+  // apply bullet type visual class
+  if (b.bulletType) el.classList.add(b.bulletType);
 
   arena.appendChild(el);
   b.el    = el;

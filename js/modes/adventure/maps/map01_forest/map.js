@@ -68,7 +68,7 @@ MapRegistry.register({
     // Wave 2 — First real wave
     2: {
       duration: 15,
-      spawnInterval: 2400,
+      spawnInterval: 800,
       maxAlive: 4,
       minAlive: 1,
       pool: { ravager: 8, crusher: 2 },
@@ -80,8 +80,8 @@ MapRegistry.register({
 
     // Wave 3 — Slightly tighter spawns
     3: {
-      duration: 18,
-      spawnInterval: 2200,
+      duration: 15,
+      spawnInterval: 1000,
       maxAlive: 3,
       minAlive: 1,
       pool: { ravager: 7, crusher: 3 },
@@ -91,11 +91,11 @@ MapRegistry.register({
 
     // Wave 4 — More enemies, first bursts
     4: {
-      duration: 20,
-      spawnInterval: 1800,
+      duration: 15,
+      spawnInterval: 1900,
       maxAlive: 4,
       minAlive: 2,
-      pool: { ravager: 6, crusher: 4 },
+      pool: { ravager: 7, crusher: 3 },
       burstChance: 0.15,
       burstSize: 2,
     },
@@ -105,8 +105,8 @@ MapRegistry.register({
     // Wave 5 — Peak difficulty for beginners
     // Ravager now 2-hit, same pressure as wave 4
     5: {
-      duration: 22,
-      spawnInterval: 2000,
+      duration: 20,
+      spawnInterval: 2200,
       maxAlive: 4,
       minAlive: 2,
       pool: { ravager: 7, crusher: 3 },
@@ -118,11 +118,11 @@ MapRegistry.register({
     // Player just got upgrade, feels powerful
     // But ravagers are 2-hit now so still engaging
     6: {
-      duration: 22,
-      spawnInterval: 1800,
+      duration: 20,
+      spawnInterval: 2100,
       maxAlive: 5,
       minAlive: 3,
-      pool: { ravager: 10 },
+      pool: { ravager: 9, crusher: 1 },
       burstChance: 0.2,
       burstSize: 2,
     },
@@ -132,11 +132,11 @@ MapRegistry.register({
     // Wave 7 — Crusher returns, like wave 4 but
     // ravagers are 2-hit so player feels the difference
     7: {
-      duration: 25,
+      duration: 20,
       spawnInterval: 2000,
-      maxAlive: 4,
+      maxAlive: 3,
       minAlive: 2,
-      pool: { ravager: 6, crusher: 4 },
+      pool: { ravager: 7, crusher: 3 },
       burstChance: 0.15,
       burstSize: 2,
     },
@@ -144,10 +144,10 @@ MapRegistry.register({
     // Wave 8 — ALL CRUSHER: dangerous but fewer on field
     // Player must parry bullets and manage space
     8: {
-      duration: 25,
+      duration: 20,
       spawnInterval: 2000,
       maxAlive: 3,
-      minAlive: 1,
+      minAlive: 2,
       pool: { crusher: 10 },
       burstChance: 0.2,
       burstSize: 2,
@@ -157,10 +157,10 @@ MapRegistry.register({
 
     // Wave 9 — Mix returns, ravager-heavy
     9: {
-      duration: 25,
+      duration: 20,
       spawnInterval: 2000,
       maxAlive: 4,
-      minAlive: 2,
+      minAlive: 1,
       pool: { ravager: 6, crusher: 4 },
       burstChance: 0.25,
       burstSize: 2,
@@ -182,7 +182,7 @@ MapRegistry.register({
     // Ravager flood, fast (speedMult 1.2), 1-hit again
     // Player with 5 upgrades destroys everything
     11: {
-      duration: 35,
+      duration: 30,
       spawnInterval: 1200,
       maxAlive: 4,
       minAlive: 2,

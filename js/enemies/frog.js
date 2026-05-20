@@ -101,8 +101,8 @@ function _spawnFrogSpit(enemy) {
 
   const spitDef = {
     id:        '_frog_spit',
-    sprite:    'assets/enemies/bullet_rock/idle.png',
-    size:      22,
+    sprite: 'assets/enemies/bullet_spit/idle.png',
+    size:      32,
     hpPct:     0.01,
     damagePct: 0.15,
     speedMult: 2.0,
@@ -126,6 +126,7 @@ function _spawnFrogSpit(enemy) {
   el.style.backgroundSize  = 'cover';
   el.style.imageRendering  = 'pixelated';
   el.style.transform  = 'translate(-50%,-50%)';
+  el.classList.add('bullet-spit');
 
   arena.appendChild(el);
   spit.el     = el;
