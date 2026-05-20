@@ -98,7 +98,7 @@ document.getElementById('pause-maps').addEventListener('click', () => {
     if (ActiveDirector === ChallengeDirector) {
       showScreen(sMenu);
     } else {
-      showScreen(sMapSelect);
+     showScreen(sMapSelect);
       if (typeof initMapSelect === 'function') initMapSelect();
     }
   });

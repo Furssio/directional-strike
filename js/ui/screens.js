@@ -134,7 +134,7 @@ function _setupCompleteButtons() {
         startGame(true);
       } else {
         showScreen(sMapSelect);
-        if (typeof initMapSelect === 'function') initMapSelect();
+      if (typeof initMapSelect === 'function') initMapSelect();
       }
     }, () => {
       startGameLoop();

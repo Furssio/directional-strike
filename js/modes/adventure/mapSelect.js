@@ -123,9 +123,10 @@ function _buildCarouselTrack() {
       slide.appendChild(lock);
     }
 
-    // slot badge for maps that give guaranteed free spin
+   // slot badge for maps that give guaranteed free spin (hide if already claimed)
     const hasSlot = CONFIG.abilities.slotAfterMaps.includes(map.id);
-    if (hasSlot && !isBoss) {
+    const slotClaimed = Progress.isMapCompleted(map.id) && !Progress.shouldTriggerSlot(map.id);
+    if (hasSlot && !isBoss && !slotClaimed) {
       const badge = document.createElement('div');
       badge.className = 'slide-slot-badge';
       badge.innerHTML =
@@ -380,7 +381,6 @@ function _buildSlotButton() {
   btn.classList.remove('hidden');
   btn.onclick = _onSlotMenuClick;
 }
-
 function _onSlotMenuClick(e) {
   if (e) { e.stopPropagation(); e.preventDefault(); }
 
@@ -478,4 +478,7 @@ function _renderAbilityPicker() {
     wrap.style.borderColor = colors[rarity] || '#4488ff';
     wrap.style.opacity = isLocked ? '0.6' : '1';
   }
+}
+function initMapSelect() {
+  buildMapSelectScreen();
 }
