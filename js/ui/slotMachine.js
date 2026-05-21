@@ -92,19 +92,8 @@ const SlotMachine = (() => {
       return { result: Progress.rollSlot(true), nearMiss: false };
     }
 
-    // menu: last spin of last video, nothing found = guaranteed
-    if (_isLastSpinOfLastVideo() && !_foundAny && _allResults.length === 0) {
-      return { result: Progress.rollSlot(true), nearMiss: false };
-    }
-
-    const result = Progress.rollSlot(false);
-
-    // near miss: 3rd spin of video, all empty
-    if (_spins === _maxSpins - 1 && !_foundAny && result === null) {
-      return { result: null, nearMiss: true };
-    }
-
-    return { result, nearMiss: false };
+    // menu mode: every spin is guaranteed
+    return { result: Progress.rollSlot(true), nearMiss: false };
   }
 
   /* ── SPIN ───────────────────────────── */

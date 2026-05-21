@@ -13,7 +13,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: false,
+ debug: true,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -432,9 +432,8 @@ abilities: {
     
     // Menu slot machine (rewarded ad)
     menuSlots: {
-        maxVideos:       3,
-        spinsPerVideo:   3,
-        // Last video guarantees ability if none found in first 2
+        maxVideos:       2,
+        spinsPerVideo:   1,
         guaranteedLastVideo: true
     }
 },

@@ -261,5 +261,5 @@ MapRegistry.register({
     crusher: { fromWave: 3, weight: 2 },
   },
 
-  unlocksAbility: 'range_boost',
+  unlocksAbility: null,
 });
