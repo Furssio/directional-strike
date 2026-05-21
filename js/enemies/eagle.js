@@ -22,9 +22,34 @@ EnemyRegistry.register({
   deathColors: ['#dddddd', '#aaaaaa', '#776633'],
    bulletType: 'bullet-dark',
 
+  /* --- Wind burst at vanish position --- */
+  _spawnWind(x, y, dirX, dirY) {
+    const arena = document.getElementById('G');
+    if (!arena) return;
+    const count = 12;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'eagle-wind';
+      const spread = (Math.random() - 0.5) * 1.4;
+      const baseAngle = Math.atan2(dirY, dirX);
+      const angle = baseAngle + spread;
+      const dist = 30 + Math.random() * 60;
+      p.style.left = x + 'px';
+      p.style.top  = y + 'px';
+      p.style.setProperty('--wx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--wy', Math.sin(angle) * dist + 'px');
+      arena.appendChild(p);
+      setTimeout(() => p.remove(), 450);
+    }
+  },
+
   onHit(e) {
     if (e._phase2) return;
     e._phase2 = true;
+
+    // save old position for FX
+    const oldX = e.x;
+    const oldY = e.y;
 
     // vanish and reappear from opposite side
     const opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
@@ -45,10 +70,16 @@ EnemyRegistry.register({
     e.firstShotFired = false;
     e.hasBullet = false;
 
+    // wind FX at old position (vanish effect)
+    const dx = e.x - oldX;
+    const dy = e.y - oldY;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    this._spawnWind(oldX, oldY, dx / dist, dy / dist);
+
     // recalc first shot distance from new position
-    const dx = cx - e.x;
-    const dy = cy - e.y;
-    e.spawnDist     = Math.sqrt(dx * dx + dy * dy);
+    const sdx = cx - e.x;
+    const sdy = cy - e.y;
+    e.spawnDist     = Math.sqrt(sdx * sdx + sdy * sdy);
     e.firstShotDist = e.spawnDist * CONFIG.bullet.firstShotDistPct;
 
     // phase 2: change sprite + remove rotation

@@ -14,7 +14,7 @@ AbilityRegistry.register({
   desc:     'slows everything for 3s',
   icon:     '🌀',
   barColor: '#E24B4A',
-  duration: 5000,
+  duration: 4000,
 
   piercing:      false,
   blocksBullets: false,

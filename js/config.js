@@ -56,8 +56,8 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
   combo: {
     minKills:           3,
     decayMs:            3000,
-    chargePerKill:      8,
-    chargePerComboKill: 14,
+    chargePerKill:      6,
+    chargePerComboKill: 10,
 
     // color tiers — each entry: [minKills, multiplier]
     // combo tick sound plays from minKills onward
