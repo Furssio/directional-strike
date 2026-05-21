@@ -103,6 +103,10 @@ const SCRIPTS = [
   'js/modes/challenge/challengeDirector.js',
   'js/modes/challenge/challengeUpgradeChoice.js',
   'js/modes/challenge/challengeScreen.js',
+  'js/modes/challenge/challengeScaling.js',
+  'js/modes/challenge/challengePool.js',
+  'js/modes/challenge/challengeTransition.js',
+  'js/modes/challenge/challengeDimension.js',
 
 
   /* ── DEBUG (must be last) ── */
