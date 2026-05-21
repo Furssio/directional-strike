@@ -249,7 +249,31 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
     inputWindowMs:        3000,
     inputIdleThreshold:   1,
     inputIdleSpawnMs:     600,
+
+    // ... existing adventure config stays ...
+
+  // ── COMBO SYSTEM DEFAULTS ──────────────
+  // Default direction cooldown (ms) — how long
+  // a direction is blocked after spawning.
+  // Can be overridden per wave with dirCooldown.
+  defaultDirCooldown: 800,
+
+  // Default stagger per combo pattern (ms).
+  // This is the delay between enemies in
+  // a multi-enemy combo. Can be overridden
+  // per wave with 'stagger' in waveConfig.
+  comboStagger: {
+    single:        0,
+    pair_opposite: 400,
+    pair_adjacent: 350,
+    burst_single:  250,
+    triple:        400,
+    rush:          300,
+    surround:      500,
   },
+  },
+
+
 
 /* ── CHALLENGE ─────────────────────────
      Challenge Mode — infinite survival.

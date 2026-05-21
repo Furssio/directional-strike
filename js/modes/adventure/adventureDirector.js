@@ -1,12 +1,75 @@
 /* ═══════════════════════════════════════
-   ADVENTUREDIRECTOR.JS
-   Adventure Mode orchestrator — v3.
-   Time-based waves with automatic upgrade
-   choice after configurable waves.
+   ADVENTUREDIRECTOR.JS — v4 COMBO SYSTEM
+   Adventure Mode orchestrator.
 
-   Each wave's duration and spawn config
-   comes from the map's waveConfig.
-   No stress meter, no kill-based advance.
+   === HOW THE COMBO SYSTEM WORKS ===
+
+   Every spawn tick, instead of spawning
+   1 random enemy, the system picks a
+   COMBO PATTERN and spawns enemies
+   according to that pattern.
+
+   COMBO PATTERNS (defined in CONFIG):
+   - single:         1 enemy from 1 direction
+   - pair_opposite:  1+1 from opposite sides (up+down or left+right)
+   - pair_adjacent:  1+1 from adjacent sides (up+right, down+left...)
+   - burst_single:   2 enemies from SAME direction (one line)
+   - triple:         1 from 3 different directions
+   - rush:           3 enemies from SAME direction
+   - surround:       1 from ALL 4 directions
+
+   STAGGER:
+   When a combo spawns multiple enemies,
+   they don't all appear at once. There's
+   a delay (stagger) between each one.
+   Each pattern has its own default stagger:
+   - single:        0ms (only 1 enemy)
+   - pair_opposite: 400ms (player needs time to turn)
+   - pair_adjacent: 350ms
+   - burst_single:  250ms (same dir, one hit kills both)
+   - triple:        400ms
+   - rush:          300ms
+   - surround:      500ms (most pressure, most time)
+
+   HOW TO USE IN WAVECONFIG:
+   Each wave can define which combos are
+   available and their weights (probability).
+   Higher weight = more likely to be picked.
+
+   Example wave config:
+   {
+     duration: 20,
+     spawnInterval: 2000,
+     maxAlive: 5,
+     minAlive: 2,
+     pool: { ravager: 7, crusher: 3 },
+     combos: {
+       single: 5,        // very common
+       pair_opposite: 3,  // moderate
+       burst_single: 2,   // occasional
+     },
+     stagger: 400,        // override default stagger (optional)
+     dirCooldown: 1000,   // ms before same dir can spawn again (optional)
+   }
+
+   FALLBACK:
+   If a wave does NOT have 'combos' defined,
+   the system uses the OLD behavior:
+   single spawn + burstChance/burstSize.
+   This keeps all existing maps working.
+
+   DIRECTION COOLDOWN:
+   After spawning from a direction, that
+   direction is blocked for dirCooldown ms.
+   This prevents the same side from being
+   hammered repeatedly. Default: 800ms.
+   Configurable per wave in waveConfig.
+
+   COMBO FALLBACK:
+   If the chosen combo can't spawn
+   (directions blocked), the system tries
+   a simpler combo automatically:
+   surround → triple → pair → single → skip
 
    Used by: systems/loop.js
    Depends on: MapRegistry, config.js,
@@ -26,10 +89,18 @@ const AdventureDirector = (() => {
   let draining      = false;
   let drainPauseMs  = 0;
 
+  /* ── STAGGER QUEUE ──────────────────
+     When a combo spawns multiple enemies,
+     the extras go in this queue with a
+     delay. Each tick processes the queue.
+
+     Format: { dir, pool, delay, maxAlive }
+  ──────────────────────────────────────── */
+  let _staggerQueue = [];
+
   /* ── INPUT TRACKER ──────────────────
      Counts player actions to detect idle.
-     If player isn't pressing anything
-     and field is low, spawn faster.     */
+  ──────────────────────────────────────── */
   let _inputTimes = [];
 
   function _trackInput() {
@@ -57,7 +128,6 @@ const AdventureDirector = (() => {
   function _getWaveDuration() {
     const wc = _getWaveConfig();
     if (wc && wc.duration !== undefined) return wc.duration * 1000;
-    // fallback: 30 seconds
     return 30000;
   }
 
@@ -72,7 +142,7 @@ const AdventureDirector = (() => {
     const factor   = 1 - (progress * accel);
     let interval = Math.max(300, Math.round(base * factor));
 
-    // slow spawn rate when bullet time (or any slow) is active
+    // slow spawn rate when bullet time is active
     if (player && player.speedMultiplier < 1) {
       interval = Math.round(interval / player.speedMultiplier);
     }
@@ -91,6 +161,16 @@ const AdventureDirector = (() => {
               : (currentMap.minEnemiesAlive || CONFIG.adventure.defaultMinAlive);
   }
 
+  function _getDirCooldown() {
+    const wc = _getWaveConfig();
+    if (wc && wc.dirCooldown !== undefined) return wc.dirCooldown;
+    return CONFIG.adventure.defaultDirCooldown || 800;
+  }
+
+  /* ── BUILD POOL ───────────────────────
+     Creates weighted array of enemy names.
+     ['ravager','ravager','ravager','crusher','crusher']
+  ──────────────────────────────────────── */
   function _buildPool() {
     const wc = _getWaveConfig();
     if (wc && wc.pool) {
@@ -100,21 +180,43 @@ const AdventureDirector = (() => {
       }
       return pool;
     }
-    // fallback: use old enemyPool with fromWave
     return buildEnemyPoolForMap(wave, currentMap, false);
   }
 
-  /* ── UPGRADE CHECK ──────────────────
-     Returns true if an upgrade choice
-     should trigger after this wave.     */
+  /* ── PICK FROM POOL ───────────────────
+     Picks a random enemy from the weighted
+     pool, respecting maxInField limits.
+  ──────────────────────────────────────── */
+  function _pickFromPool(pool) {
+    if (pool.length === 0) return null;
+
+    // count current enemies by type
+    const fieldCounts = {};
+    for (const e of enemies) {
+      fieldCounts[e.name] = (fieldCounts[e.name] || 0) + 1;
+    }
+
+    // filter by maxInField
+    let available = pool;
+    if (currentMap && currentMap.maxInField) {
+      available = pool.filter(name => {
+        const cap = currentMap.maxInField[name];
+        if (cap === undefined) return true;
+        return (fieldCounts[name] || 0) < cap;
+      });
+    }
+    if (available.length === 0) return null;
+
+    const name = available[Math.floor(Math.random() * available.length)];
+    return EnemyRegistry.get(name);
+  }
+
+  /* ── UPGRADE CHECK ──────────────────── */
   function _isUpgradeWave(w) {
     const list = CONFIG.adventure.upgradeAfterWaves || [2, 4, 6, 8, 10];
     return list.includes(w);
   }
 
-  /* ── FINAL WAVE CHECK ───────────────
-     Wave 11 is the final wave.
-     Maps can override with totalWaves.  */
   function _getTotalWaves() {
     if (currentMap && currentMap.totalWaves) return currentMap.totalWaves;
     return 11;
@@ -124,76 +226,274 @@ const AdventureDirector = (() => {
     return wave === _getTotalWaves();
   }
 
-  /* ── SPAWN ONE ENEMY ──────────────── */
+  /* ═══════════════════════════════════
+     COMBO SYSTEM
+     ═══════════════════════════════════ */
 
-  function _spawnOne() {
-    const pool = _buildPool();
-    if (pool.length === 0) return;
+  /* ── GET COMBO CONFIG ─────────────────
+     Returns the combos object for current
+     wave, or null if wave uses old system.
+  ──────────────────────────────────────── */
+  function _getCombos() {
+    const wc = _getWaveConfig();
+    if (wc && wc.combos) return wc.combos;
+    return null;
+  }
 
-    const maxAlive = _getMaxAlive();
-    if (enemies.length >= maxAlive) return;
+  /* ── PICK A COMBO PATTERN ─────────────
+     Weighted random pick from the combos
+     object. Returns pattern name string.
 
-    const dir = pickDirAdventure();
-    if (!dir) return;
+     Example input: { single: 5, pair_opposite: 3 }
+     Total weight = 8
+     'single' has 5/8 = 62.5% chance
+  ──────────────────────────────────────── */
+  /* ── PICK A COMBO PATTERN ─────────────
+     Supports two formats in waveConfig:
+     
+     Simple (weight only):
+       combos: { single: 5, pair_opposite: 3 }
+     
+     Detailed (weight + custom stagger):
+       combos: {
+         single: 5,
+         pair_opposite: { weight: 3, stagger: 300 },
+         surround: { weight: 1, stagger: 450 },
+       }
+     
+     You can mix both formats in the same wave.
+     Returns the pattern name string.
+  ──────────────────────────────────────── */
+  function _pickCombo(combos) {
+    const entries = Object.entries(combos);
+    let total = 0;
+    for (const [, val] of entries) {
+      total += (typeof val === 'object') ? val.weight : val;
+    }
+    if (total <= 0) return 'single';
 
-    const enemyName = pool[Math.floor(Math.random() * pool.length)];
-    const def       = EnemyRegistry.get(enemyName);
-    if (!def) return;
+    let roll = Math.random() * total;
+    for (const [pattern, val] of entries) {
+      const w = (typeof val === 'object') ? val.weight : val;
+      roll -= w;
+      if (roll <= 0) return pattern;
+    }
+    return entries[0][0];
+  }
+
+  /* ── GET STAGGER FOR PATTERN ──────────
+     Returns delay in ms between enemies
+     in a multi-enemy combo.
+     Wave config can override with 'stagger'.
+  ──────────────────────────────────────── */
+ /* ── GET STAGGER FOR PATTERN ──────────
+     Priority order:
+     1. Per-combo stagger in waveConfig
+        combos: { pair_opposite: { weight:3, stagger:300 } }
+     2. CONFIG.adventure.comboStagger defaults
+     3. Fallback 400ms
+  ──────────────────────────────────────── */
+  function _getStagger(pattern) {
+    // check per-combo stagger in waveConfig
+    const wc = _getWaveConfig();
+    if (wc && wc.combos && wc.combos[pattern]) {
+      const val = wc.combos[pattern];
+      if (typeof val === 'object' && val.stagger !== undefined) {
+        return val.stagger;
+      }
+    }
+
+    // per-pattern defaults from CONFIG
+    const defaults = CONFIG.adventure.comboStagger || {};
+    if (defaults[pattern] !== undefined) return defaults[pattern];
+
+    // fallback
+    return 400;
+  }
+
+  /* ── SPAWN ONE ENEMY ──────────────────
+     Spawns a single enemy from pool at
+     the given direction. Applies cooldown.
+     Returns true if spawned successfully.
+  ──────────────────────────────────────── */
+  function _doSpawn(dir, pool) {
+    const def = _pickFromPool(pool);
+    if (!def) return false;
 
     spawnEnemyDirected(def, dir);
-
-    // register in gate system
-    dirGateEnemies[dir].push(enemies[enemies.length - 1]);
+    registerSpawnedEnemy(dir);
+    setDirCooldown(dir, _getDirCooldown());
+    return true;
   }
 
-  /* ── SPAWN BURST ──────────────────
-     Spawns multiple enemies on the same
-     direction with small delays.         */
-  let _burstQueue = [];
-
-  function _spawnBurst(count) {
-    const pool = _buildPool();
-    if (pool.length === 0) return;
-
-    const maxAlive = _getMaxAlive();
-    if (enemies.length >= maxAlive) return;
-
-    const dir = pickDirAdventure();
-    if (!dir) return;
-
-    // spawn first one immediately
-    const name1 = pool[Math.floor(Math.random() * pool.length)];
-    const def1  = EnemyRegistry.get(name1);
-    if (!def1) return;
-    spawnEnemyDirected(def1, dir);
-    dirGateEnemies[dir].push(enemies[enemies.length - 1]);
-
-    // queue the rest with delays
-    for (let i = 1; i < count; i++) {
-      _burstQueue.push({
-        dir:      dir,
-        pool:     pool,
-        delay:    i * 500,
-        maxAlive: maxAlive,
-      });
-    }
+  /* ── QUEUE STAGGERED SPAWN ────────────
+     Adds a delayed spawn to the queue.
+     Will be processed in _tickStaggerQueue.
+  ──────────────────────────────────────── */
+  function _queueSpawn(dir, pool, delayMs) {
+    _staggerQueue.push({
+      dir:      dir,
+      pool:     pool,
+      delay:    delayMs,
+      maxAlive: _getMaxAlive(),
+    });
   }
 
-  function _tickBurstQueue(dt) {
-    for (let i = _burstQueue.length - 1; i >= 0; i--) {
-      _burstQueue[i].delay -= dt;
-      if (_burstQueue[i].delay <= 0) {
-        const b = _burstQueue[i];
-        _burstQueue.splice(i, 1);
-        if (enemies.length >= b.maxAlive) continue;
-        const name = b.pool[Math.floor(Math.random() * b.pool.length)];
-        const def  = EnemyRegistry.get(name);
-        if (!def) continue;
-        spawnEnemyDirected(def, b.dir);
-        dirGateEnemies[b.dir].push(enemies[enemies.length - 1]);
+  /* ── TICK STAGGER QUEUE ───────────────
+     Process delayed spawns from combos.
+     Called every tick.
+  ──────────────────────────────────────── */
+  function _tickStaggerQueue(dt) {
+    for (let i = _staggerQueue.length - 1; i >= 0; i--) {
+      _staggerQueue[i].delay -= dt;
+      if (_staggerQueue[i].delay <= 0) {
+        const item = _staggerQueue[i];
+        _staggerQueue.splice(i, 1);
+        if (enemies.length >= item.maxAlive) continue;
+        _doSpawn(item.dir, item.pool);
       }
     }
   }
+
+  /* ── EXECUTE COMBO ────────────────────
+     Main combo executor. Picks directions
+     based on pattern, spawns first enemy
+     immediately, queues rest with stagger.
+
+     If the chosen pattern can't find free
+     directions, falls back to simpler
+     patterns automatically:
+     surround → triple → pair_opposite → single
+
+     Returns true if at least 1 enemy spawned.
+  ──────────────────────────────────────── */
+  function _executeCombo(pattern) {
+    const pool    = _buildPool();
+    if (pool.length === 0) return false;
+
+    const maxAlive = _getMaxAlive();
+    if (enemies.length >= maxAlive) return false;
+
+    const stagger = _getStagger(pattern);
+
+    // ── SINGLE: 1 enemy, 1 direction
+    if (pattern === 'single') {
+      const dir = pickDirAdventure();
+      if (!dir) return false;
+      return _doSpawn(dir, pool);
+    }
+
+    // ── PAIR_OPPOSITE: 1+1 from opposite sides
+    if (pattern === 'pair_opposite') {
+      const dirs = pickDirOpposite();
+      if (!dirs) return _executeCombo('single'); // fallback
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      return true;
+    }
+
+    // ── PAIR_ADJACENT: 1+1 from adjacent sides
+    if (pattern === 'pair_adjacent') {
+      const dirs = pickDirAdjacent();
+      if (!dirs) return _executeCombo('single'); // fallback
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      return true;
+    }
+
+    // ── BURST_SINGLE: 2 enemies same direction
+    if (pattern === 'burst_single') {
+      const dir = pickDirAdventure();
+      if (!dir) return false;
+      _doSpawn(dir, pool);
+      _queueSpawn(dir, pool, stagger);
+      return true;
+    }
+
+    // ── TRIPLE: 1 from 3 directions
+    if (pattern === 'triple') {
+      const dirs = pickDir3();
+      if (!dirs) return _executeCombo('pair_opposite'); // fallback
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      _queueSpawn(dirs[2], pool, stagger * 2);
+      return true;
+    }
+
+    // ── RUSH: 3 enemies same direction
+    if (pattern === 'rush') {
+      const dir = pickDirAdventure();
+      if (!dir) return false;
+      _doSpawn(dir, pool);
+      _queueSpawn(dir, pool, stagger);
+      _queueSpawn(dir, pool, stagger * 2);
+      return true;
+    }
+
+    // ── SURROUND: 1 from all 4 directions
+    if (pattern === 'surround') {
+      const dirs = pickDirAll();
+      if (!dirs) return _executeCombo('triple'); // fallback
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      _queueSpawn(dirs[2], pool, stagger * 2);
+      _queueSpawn(dirs[3], pool, stagger * 3);
+      return true;
+    }
+
+    // unknown pattern — default to single
+    return _executeCombo('single');
+  }
+
+  /* ── LEGACY SPAWN (no combos) ─────────
+     Used when wave has NO combos defined.
+     Same behavior as old system:
+     1 enemy + burstChance.
+  ──────────────────────────────────────── */
+  function _legacySpawn() {
+    const pool = _buildPool();
+    if (pool.length === 0) return;
+
+    const maxAlive = _getMaxAlive();
+    if (enemies.length >= maxAlive) return;
+
+    const dir = pickDirAdventure();
+    if (!dir) {
+      // fallback for nearly empty field
+      if (enemies.length < (currentMap.minEnemiesAlive || 2)) {
+        const dirs = ['up', 'down', 'left', 'right'];
+        const fb = dirs.filter(d => {
+          const list = dirGateEnemies[d];
+          let alive = 0;
+          for (const e of list) { if (e.isAlive()) alive++; }
+          return alive < 2;
+        });
+        if (fb.length > 0) {
+          const pick = fb[Math.floor(Math.random() * fb.length)];
+          _doSpawn(pick, pool);
+        }
+      }
+      return;
+    }
+
+    // burst chance (old system)
+    const wc = _getWaveConfig();
+    const burstChance = (wc && wc.burstChance !== undefined) ? wc.burstChance : 0;
+    const burstSize   = (wc && wc.burstSize !== undefined) ? wc.burstSize : 2;
+
+    if (burstChance > 0 && Math.random() < burstChance && _staggerQueue.length === 0) {
+      _doSpawn(dir, pool);
+      for (let i = 1; i < burstSize; i++) {
+        _queueSpawn(dir, pool, i * 500);
+      }
+    } else {
+      _doSpawn(dir, pool);
+    }
+  }
+
+  /* ═══════════════════════════════════
+     MAIN DIRECTOR LOGIC
+     ═══════════════════════════════════ */
 
   return {
 
@@ -213,17 +513,16 @@ const AdventureDirector = (() => {
       drainPauseMs  = 0;
       active        = true;
       _inputTimes   = [];
-      _burstQueue   = [];
+      _staggerQueue = [];
 
       waveDuration = _getWaveDuration();
-waveTimeLeft = waveDuration;
-console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
+      waveTimeLeft = waveDuration;
 
       resetAdventureSpawner();
       if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
       setArenaBackground(currentMap.background || null);
 
-      // start tutorial on wave 1 of first map (first time only)
+      // tutorial on wave 1 of first map (first time only)
       if (wave === 1 && currentMap.id === 'map01_forest' &&
           typeof Tutorial !== 'undefined' && Tutorial.isNeeded()) {
         Tutorial.start();
@@ -234,47 +533,41 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
 
     /* ── STOP ─────────────────────────── */
     stop() {
-  active = false;
-},
+      active = false;
+    },
 
-    /* ── INPUT TRACKING (called from input.js) ── */
+    /* ── INPUT TRACKING ───────────────── */
     trackInput() {
       _trackInput();
     },
 
     /* ── EVENTS ───────────────────────── */
-    onDamage() { /* no stress — kept for interface compat */ },
-    onKill()   { /* kills don't advance waves anymore */  },
+    onDamage() {},
+    onKill()   {},
 
     /* ── NEXT WAVE ────────────────────── */
     nextWave() {
       const total = _getTotalWaves();
-
-      // current wave just ended — check if it was the last
       if (wave >= total) {
         this.completeMap();
         return;
       }
-
-      // check if upgrade choice triggers after this wave
       if (_isUpgradeWave(wave)) {
         active = false;
         if (typeof startUpgradeChoice === 'function') startUpgradeChoice();
         return;
       }
-
-      // advance to next wave
       this._startWave(wave + 1);
     },
 
-    /* ── START WAVE (internal) ────────── */
+    /* ── START WAVE ───────────────────── */
     _startWave(newWave) {
       wave         = newWave;
       waveElapsed  = 0;
       spawnTimer   = 0;
       draining     = false;
       drainPauseMs = 0;
-      _burstQueue  = [];
+      _staggerQueue = [];
       resetAdventureSpawner();
 
       waveDuration = _getWaveDuration();
@@ -287,20 +580,20 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
 
     /* ── COMPLETE MAP ─────────────────── */
     completeMap() {
-  if (completed) return;
-  completed = true;
-  active    = false;
+      if (completed) return;
+      completed = true;
+      active    = false;
 
-  Progress.markMapCompleted(currentMap.id);
+      Progress.markMapCompleted(currentMap.id);
 
-  // check if this map triggers guaranteed slot
-  const hasSlot = Progress.shouldTriggerSlot(currentMap.id);
-  if (hasSlot) Progress.markSlotGiven(currentMap.id);
+      const hasSlot = Progress.shouldTriggerSlot(currentMap.id);
+      if (hasSlot) Progress.markSlotGiven(currentMap.id);
 
-  if (typeof showMapComplete === 'function') {
-    showMapComplete(currentMap, hasSlot);
-  }
-},
+      if (typeof showMapComplete === 'function') {
+        showMapComplete(currentMap, hasSlot);
+      }
+    },
+
     /* ── TICK ─────────────────────────── */
     tick(dt) {
       if (!active) return;
@@ -308,21 +601,19 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
       // tutorial controls wave 1 spawning
       if (typeof Tutorial !== 'undefined' && Tutorial.isActive()) {
         Tutorial.tick(dt);
-        // still tick orbs and burst queue
         if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
-        _tickBurstQueue(dt);
-        return; // skip normal spawn logic
+        _tickStaggerQueue(dt);
+        return;
       }
 
-      // process queued burst spawns
-      _tickBurstQueue(dt);
+      // process stagger queue
+      _tickStaggerQueue(dt);
 
-      // tick orb system
+      // orb system
       if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
 
-      // wave timer countdown
+      // draining: waiting for enemies to die after wave timer ends
       if (draining) {
-        // waiting for remaining enemies to die
         if (enemies.length === 0 && bullets.length === 0) {
           drainPauseMs -= dt;
           if (drainPauseMs <= 0) {
@@ -333,33 +624,37 @@ console.log('waveDuration:', waveDuration, 'waveTimeLeft:', waveTimeLeft);
         return;
       }
 
+      // wave timer
       waveElapsed  += dt;
-waveTimeLeft -= dt;
-if (dt > 100) console.log('BIG DT:', dt, 'waveTimeLeft:', waveTimeLeft);
-if (waveTimeLeft <= 0) {
-  waveTimeLeft = 0;
-  draining     = true;
-  drainPauseMs = 500;
-  console.log('DRAINING at waveElapsed:', waveElapsed, 'waveDuration:', waveDuration);
-  return;
-}
+      waveTimeLeft -= dt;
+      if (waveTimeLeft <= 0) {
+        waveTimeLeft = 0;
+        draining     = true;
+        drainPauseMs = 500;
+        return;
+      }
 
       // ── SPAWN LOGIC ──
 
       const minAlive = _getMinAlive();
+      const combos   = _getCombos();
 
-      // anti-idle: if player isn't pressing and field is low, spawn fast
+      // anti-idle: field below minimum, force spawn
       if (enemies.length < minAlive) {
         const inputRate     = _getInputRate();
         const idleThreshold = CONFIG.adventure.inputIdleThreshold || 1;
-        if (inputRate <= idleThreshold) {
-          _spawnOne();
-          spawnTimer = CONFIG.adventure.inputIdleSpawnMs || 600;
-          return;
+
+        if (combos) {
+          // combo system: force a single spawn
+          _executeCombo('single');
+        } else {
+          // legacy system
+          _legacySpawn();
         }
-        // field below minimum but player is active — spawn soon
-        _spawnOne();
-        spawnTimer = 400;
+
+        spawnTimer = (inputRate <= idleThreshold)
+          ? (CONFIG.adventure.inputIdleSpawnMs || 600)
+          : 400;
         return;
       }
 
@@ -368,16 +663,15 @@ if (waveTimeLeft <= 0) {
       if (spawnTimer <= 0) {
         const interval = _getSpawnInterval();
 
-        // burst chance from wave config
-        const wc          = _getWaveConfig();
-        const burstChance = (wc && wc.burstChance !== undefined) ? wc.burstChance : 0;
-        const burstSize   = (wc && wc.burstSize !== undefined) ? wc.burstSize : 2;
-
-        if (burstChance > 0 && Math.random() < burstChance && _burstQueue.length === 0) {
-          _spawnBurst(burstSize);
+        if (combos) {
+          // ── COMBO SYSTEM ──
+          const pattern = _pickCombo(combos);
+          _executeCombo(pattern);
         } else {
-          _spawnOne();
+          // ── LEGACY SYSTEM ──
+          _legacySpawn();
         }
+
         spawnTimer = interval;
       }
     },
@@ -398,27 +692,20 @@ if (waveTimeLeft <= 0) {
 
     resumeAfterChoice() {
       active = true;
-      // after upgrade choice, advance to next wave
       this._startWave(wave + 1);
     },
 
-   restart() {
+    restart() {
       if (!currentMap) return false;
       return this.init(currentMap.id);
     },
 
-    /* ── RESTART CURRENT WAVE ────────────
-       Used by ad continue system.
-       Restarts the same wave from scratch
-       without advancing. Re-activates
-       the director.                       */
     restartCurrentWave() {
       this._startWave(wave);
       active = true;
     },
-    /* ── DEBUG INTERFACE ─────────────────
-       Only used by debug.js when CONFIG.debug = true.
-       Returns snapshot of internal state. */
+
+    /* ── DEBUG ────────────────────────── */
     _debug() {
       return {
         wave,
@@ -437,15 +724,14 @@ if (waveTimeLeft <= 0) {
         minAlive:      _getMinAlive(),
         pool:          _buildPool(),
         inputRate:     _getInputRate(),
-        burstQueue:    _burstQueue.length,
+        staggerQueue:  _staggerQueue.length,
+        combos:        _getCombos(),
+        dirCooldown:   _getDirCooldown(),
         isFinalWave:   _isFinalWave(),
         isUpgradeWave: _isUpgradeWave(wave),
       };
     },
 
-    /* ── DEBUG SKIP TIMER ────────────────
-       Sets wave timer to 10s or less.
-       No-op if already draining or inactive. */
     debugSkipTimer() {
       if (!active || draining) return;
       if (waveTimeLeft > 10000) {
