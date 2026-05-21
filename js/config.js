@@ -13,7 +13,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: true,
+ debug: false,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -276,119 +276,115 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
 
 
 /* ── CHALLENGE ─────────────────────────
-     Challenge Mode — infinite survival.
-     Maps rotate, difficulty scales with caps.
-     Two choice types alternate: stat & ability.
+   Challenge Mode — infinite survival.
+   Combo system + sawtooth difficulty.
+   Maps rotate every 10 waves, difficulty
+   rises within cycle then drops on change.
+   Floor rises each cycle until plateau.
+─────────────────────────────────────── */
+challenge: {
 
-     wavePerMap:        waves before map changes
-     waveDuration:      base (ms), increment, cap, slowdownAfterWave
-     spawn:             base interval/maxAlive/minAlive, scaling, caps
-     choiceSchedule:    array of {untilWave, every} — how often choices appear
-     choicePattern:     alternating types: 'stat' and 'ability'
-     abilityChoiceCount: how many abilities shown per choice (pick 1)
-     mapPool:           map ids available for rotation
-     dimensionEvent:    every X map changes, chance to trigger dimension map
-     difficultyCap:     wave number where scaling stops
-  ─────────────────────────────────────── */
-  challenge: {
+  wavesPerMap: 10,
 
-    /* — map rotation — */
-    wavesPerMap: 10,
+  /* wave duration in SECONDS */
+  waveDuration: {
+    base:              12,
+    incrementPerWave:  0.8,
+    slowdownAfterWave: 20,
+    slowdownFactor:    0.5,
+    cap:               25,
+  },
 
-    /* — wave duration curve (ms) —
-       Starts at base, grows by increment each wave.
-       Growth slows after slowdownAfterWave (increment halves).
-       Stops growing at cap. */
-    waveDuration: {
-      base:               15000,
-      incrementPerWave:   800,
-      slowdownAfterWave:  20,
-      slowdownFactor:     0.5,
-      cap:                45000,
-    },
+  /* after this many map cycles, floor stops rising */
+  plateauAtCycle: 6,
 
-    /* — spawn scaling —
-       spawnInterval shrinks each wave (faster spawns).
-       maxAlive grows each wave (more enemies).
-       Everything has a cap so it never breaks. */
-    spawn: {
-      baseInterval:         1800,
-      intervalDecayPerWave: 25,
-      intervalCap:          600,
+  /* maps challenge wave position (1-10) to adventure wave number */
+  tierMapping: {
+    easy:     [2, 3],
+    medium:   [5, 6],
+    hard:     [8, 9],
+    peak:     [10, 11],
+    moonPeak: [7, 9],
+  },
 
-      baseMaxAlive:         4,
-      maxAliveGrowPerWave:  0.2,
-      maxAliveCap:          12,
+  waveTiers: {
+    1: 'easy', 2: 'easy',
+    3: 'medium', 4: 'medium', 5: 'medium',
+    6: 'hard', 7: 'hard', 8: 'hard',
+    9: 'peak', 10: 'peak',
+  },
 
-      baseMinAlive:         2,
-      minAliveGrowPerWave:  0.1,
-      minAliveCap:          6,
+  /* floor scaling per completed cycle (multipliers) */
+  floorScaling: {
+    spawnIntervalMult: 0.03,
+    dirCooldownMult:   0.03,
+    maxAlivePlus:      0.3,
+  },
 
-      baseBurstChance:      0.0,
-      burstChanceGrow:      0.02,
-      burstChanceCap:       0.35,
-      burstSize:            2,
-    },
-
-    /* — choice schedule —
-       untilWave: this bracket applies up to wave X
-       every: choice appears every N waves
-       Last entry has no untilWave = applies forever */
-    choiceSchedule: [
-      { untilWave: 10, every: 2 },
-      { untilWave: 20, every: 3 },
-      { untilWave: 30, every: 4 },
-      { every: 5 },
+  /* map rotation */
+  mapRotation: {
+    earlyMaps: [
+      'map01_forest', 'map02_dungeon', 'map03_desert',
+      'map05_snow', 'map06_beach',
     ],
-
-    /* — choice types —
-       Alternate between these. First choice is ALWAYS 'ability'.
-       'stat' = normal upgrade cards (attack, speed, hp, etc.)
-       'ability' = 4 random abilities, must pick one (swap current) */
-    choiceTypes: ['ability', 'stat'],
-
-    /* how many ability cards shown per ability choice */
-    abilityChoiceCount: 4,
-
-    /* — map pool — playable map ids (no boss maps) */
-    mapPool: [
+    lateMaps: [
+      'map07_clouds', 'map09_volcano',
+      'map10_sakura', 'map12_moon',
+    ],
+    allMaps: [
       'map01_forest', 'map02_dungeon', 'map03_desert',
       'map05_snow', 'map06_beach', 'map07_clouds',
       'map09_volcano', 'map10_sakura', 'map12_moon',
     ],
-
-    /* — dimension event —
-       Special map with mixed enemies from all maps.
-       afterMaps: can't appear before this many map changes
-       chance: probability each map change (after afterMaps) */
-    dimensionEvent: {
-      afterMaps: 3,
-      chance:    0.2,
-    },
-
-    /* — difficulty cap —
-       After this wave, spawn params stop scaling.
-       Wave duration also stops growing (separate cap above).
-       Game continues infinitely at this difficulty. */
-    difficultyCap: 60,
-
-    /* — map theme colors —
-       Used by map transition effect.
-       Each map id maps to [color, colorDark]. */
-    mapColors: {
-      map01_forest:  ['#44aa66', '#226633'],
-      map02_dungeon: ['#8888aa', '#555577'],
-      map03_desert:  ['#ddaa55', '#997733'],
-      map05_snow:    ['#88ccff', '#4488bb'],
-      map06_beach:   ['#55ccbb', '#228877'],
-      map07_clouds:  ['#aaccff', '#5577aa'],
-      map09_volcano: ['#ff6644', '#aa3311'],
-      map10_sakura:  ['#ff88aa', '#aa4466'],
-      map12_moon:    ['#aa88ff', '#6644bb'],
-      dimension:     ['#ff00ff', '#880088'],
-    },
+    historySize: 3,
+    earlyCycleEnd: 3,
+    breatherMap: 'map01_forest',
+    breatherChance: 0.15,
   },
 
+  /* dimension event */
+  dimensionEvent: {
+    afterCycles: 3,
+    chance: 0.20,
+    poolSize: 4,
+    rotatePerWave: 1,
+  },
+
+  /* enemy classes for dimension pool */
+  enemyClasses: {
+    fodder:   ['ravager', 'star', 'tornado'],
+    splitter: ['slime_large', 'slime_lava', 'crab'],
+    tank:     ['golem', 'golem_lava', 'turtle', 'oni'],
+    ranged:   ['crusher', 'parrot', 'eagle'],
+    tricky:   ['wolf', 'bear', 'spectral_deer', 'nara_deer',
+               'kitsune', 'thunder_hound', 'scorpion', 'frog'],
+  },
+
+  /* choice schedule */
+  choiceSchedule: [
+    { untilWave: 10, every: 2 },
+    { untilWave: 20, every: 3 },
+    { untilWave: 30, every: 4 },
+    { every: 5 },
+  ],
+
+  choiceTypes: ['ability', 'stat'],
+  abilityChoiceCount: 4,
+
+  /* map theme colors */
+  mapColors: {
+    map01_forest:  ['#44aa66', '#226633'],
+    map02_dungeon: ['#8888aa', '#555577'],
+    map03_desert:  ['#ddaa55', '#997733'],
+    map05_snow:    ['#88ccff', '#4488bb'],
+    map06_beach:   ['#55ccbb', '#228877'],
+    map07_clouds:  ['#aaccff', '#5577aa'],
+    map09_volcano: ['#ff6644', '#aa3311'],
+    map10_sakura:  ['#ff88aa', '#aa4466'],
+    map12_moon:    ['#aa88ff', '#6644bb'],
+    dimension:     ['#ff00ff', '#880088'],
+  },
+},
   /* ── ABILITIES UNLOCK SYSTEM ────────────
      Slot machine progression for unlocking
      special abilities.

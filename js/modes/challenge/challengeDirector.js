@@ -1,14 +1,19 @@
 /* ═══════════════════════════════════════
-   CHALLENGEDIRECTOR.JS
+   CHALLENGEDIRECTOR.JS — v2 COMBO SYSTEM
    Challenge Mode orchestrator.
    Infinite survival — maps rotate every
    N waves, difficulty scales with caps.
 
-   Two alternating choice types:
-   - 'stat'    = normal upgrade cards
-   - 'ability' = 4 random abilities, must pick one
+   Uses combo system from adventureDirector.
+   Sawtooth difficulty: rises within each
+   10-wave cycle, drops on map change,
+   floor rises each cycle until plateau.
 
-   First choice is ALWAYS ability (pre-wave 1).
+   Adventure waveConfigs are used directly
+   for pool + combos + dirCooldown values.
+
+   Dimension map: mixed enemies from all
+   maps using class system.
 
    Used by: systems/loop.js (via ActiveDirector)
    Depends on: MapRegistry, config.js,
@@ -24,7 +29,7 @@ const ChallengeDirector = (() => {
   let currentMapIndex = 0;
   let mapHistory      = [];
   let mapsCompleted   = 0;
-  let choiceCount     = 0;   // total choices made (for alternation)
+  let choiceCount     = 0;
   let bestWave        = 0;
 
   /* ── WAVE TIMER ────────────────────── */
@@ -35,8 +40,12 @@ const ChallengeDirector = (() => {
   let drainPauseMs  = 0;
   let spawnTimer    = 0;
 
-  /* ── BURST QUEUE ───────────────────── */
-  let _burstQueue = [];
+  /* ── STAGGER QUEUE ─────────────────── */
+  let _staggerQueue = [];
+
+  /* ── DIMENSION STATE ───────────────── */
+  let _dimPool      = [];
+  let _dimClasses   = [];
 
   /* ── INPUT TRACKER ─────────────────── */
   let _inputTimes = [];
@@ -54,55 +63,428 @@ const ChallengeDirector = (() => {
     return _inputTimes.length;
   }
 
-  /* ── WAVE DURATION CURVE ───────────── */
+  /* ── CYCLE HELPERS ─────────────────── */
+
+  function _getCycle() {
+    return Math.floor((wave - 1) / CONFIG.challenge.wavesPerMap) + 1;
+  }
+
+  function _getWaveInCycle() {
+    const pos = ((wave - 1) % CONFIG.challenge.wavesPerMap) + 1;
+    return pos; // 1-10
+  }
+
+  /* ── WAVE DURATION ─────────────────── */
 
   function _calcWaveDuration(w) {
     const c = CONFIG.challenge.waveDuration;
-    if (w <= 0) return c.base;
-
     let duration = c.base;
     for (let i = 1; i < w; i++) {
       let inc = c.incrementPerWave;
-      if (i >= c.slowdownAfterWave) {
-        inc *= c.slowdownFactor;
-      }
+      if (i >= c.slowdownAfterWave) inc *= c.slowdownFactor;
       duration += inc;
     }
-    return Math.min(c.cap, Math.round(duration));
+    return Math.min(c.cap, Math.round(duration * 10) / 10) * 1000;
   }
 
-  /* ── SPAWN PARAM CURVES ────────────── */
+  /* ── FLOOR SCALING ─────────────────── */
 
-  function _calcSpawnInterval(w) {
-    const s   = CONFIG.challenge.spawn;
-    const cap = CONFIG.challenge.difficultyCap;
-    const ew  = Math.min(w, cap);
-    const val = s.baseInterval - (ew * s.intervalDecayPerWave);
-    return Math.max(s.intervalCap, Math.round(val));
+  function _getFloorMult() {
+    const c       = CONFIG.challenge;
+    const cycle   = _getCycle();
+    const capped  = Math.min(cycle - 1, c.plateauAtCycle - 1);
+    return capped; // 0 at cycle 1, max at plateauAtCycle-1
   }
 
-  function _calcMaxAlive(w) {
-    const s   = CONFIG.challenge.spawn;
-    const cap = CONFIG.challenge.difficultyCap;
-    const ew  = Math.min(w, cap);
-    const val = s.baseMaxAlive + (ew * s.maxAliveGrowPerWave);
-    return Math.min(s.maxAliveCap, Math.floor(val));
+  function _applyFloor(spawnInterval) {
+    const floor = _getFloorMult();
+    const scale = CONFIG.challenge.floorScaling;
+    const mult  = 1 - (floor * scale.spawnIntervalMult);
+    return Math.max(600, Math.round(spawnInterval * mult));
   }
 
-  function _calcMinAlive(w) {
-    const s   = CONFIG.challenge.spawn;
-    const cap = CONFIG.challenge.difficultyCap;
-    const ew  = Math.min(w, cap);
-    const val = s.baseMinAlive + (ew * s.minAliveGrowPerWave);
-    return Math.min(s.minAliveCap, Math.floor(val));
+  function _applyFloorCooldown(cd) {
+    const floor = _getFloorMult();
+    const scale = CONFIG.challenge.floorScaling;
+    const mult  = 1 - (floor * scale.dirCooldownMult);
+    return Math.max(400, Math.round(cd * mult));
   }
 
-  function _calcBurstChance(w) {
-    const s   = CONFIG.challenge.spawn;
-    const cap = CONFIG.challenge.difficultyCap;
-    const ew  = Math.min(w, cap);
-    const val = s.baseBurstChance + (ew * s.burstChanceGrow);
-    return Math.min(s.burstChanceCap, val);
+  function _applyFloorMaxAlive(ma) {
+    const floor = _getFloorMult();
+    const scale = CONFIG.challenge.floorScaling;
+    return Math.min(10, ma + Math.floor(floor * scale.maxAlivePlus));
+  }
+
+  /* ── ADVENTURE WAVECONFIG LOOKUP ───── */
+
+  function _getAdventureWaveConfig() {
+    if (!currentMap || !currentMap.waveConfig) return null;
+
+    const c         = CONFIG.challenge;
+    const waveInCyc = _getWaveInCycle();
+    const tierName  = c.waveTiers[waveInCyc] || 'medium';
+
+    // Moon uses moonPeak instead of peak
+    let tier = tierName;
+    if (tier === 'peak' && currentMap.id === 'map12_moon') {
+      tier = 'moonPeak';
+    }
+
+    const range = c.tierMapping[tier] || c.tierMapping.medium;
+    // pick random adventure wave from range
+    const minW = range[0];
+    const maxW = range[1];
+    const advWave = minW + Math.floor(Math.random() * (maxW - minW + 1));
+
+    return currentMap.waveConfig[advWave] || null;
+  }
+
+  /* ── CURRENT WAVE PARAMS ───────────── */
+
+  let _currentWC = null; // cached per wave
+
+  function _cacheWaveConfig() {
+    if (currentMap && currentMap.isDimension) {
+      _currentWC = _buildDimensionWaveConfig();
+    } else {
+      _currentWC = _getAdventureWaveConfig();
+    }
+  }
+
+  function _getSpawnInterval() {
+    const wc   = _currentWC;
+    const base = wc ? wc.spawnInterval : 1800;
+    const floored = _applyFloor(base);
+
+    // sawtooth within wave
+    if (waveDuration <= 0) return floored;
+    const progress = Math.min(1, waveElapsed / waveDuration);
+    const accel    = CONFIG.adventure.spawnAccelPct || 0.30;
+    const factor   = 1 - (progress * accel);
+    let interval   = Math.max(500, Math.round(floored * factor));
+
+    // bullet time slowdown
+    if (player && player.speedMultiplier < 1) {
+      interval = Math.round(interval / player.speedMultiplier);
+    }
+    return interval;
+  }
+
+  function _getMaxAlive() {
+    const wc = _currentWC;
+    const base = wc ? wc.maxAlive : 4;
+    return _applyFloorMaxAlive(base);
+  }
+
+  function _getMinAlive() {
+    const wc = _currentWC;
+    return wc ? (wc.minAlive || 2) : 2;
+  }
+
+  function _getDirCooldown() {
+    const wc = _currentWC;
+    const base = (wc && wc.dirCooldown !== undefined)
+      ? wc.dirCooldown
+      : (CONFIG.adventure.defaultDirCooldown || 800);
+    return _applyFloorCooldown(base);
+  }
+
+  /* ── BUILD POOL ────────────────────── */
+
+  function _buildPool() {
+    const wc = _currentWC;
+    if (wc && wc.pool) {
+      const pool = [];
+      for (const [name, weight] of Object.entries(wc.pool)) {
+        for (let i = 0; i < weight; i++) pool.push(name);
+      }
+      return pool;
+    }
+    if (currentMap && currentMap.enemyPool) {
+      const pool = [];
+      for (const [name, cfg] of Object.entries(currentMap.enemyPool)) {
+        const w = cfg.weight || 1;
+        for (let i = 0; i < w; i++) pool.push(name);
+      }
+      return pool;
+    }
+    return ['ravager'];
+  }
+
+  /* ── PICK FROM POOL ────────────────── */
+
+  function _pickFromPool(pool) {
+    if (pool.length === 0) return null;
+    const fieldCounts = {};
+    for (const e of enemies) {
+      fieldCounts[e.name] = (fieldCounts[e.name] || 0) + 1;
+    }
+
+    let available = pool;
+    if (currentMap && currentMap.maxInField) {
+      available = pool.filter(name => {
+        const cap = currentMap.maxInField[name];
+        if (cap === undefined) return true;
+        return (fieldCounts[name] || 0) < cap;
+      });
+    }
+    if (available.length === 0) return null;
+    const name = available[Math.floor(Math.random() * available.length)];
+    return EnemyRegistry.get(name);
+  }
+
+  /* ═══════════════════════════════════
+     COMBO SYSTEM
+     (same as adventureDirector)
+     ═══════════════════════════════════ */
+
+  function _getCombos() {
+    const wc = _currentWC;
+    if (wc && wc.combos) return wc.combos;
+    return null;
+  }
+
+  function _pickCombo(combos) {
+    const entries = Object.entries(combos);
+    let total = 0;
+    for (const [, val] of entries) {
+      total += (typeof val === 'object') ? val.weight : val;
+    }
+    if (total <= 0) return 'single';
+    let roll = Math.random() * total;
+    for (const [pattern, val] of entries) {
+      const w = (typeof val === 'object') ? val.weight : val;
+      roll -= w;
+      if (roll <= 0) return pattern;
+    }
+    return entries[0][0];
+  }
+
+  function _getStagger(pattern) {
+    const wc = _currentWC;
+    if (wc && wc.combos && wc.combos[pattern]) {
+      const val = wc.combos[pattern];
+      if (typeof val === 'object' && val.stagger !== undefined) {
+        return val.stagger;
+      }
+    }
+    const defaults = CONFIG.adventure.comboStagger || {};
+    if (defaults[pattern] !== undefined) return defaults[pattern];
+    return 400;
+  }
+
+  function _doSpawn(dir, pool) {
+    const def = _pickFromPool(pool);
+    if (!def) return false;
+    spawnEnemyDirected(def, dir);
+    registerSpawnedEnemy(dir);
+    setDirCooldown(dir, _getDirCooldown());
+    return true;
+  }
+
+  function _queueSpawn(dir, pool, delayMs) {
+    _staggerQueue.push({
+      dir, pool, delay: delayMs, maxAlive: _getMaxAlive(),
+    });
+  }
+
+  function _tickStaggerQueue(dt) {
+    for (let i = _staggerQueue.length - 1; i >= 0; i--) {
+      _staggerQueue[i].delay -= dt;
+      if (_staggerQueue[i].delay <= 0) {
+        const item = _staggerQueue[i];
+        _staggerQueue.splice(i, 1);
+        if (enemies.length >= item.maxAlive) continue;
+        _doSpawn(item.dir, item.pool);
+      }
+    }
+  }
+
+  function _executeCombo(pattern) {
+    const pool = _buildPool();
+    if (pool.length === 0) return false;
+
+    const maxAlive = _getMaxAlive();
+    const queueCount = _staggerQueue.length;
+    if (enemies.length >= maxAlive + 1) return false;
+    if (enemies.length >= maxAlive && queueCount > 0) return false;
+
+    const stagger = _getStagger(pattern);
+
+    if (pattern === 'single') {
+      const dir = pickDirAdventure();
+      if (!dir) return false;
+      return _doSpawn(dir, pool);
+    }
+
+    if (pattern === 'pair_opposite') {
+      const dirs = pickDirOpposite();
+      if (!dirs) return _executeCombo('single');
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      return true;
+    }
+
+    if (pattern === 'pair_adjacent') {
+      const dirs = pickDirAdjacent();
+      if (!dirs) return _executeCombo('single');
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      return true;
+    }
+
+    if (pattern === 'burst_single') {
+      const dir = pickDirAdventure();
+      if (!dir) return false;
+      _doSpawn(dir, pool);
+      _queueSpawn(dir, pool, stagger);
+      return true;
+    }
+
+    if (pattern === 'triple') {
+      const dirs = pickDir3();
+      if (!dirs) return _executeCombo('pair_opposite');
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      _queueSpawn(dirs[2], pool, stagger * 2);
+      return true;
+    }
+
+    if (pattern === 'rush') {
+      const dir = pickDirAdventure();
+      if (!dir) return false;
+      _doSpawn(dir, pool);
+      _queueSpawn(dir, pool, stagger);
+      _queueSpawn(dir, pool, stagger * 2);
+      return true;
+    }
+
+    if (pattern === 'surround') {
+      const dirs = pickDirAll();
+      if (!dirs) return _executeCombo('triple');
+      _doSpawn(dirs[0], pool);
+      _queueSpawn(dirs[1], pool, stagger);
+      _queueSpawn(dirs[2], pool, stagger * 2);
+      _queueSpawn(dirs[3], pool, stagger * 3);
+      return true;
+    }
+
+    return _executeCombo('single');
+  }
+
+  /* ═══════════════════════════════════
+     DIMENSION MAP SYSTEM
+     ═══════════════════════════════════ */
+
+  function _buildDimensionMap() {
+    return {
+      id:          'dimension',
+      name:        'Dimension',
+      background:  null,
+      enemyPool:   {},
+      isDimension: true,
+    };
+  }
+
+  function _initDimensionPool() {
+    const classes = CONFIG.challenge.enemyClasses;
+    const classNames = Object.keys(classes);
+    // shuffle classes
+    for (let i = classNames.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [classNames[i], classNames[j]] = [classNames[j], classNames[i]];
+    }
+    // pick 4 classes, 1 enemy each
+    _dimClasses = classNames.slice(0, 4);
+    _dimPool = [];
+    for (const cls of _dimClasses) {
+      const members = classes[cls];
+      const pick = members[Math.floor(Math.random() * members.length)];
+      _dimPool.push({ name: pick, cls: cls });
+    }
+  }
+
+  function _rotateDimensionPool() {
+    const classes = CONFIG.challenge.enemyClasses;
+    const allClasses = Object.keys(classes);
+    // pick which slot to replace (random)
+    const replaceIdx = Math.floor(Math.random() * _dimPool.length);
+    const oldCls = _dimPool[replaceIdx].cls;
+    // pick a new class not currently in pool
+    let available = allClasses.filter(c =>
+      !_dimClasses.includes(c) || c === oldCls
+    );
+    // if all classes used, allow any except current slot
+    if (available.length === 0) {
+      available = allClasses.filter(c => c !== oldCls);
+    }
+    const newCls = available[Math.floor(Math.random() * available.length)];
+    const members = classes[newCls];
+    const newEnemy = members[Math.floor(Math.random() * members.length)];
+
+    // update
+    _dimClasses[replaceIdx] = newCls;
+    _dimPool[replaceIdx] = { name: newEnemy, cls: newCls };
+  }
+
+  function _buildDimensionWaveConfig() {
+    // build pool from current dimension enemies
+    const pool = {};
+    for (const entry of _dimPool) {
+      pool[entry.name] = 3; // equal weight
+    }
+
+    // use tier to determine combo aggressiveness
+    const waveInCyc = _getWaveInCycle();
+    const tierName  = CONFIG.challenge.waveTiers[waveInCyc] || 'medium';
+
+    let combos, dirCooldown, spawnInterval, maxAlive, minAlive;
+
+    if (tierName === 'easy') {
+      combos = { single: 5, pair_opposite: 3, burst_single: 2 };
+      dirCooldown = 1100;
+      spawnInterval = 2000;
+      maxAlive = 3;
+      minAlive = 2;
+    } else if (tierName === 'medium') {
+      combos = {
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 600 },
+        pair_adjacent: { weight: 2, stagger: 550 },
+        burst_single: 1,
+      };
+      dirCooldown = 1000;
+      spawnInterval = 1800;
+      maxAlive = 4;
+      minAlive = 2;
+    } else if (tierName === 'hard') {
+      combos = {
+        single: 3,
+        pair_opposite: { weight: 3, stagger: 700 },
+        pair_adjacent: { weight: 2, stagger: 650 },
+        burst_single: 2,
+        triple: { weight: 1, stagger: 750 },
+      };
+      dirCooldown = 900;
+      spawnInterval = 1600;
+      maxAlive = 4;
+      minAlive = 2;
+    } else { // peak
+      combos = {
+        single: 2,
+        pair_opposite: { weight: 3, stagger: 750 },
+        burst_single: 2,
+        triple: { weight: 2, stagger: 800 },
+        rush: { weight: 1, stagger: 600 },
+      };
+      dirCooldown = 800;
+      spawnInterval = 1400;
+      maxAlive = 5;
+      minAlive = 2;
+    }
+
+    return { pool, combos, dirCooldown, spawnInterval, maxAlive, minAlive };
   }
 
   /* ── CHOICE SCHEDULE ───────────────── */
@@ -114,7 +496,6 @@ const ChallengeDirector = (() => {
         return bracket.every;
       }
     }
-    // fallback: last bracket
     return schedule[schedule.length - 1].every;
   }
 
@@ -133,146 +514,50 @@ const ChallengeDirector = (() => {
 
   function _pickNextMap() {
     const c    = CONFIG.challenge;
-    const pool = c.mapPool;
+    const cycle = _getCycle();
 
     // check dimension event
     const dim = c.dimensionEvent;
-    if (mapsCompleted >= dim.afterMaps && Math.random() < dim.chance) {
+    if (cycle > dim.afterCycles && Math.random() < dim.chance) {
+      _initDimensionPool();
       return _buildDimensionMap();
     }
 
-    // pick random map, avoid repeating last one
-    let candidates = pool.filter(id => id !== (currentMap ? currentMap.id : null));
+    // determine pool based on cycle
+    let pool;
+    if (cycle <= c.mapRotation.earlyCycleEnd) {
+      // early: mostly easy maps + chance of late maps
+      pool = c.mapRotation.earlyMaps.slice();
+      // add 1-2 late maps as cycle progresses
+      if (cycle >= 2) {
+        const late = c.mapRotation.lateMaps;
+        const addCount = Math.min(cycle - 1, 2);
+        const shuffled = late.slice().sort(() => Math.random() - 0.5);
+        for (let i = 0; i < addCount; i++) {
+          if (shuffled[i]) pool.push(shuffled[i]);
+        }
+      }
+    } else {
+      // late: full pool
+      pool = c.mapRotation.allMaps.slice();
+
+      // breather chance — Forest appears as relief
+      if (Math.random() < c.mapRotation.breatherChance) {
+        return MapRegistry.get(c.mapRotation.breatherMap);
+      }
+    }
+
+    // filter out recent maps
+    const history = mapHistory.slice(-c.mapRotation.historySize);
+    let candidates = pool.filter(id => !history.includes(id));
     if (candidates.length === 0) candidates = pool.slice();
 
     const mapId = candidates[Math.floor(Math.random() * candidates.length)];
     return MapRegistry.get(mapId);
   }
 
-  function _buildDimensionMap() {
-    // special map: mixed enemies from all maps
-    const allEnemies = {};
-    const pool = CONFIG.challenge.mapPool;
-
-    for (const mapId of pool) {
-      const map = MapRegistry.get(mapId);
-      if (!map || !map.enemyPool) continue;
-      for (const [name, cfg] of Object.entries(map.enemyPool)) {
-        if (!allEnemies[name]) {
-          allEnemies[name] = { fromWave: 1, weight: cfg.weight || 1 };
-        }
-      }
-    }
-
-    return {
-      id:         'dimension',
-      name:       'Dimension',
-      background: null,  // can set a special bg later
-      enemyPool:  allEnemies,
-      isDimension: true,
-    };
-  }
-
   function _isMapChangeWave(w) {
     return w > 0 && (w % CONFIG.challenge.wavesPerMap) === 0;
-  }
-
-  /* ── BUILD ENEMY POOL ──────────────── */
-
-  function _buildPool() {
-    if (!currentMap || !currentMap.enemyPool) return ['ravager'];
-
-    const pool = [];
-    for (const [name, cfg] of Object.entries(currentMap.enemyPool)) {
-      const w = cfg.weight || 1;
-      for (let i = 0; i < w; i++) pool.push(name);
-    }
-    return pool;
-  }
-
-  /* ── SPAWN ONE ENEMY ───────────────── */
-
-  function _spawnOne() {
-    const pool = _buildPool();
-    if (pool.length === 0) return;
-
-    const maxAlive = _calcMaxAlive(wave);
-    if (enemies.length >= maxAlive) return;
-
-    const dir = pickDirAdventure();
-    if (!dir) return;
-
-    const enemyName = pool[Math.floor(Math.random() * pool.length)];
-    const def       = EnemyRegistry.get(enemyName);
-    if (!def) return;
-
-    spawnEnemyDirected(def, dir);
-    dirGateEnemies[dir].push(enemies[enemies.length - 1]);
-  }
-
-  /* ── SPAWN BURST ───────────────────── */
-
-  function _spawnBurst(count) {
-    const pool = _buildPool();
-    if (pool.length === 0) return;
-
-    const maxAlive = _calcMaxAlive(wave);
-    if (enemies.length >= maxAlive) return;
-
-    const dir = pickDirAdventure();
-    if (!dir) return;
-
-    const name1 = pool[Math.floor(Math.random() * pool.length)];
-    const def1  = EnemyRegistry.get(name1);
-    if (!def1) return;
-
-    spawnEnemyDirected(def1, dir);
-    dirGateEnemies[dir].push(enemies[enemies.length - 1]);
-
-    for (let i = 1; i < count; i++) {
-      _burstQueue.push({
-        dir,
-        pool,
-        delay:    i * 500,
-        maxAlive,
-      });
-    }
-  }
-
-  function _tickBurstQueue(dt) {
-    for (let i = _burstQueue.length - 1; i >= 0; i--) {
-      _burstQueue[i].delay -= dt;
-      if (_burstQueue[i].delay <= 0) {
-        const b = _burstQueue[i];
-        _burstQueue.splice(i, 1);
-        if (enemies.length >= b.maxAlive) continue;
-        const name = b.pool[Math.floor(Math.random() * b.pool.length)];
-        const def  = EnemyRegistry.get(name);
-        if (!def) continue;
-        spawnEnemyDirected(def, b.dir);
-        dirGateEnemies[b.dir].push(enemies[enemies.length - 1]);
-      }
-    }
-  }
-
-  /* ── GET SPAWN INTERVAL (with accel + bullet time) ── */
-
-  function _getSpawnInterval() {
-    const base = _calcSpawnInterval(wave);
-
-    // sawtooth: interval shrinks as wave progresses
-    if (waveDuration <= 0) return base;
-    const progress = Math.min(1, waveElapsed / waveDuration);
-    const accel    = CONFIG.adventure.spawnAccelPct || 0.30;
-    const factor   = 1 - (progress * accel);
-    let interval   = Math.max(300, Math.round(base * factor));
-
-    // slow spawn rate when bullet time is active
-    if (player && player.speedMultiplier < 1) {
-      interval = Math.round(interval / player.speedMultiplier);
-    }
-
-    return interval;
   }
 
   /* ── BEST WAVE (localStorage) ──────── */
@@ -296,10 +581,6 @@ const ChallengeDirector = (() => {
 
   return {
 
-    /* ── INIT ─────────────────────────
-       Called once when challenge starts.
-       Does NOT start wave 1 yet —
-       first shows ability choice.       */
     init() {
       wave            = 0;
       active          = false;
@@ -314,8 +595,11 @@ const ChallengeDirector = (() => {
       waveTimeLeft    = 0;
       draining        = false;
       drainPauseMs    = 0;
-      _burstQueue     = [];
+      _staggerQueue   = [];
       _inputTimes     = [];
+      _dimPool        = [];
+      _dimClasses     = [];
+      _currentWC      = null;
       bestWave        = _loadBestWave();
 
       // pick first map
@@ -327,66 +611,64 @@ const ChallengeDirector = (() => {
       return true;
     },
 
-    /* ── START FIRST WAVE ─────────────
-       Called after initial ability choice. */
     startFirstWave() {
       this._startWave(1);
       active = true;
     },
 
-    /* ── STOP ─────────────────────────── */
     stop() {
       active = false;
     },
 
-   /* ── INPUT TRACKING ──────────────── */
     trackInput() {
       _trackInput();
     },
 
-    /* ── COUNT CHOICE (used by first ability pick) ── */
     countChoice() {
       choiceCount++;
     },
 
-    /* ── EVENTS ───────────────────────── */
-    onDamage() { /* no stress in challenge */ },
-    onKill()   { /* kills don't advance waves */ },
+    onDamage() {},
+    onKill()   {},
 
-    /* ── NEXT WAVE ────────────────────── */
     nextWave() {
-      // check map change — async transition
       if (_isMapChangeWave(wave)) {
         active = false;
         this._changeMap();
-        return; // transition will call _afterMapChange()
+        return;
       }
 
-      // check if choice triggers
       if (_isChoiceWave(wave)) {
         active = false;
         const type = _getNextChoiceType();
         choiceCount++;
-
         if (typeof startChallengeChoice === 'function') {
           startChallengeChoice(type);
         }
         return;
       }
 
-      // advance to next wave
       this._startWave(wave + 1);
     },
 
-    /* ── START WAVE (internal) ────────── */
     _startWave(newWave) {
       wave         = newWave;
       waveElapsed  = 0;
       spawnTimer   = 0;
       draining     = false;
       drainPauseMs = 0;
-      _burstQueue  = [];
+      _staggerQueue = [];
       resetAdventureSpawner();
+
+      // rotate dimension pool each wave
+      if (currentMap && currentMap.isDimension && _dimPool.length > 0) {
+        if (_getWaveInCycle() > 1) {
+          _rotateDimensionPool();
+        }
+      }
+
+      // cache wave config for this wave
+      _cacheWaveConfig();
 
       waveDuration = _calcWaveDuration(wave);
       waveTimeLeft = waveDuration;
@@ -396,13 +678,11 @@ const ChallengeDirector = (() => {
       }
     },
 
-    /* ── CHANGE MAP ───────────────────── */
     _changeMap() {
       mapsCompleted++;
       const newMap = _pickNextMap();
       const self   = this;
 
-      // get theme colors
       const colors = CONFIG.challenge.mapColors;
       const isDim  = !!newMap.isDimension;
       const mapId  = newMap.id;
@@ -412,10 +692,8 @@ const ChallengeDirector = (() => {
       const themeDark  = colors[mapId]
         ? colors[mapId][1] : '#888888';
 
-      const displayName = (newMap.name || mapId)
-        .toUpperCase();
+      const displayName = (newMap.name || mapId).toUpperCase();
 
-      // swap callback — called mid-transition
       function onSwapBg() {
         currentMap = newMap;
         mapHistory.push(newMap.id);
@@ -423,7 +701,6 @@ const ChallengeDirector = (() => {
         resetAdventureSpawner();
       }
 
-      // play transition then resume
       if (isDim) {
         MapTransition.playDimension(onSwapBg).then(() => {
           self._afterMapChange();
@@ -437,11 +714,7 @@ const ChallengeDirector = (() => {
       }
     },
 
-/* ── AFTER MAP CHANGE ─────────────
-       Called when transition finishes.
-       Resumes wave progression. */
     _afterMapChange() {
-      // check if choice triggers on this wave
       if (_isChoiceWave(wave)) {
         const type = _getNextChoiceType();
         choiceCount++;
@@ -451,12 +724,10 @@ const ChallengeDirector = (() => {
         return;
       }
 
-      // otherwise start next wave
       active = true;
       this._startWave(wave + 1);
     },
 
-    /* ── GAME OVER ────────────────────── */
     onGameOver() {
       active = false;
       if (wave > bestWave) {
@@ -465,15 +736,14 @@ const ChallengeDirector = (() => {
       }
     },
 
-    /* ── TICK ─────────────────────────── */
     tick(dt) {
       if (!active) return;
 
-      _tickBurstQueue(dt);
+      _tickStaggerQueue(dt);
 
       if (typeof OrbSystem !== 'undefined') OrbSystem.tick(dt);
 
-      // draining: wait for enemies to die
+      // draining
       if (draining) {
         if (enemies.length === 0 && bullets.length === 0) {
           drainPauseMs -= dt;
@@ -497,35 +767,53 @@ const ChallengeDirector = (() => {
 
       // ── SPAWN LOGIC ──
 
-      const minAlive = _calcMinAlive(wave);
+      const minAlive = _getMinAlive();
+      const combos   = _getCombos();
 
-      // anti-idle: field below minimum
+      // anti-idle
       if (enemies.length < minAlive) {
         const inputRate     = _getInputRate();
         const idleThreshold = CONFIG.adventure.inputIdleThreshold || 1;
-        if (inputRate <= idleThreshold) {
-          _spawnOne();
-          spawnTimer = CONFIG.adventure.inputIdleSpawnMs || 600;
-          return;
+
+        if (combos) {
+          const spawned = _executeCombo('single');
+          if (!spawned) {
+            spawnTimer = 150;
+            return;
+          }
+        } else {
+          // legacy fallback (shouldn't happen)
+          const dir = pickDirAdventure();
+          if (dir) {
+            const pool = _buildPool();
+            _doSpawn(dir, pool);
+          }
         }
-        _spawnOne();
-        spawnTimer = 400;
+
+        spawnTimer = (inputRate <= idleThreshold)
+          ? (CONFIG.adventure.inputIdleSpawnMs || 600)
+          : 400;
         return;
       }
 
       // standard spawn cycle
       spawnTimer -= dt;
       if (spawnTimer <= 0) {
-        const interval   = _getSpawnInterval();
-        const burstChance = _calcBurstChance(wave);
-        const burstSize   = CONFIG.challenge.spawn.burstSize || 2;
+        const interval = _getSpawnInterval();
 
-        if (burstChance > 0 && Math.random() < burstChance && _burstQueue.length === 0) {
-          _spawnBurst(burstSize);
+        if (combos) {
+          const pattern = _pickCombo(combos);
+          const spawned = _executeCombo(pattern);
+          spawnTimer = spawned ? interval : Math.min(interval, 300);
         } else {
-          _spawnOne();
+          // legacy fallback
+          const dir = pickDirAdventure();
+          if (dir) {
+            const pool = _buildPool();
+            _doSpawn(dir, pool);
+          }
+          spawnTimer = interval;
         }
-        spawnTimer = interval;
       }
     },
 
@@ -547,34 +835,31 @@ const ChallengeDirector = (() => {
     getMapsCompleted()  { return mapsCompleted; },
     isDimensionMap()    { return currentMap && currentMap.isDimension; },
 
-    /* ── RESUME AFTER CHOICE ──────────── */
     resumeAfterChoice() {
       active = true;
       this._startWave(wave + 1);
     },
 
-    /* ── RESTART ──────────────────────── */
     restart() {
       return this.init();
     },
 
-    /* ── RESTART CURRENT WAVE ────────────
-       Used by ad continue system.
-       Restarts the same wave from scratch
-       without advancing. Re-activates
-       the director.                       */
     restartCurrentWave() {
       this._startWave(wave);
       active = true;
     },
 
-    /* ── DEBUG INTERFACE ─────────────── */
+    /* ── DEBUG ────────────────────────── */
     _debug() {
       return {
         wave,
         active,
         draining,
-        waveDuration,
+        cycle:           _getCycle(),
+        waveInCycle:     _getWaveInCycle(),
+        tier:            CONFIG.challenge.waveTiers[_getWaveInCycle()],
+        floorMult:       _getFloorMult(),
+        waveDuration:    waveDuration,
         waveTimeLeft,
         waveElapsed,
         spawnTimer,
@@ -585,16 +870,19 @@ const ChallengeDirector = (() => {
         nextChoiceType:  _getNextChoiceType(),
         choiceInterval:  _getChoiceInterval(wave),
         isChoiceWave:    _isChoiceWave(wave),
-        spawnInterval:   _calcSpawnInterval(wave),
-        maxAlive:        _calcMaxAlive(wave),
-        minAlive:        _calcMinAlive(wave),
-        burstChance:     _calcBurstChance(wave),
+        spawnInterval:   _getSpawnInterval(),
+        maxAlive:        _getMaxAlive(),
+        minAlive:        _getMinAlive(),
+        dirCooldown:     _getDirCooldown(),
         bestWave,
         pool:            _buildPool(),
+        combos:          _getCombos(),
+        dimPool:         _dimPool.map(d => d.name + ' (' + d.cls + ')'),
+        staggerQueue:    _staggerQueue.length,
+        cachedWC:        _currentWC,
       };
     },
 
-    /* ── DEBUG SKIP TIMER ────────────── */
     debugSkipTimer() {
       if (!active || draining) return;
       if (waveTimeLeft > 10000) {
