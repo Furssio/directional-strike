@@ -211,15 +211,15 @@ MapRegistry.register({
     // special wisely to survive.
     10: {
       duration: 20,
-      spawnInterval: 1900,
+      spawnInterval: 2100,
       maxAlive: 5,
       minAlive: 2,
       pool: { scorpion: 2, crusher: 5, tornado: 2, golem: 1 },
       combos: {
         single: 2,
         pair_opposite: 3,
-        pair_adjacent: 2,
-        burst_single: 2,
+        pair_adjacent: 2, 
+        burst_single: 2, stagger: 800,
         triple: 1,
       },
       dirCooldown: 1000,
@@ -233,7 +233,7 @@ MapRegistry.register({
     // Rush = 3 tornados in a line, satisfying parry chain.
     // Surround = panic moment to end the map.
     11: {
-      duration: 30,
+      duration: 25,
       spawnInterval: 1400,
       maxAlive: 5,
       minAlive: 2,
@@ -244,7 +244,7 @@ MapRegistry.register({
         rush: 2,
         surround: 1,
       },
-      dirCooldown: 600,
+      dirCooldown: 800,
     },
 
   },
