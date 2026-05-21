@@ -15,7 +15,7 @@ EnemyRegistry.register({
   size:          76,
   hpPct:     0.30,
   damagePct: 0.30,
-  speedMult: 0.55,
+  speedMult: 0.75,
   points:    1755,
   hitSound:  'flesh',
   shoots:    false,
@@ -57,7 +57,7 @@ EnemyRegistry.register({
 
     if (dist <= attackRange) {
       e._lunging = true;
-      e.speed = e.baseSpeed * 4.0;
+      e.speed = e.baseSpeed * 2.5;
 
       // lunge FX
       if (e.el) e.el.classList.add('kitsune-lunge');
