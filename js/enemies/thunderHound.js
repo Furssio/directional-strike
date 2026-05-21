@@ -11,9 +11,9 @@ EnemyRegistry.register({
   spriteFrames:  12,
   spriteFrameW:  120,
   spriteFrameH:  120,
-  spriteSpeed:   1.0,
+  spriteSpeed:   1.2,
   size:          120,
-  hpPct:     9.00,
+  hpPct:     2.50,
   damagePct: 0.28,
   speedMult: 1.6,
   points:    2222,
@@ -86,7 +86,7 @@ EnemyRegistry.register({
     if (newDir === 'right') { e.x = cx + placeDist; e.y = cy; }
 
     e.dir = newDir;
-    e.speed = e.baseSpeed * 2.2;
+    e.speed = e.baseSpeed * 1.2;
 
     const rotMap = { down: 0, left: 90, up: 180, right: 270 };
     if (e.el) {

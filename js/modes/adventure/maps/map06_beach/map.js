@@ -38,15 +38,18 @@ MapRegistry.register({
     // Parrot shoots 2 bullets = player learns to dodge
     // sequences. All singles, easy rhythm.
     1: {
-      duration: 15,
-      spawnInterval: 2600,
+      duration: 18,
+      spawnInterval: 1900,
       maxAlive: 3,
-      minAlive: 1,
-      pool: { scorpion: 6, parrot: 4 },
+      minAlive: 2,
+      pool: { crab: 6, parrot: 4 },
       combos: {
-        single: 10,
+        single: 4,
+        pair_opposite: 3,
+        pair_adjacent: 2,
+        burst_single: 1,
       },
-      dirCooldown: 1200,
+      dirCooldown: 1000,
     },
 
     // ── Wave 2 — First pairs ──
@@ -54,14 +57,16 @@ MapRegistry.register({
     // parrot shooting from opposite.
     // Player juggles poison + bullets.
     2: {
-      duration: 15,
-      spawnInterval: 2400,
+      duration: 18,
+      spawnInterval: 1900,
       maxAlive: 3,
-      minAlive: 1,
-      pool: { scorpion: 6, parrot: 4 },
-      combos: {
-        single: 7,
+      minAlive: 2,
+      pool: { scorpion: 3, parrot: 4, crab: 3 },
+      ombos: {
+        single: 4,
         pair_opposite: 3,
+        pair_adjacent: 2,
+        burst_single: 1,
       },
       dirCooldown: 1200,
     },
@@ -73,14 +78,15 @@ MapRegistry.register({
     // Mostly singles so player can learn the
     // crab mechanic without other pressure.
     3: {
-      duration: 18,
+      duration: 15,
       spawnInterval: 2200,
       maxAlive: 4,
-      minAlive: 1,
+      minAlive: 2,
       pool: { scorpion: 4, parrot: 2, crab: 4 },
-      combos: {
-        single: 6,
+      ombos: {
+        single: 4,
         pair_opposite: 3,
+        pair_adjacent: 2,
         burst_single: 1,
       },
       dirCooldown: 1100,
@@ -92,14 +98,15 @@ MapRegistry.register({
     // Burst_single: 2 scorpions same side = quick kills.
     4: {
       duration: 20,
-      spawnInterval: 2000,
+      spawnInterval: 1900,
       maxAlive: 4,
       minAlive: 2,
-      pool: { scorpion: 3, parrot: 3, crab: 4 },
-      combos: {
-        single: 5,
-        pair_opposite: 3,
-        burst_single: 2,
+      pool: {  crab: 6, turtle: 4 },
+      ombos: {
+        single: 4, stagger : 600,
+        pair_opposite: 3, stagger : 800,
+        pair_adjacent: 2, stagger : 800,
+        burst_single: 1, stagger : 800,
       },
       dirCooldown: 1000,
     },
@@ -117,10 +124,10 @@ MapRegistry.register({
       minAlive: 2,
       pool: { scorpion: 3, parrot: 3, crab: 3, turtle: 1 },
       combos: {
-        single: 4,
-        pair_opposite: 3,
-        pair_adjacent: 2,
-        burst_single: 1,
+        single: 4, stagger : 600,
+        pair_opposite: 3, stagger : 600,
+        pair_adjacent: 2, stagger : 600,
+        burst_single: 1, stagger : 600,
       },
       dirCooldown: 1000,
     },
@@ -154,9 +161,9 @@ MapRegistry.register({
     7: {
       duration: 25,
       spawnInterval: 2200,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { crab: 5, parrot: 3, scorpion: 2 },
+      maxAlive: 5,
+      minAlive: 4,
+      pool: { crab: 5,  scorpion: 5 },
       combos: {
         single: 5,
         pair_opposite: 3,
@@ -237,7 +244,7 @@ MapRegistry.register({
       spawnInterval: 1400,
       maxAlive: 5,
       minAlive: 2,
-      pool: { crab: 7, parrot: 3 },
+      pool: { crab: 6, parrot: 3, turtle: 1 },
       combos: {
         pair_opposite: { weight: 3, stagger: 500 },
         burst_single: 3,

@@ -137,7 +137,7 @@ MapRegistry.register({
 
     // Wave 11 — FINAL: tornado flood
     11: {
-      duration: 35,
+      duration: 30,
       spawnInterval: 800,
       maxAlive: 5,
       minAlive: 3,

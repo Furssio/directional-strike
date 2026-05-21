@@ -18,7 +18,7 @@ EnemyRegistry.register({
   shoots:    false,
   noHpBar:   true,
   underground:     true,
-  undergroundSpeed: 0.5,
+  undergroundSpeed: 1.3,
   customOpacity:   true,
 deathColors: ['#cc5533', '#ff7744', '#993322'],
   onTick(e, cx, cy, attackRange) {
@@ -97,7 +97,7 @@ EnemyRegistry.register({
   size:      29,
   hpPct:     0.30,
   damagePct: 0.15,
-  speedMult: 0.90,
+  speedMult: 1.2,
   points:    347,
   hitSound:  'shell',
   shoots:    false,
