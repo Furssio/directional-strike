@@ -372,7 +372,11 @@ const AdventureDirector = (() => {
     if (pool.length === 0) return false;
 
     const maxAlive = _getMaxAlive();
-    if (enemies.length >= maxAlive) return false;
+    // allow spawn if close to max but stagger queue
+    // will resolve soon — prevents dead air
+    const queueCount = _staggerQueue.length;
+    if (enemies.length >= maxAlive + 1) return false;
+    if (enemies.length >= maxAlive && queueCount > 0) return false;
 
     const stagger = _getStagger(pattern);
 
@@ -598,6 +602,19 @@ const AdventureDirector = (() => {
     tick(dt) {
       if (!active) return;
 
+      // ── GATE CLEANUP ──────────────────
+      // Purge dead enemies from gate tracking
+      // every tick to prevent ghost buildup
+      for (const dir of ['up', 'down', 'left', 'right']) {
+        const list = dirGateEnemies[dir];
+        for (let i = list.length - 1; i >= 0; i--) {
+          const e = list[i];
+          if (!e.isAlive() || !enemies.includes(e)) {
+            list.splice(i, 1);
+          }
+        }
+      }
+
       // tutorial controls wave 1 spawning
       if (typeof Tutorial !== 'undefined' && Tutorial.isActive()) {
         Tutorial.tick(dt);
@@ -645,10 +662,13 @@ const AdventureDirector = (() => {
         const idleThreshold = CONFIG.adventure.inputIdleThreshold || 1;
 
         if (combos) {
-          // combo system: force a single spawn
-          _executeCombo('single');
+          const spawned = _executeCombo('single');
+          if (!spawned) {
+            // all dirs blocked — retry very fast
+            spawnTimer = 150;
+            return;
+          }
         } else {
-          // legacy system
           _legacySpawn();
         }
 
@@ -664,15 +684,15 @@ const AdventureDirector = (() => {
         const interval = _getSpawnInterval();
 
         if (combos) {
-          // ── COMBO SYSTEM ──
           const pattern = _pickCombo(combos);
-          _executeCombo(pattern);
+          const spawned = _executeCombo(pattern);
+          // if spawn was blocked (maxAlive, no free dirs),
+          // retry quickly instead of waiting full interval
+          spawnTimer = spawned ? interval : Math.min(interval, 300);
         } else {
-          // ── LEGACY SYSTEM ──
           _legacySpawn();
+          spawnTimer = interval;
         }
-
-        spawnTimer = interval;
       }
     },
 

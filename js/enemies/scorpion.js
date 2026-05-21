@@ -13,7 +13,7 @@ EnemyRegistry.register({
 
   // while underground: not visible, not hittable
   underground:      true,
-  undergroundSpeed:  0.7,   // multiplier while underground (slow)
+  undergroundSpeed:  1.2,   // multiplier while underground (slow)
 
   onContact(player) {
     // poison: 5% hp per second for 3 seconds

@@ -370,7 +370,8 @@ updateProgress();
         }
       }
 
-     e.el.remove();
+     e.hp = 0;  // mark dead so gate system cleans up
+      e.el.remove();
       enemies.splice(i, 1);
 
       // shield absorbs contact — register as kill to keep gate system clean

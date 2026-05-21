@@ -11,6 +11,7 @@
    Hotkeys:
      Q — skip wave timer to 10s remaining
      G — toggle Frost Touch III
+     R — full reset (menu/map select only)
 
    Depends on: config.js, state.js,
                adventureDirector.js,
@@ -22,7 +23,6 @@
 
   /* ── HELPERS ────────────────────────── */
 
-  // Returns true if ActiveDirector is adventure or challenge
   function isDirectorActive() {
     if (typeof ActiveDirector === 'undefined' || !ActiveDirector) return false;
     if (typeof AdventureDirector !== 'undefined' && ActiveDirector === AdventureDirector) return true;
@@ -67,41 +67,24 @@
         console.log('[DEBUG] Frost Touch III ON (45%)');
       }
     }
-// R — full reset (clear all localStorage game data)
-    if (e.key === 'r' || e.key === 'R') {
-      if (running) return; // only from menu/map select
-      if (typeof Progress !== 'undefined') {
-        Progress.reset();
-        Object.keys(localStorage).forEach(k => {
-          if (k.startsWith('ds_')) localStorage.removeItem(k);
-        });
-        localStorage.removeItem('ds_equipped_ability');
-        console.log('[DEBUG] FULL RESET — all progress cleared');
-        if (typeof buildMapSelectScreen === 'function') {
-          buildMapSelectScreen();
-        }
-      }
-    }
 
-  });
-// R — full reset (clear all localStorage game data)
+    // R — full reset (clear all localStorage game data)
     if (e.key === 'r' || e.key === 'R') {
-      if (running) return; // only from menu/map select
+      if (running) return;
       if (typeof Progress !== 'undefined') {
         Progress.reset();
-        // also clear best scores
         Object.keys(localStorage).forEach(k => {
           if (k.startsWith('ds_')) localStorage.removeItem(k);
         });
-        // clear equipped ability
         localStorage.removeItem('ds_equipped_ability');
         console.log('[DEBUG] FULL RESET — all progress cleared');
-        // refresh map select if visible
         if (typeof buildMapSelectScreen === 'function') {
           buildMapSelectScreen();
         }
       }
     }
+  });
+
   /* ── FORMAT HELPERS ─────────────────── */
 
   function ms2s(ms) {
@@ -140,12 +123,17 @@
     s += 'MinAlive:  ' + d.minAlive + '\n';
     s += 'OnField:   ' + enemies.length + '\n';
     s += 'Bullets:   ' + bullets.length + '\n';
-    s += 'BurstQ:    ' + d.burstQueue + '\n';
-    if (wc) {
-      s += 'BurstCh:   ' + ((wc.burstChance || 0) * 100).toFixed(0) + '%\n';
-      s += 'BurstSz:   ' + (wc.burstSize || 0) + '\n';
-    }
+    s += 'StaggerQ:  ' + (d.staggerQueue || 0) + '\n';
+    s += 'DirCD:     ' + (d.dirCooldown || 0) + 'ms\n';
     s += 'InputRate: ' + d.inputRate + '\n';
+    if (d.combos) {
+      s += 'Combos:    ';
+      const entries = Object.entries(d.combos);
+      s += entries.map(([p, v]) => {
+        const w = (typeof v === 'object') ? v.weight : v;
+        return p + ':' + w;
+      }).join(' ') + '\n';
+    }
     return s;
   }
 
@@ -233,11 +221,50 @@
   function buildGateSection() {
     let s = '═══ GATES ══════════════════\n';
     if (typeof dirGateEnemies === 'undefined') return s + '(n/a)\n';
+
+    const now = performance.now();
+    const { w, h } = getArenaSize();
+    const cx = w / 2;
+    const cy = h / 2;
+    const map = ActiveDirector.getCurrentMap ? ActiveDirector.getCurrentMap() : null;
+    const mapGate = (map && map.gateThreshold !== undefined) ? map.gateThreshold : 0.40;
+    const gate = Math.min(w, h) * mapGate;
+
     for (const dir of ['up', 'down', 'left', 'right']) {
       const list = dirGateEnemies[dir];
       let alive = 0;
-      for (const e of list) { if (e.isAlive()) alive++; }
-      s += '  ' + dir.padEnd(6) + ': ' + alive + '\n';
+      let ghost = 0;
+      for (const e of list) {
+        if (e.isAlive()) alive++;
+        else ghost++;
+      }
+
+      // cooldown remaining
+      const cdLeft = typeof _dirCooldownUntil !== 'undefined'
+        ? Math.max(0, _dirCooldownUntil[dir] - now)
+        : 0;
+
+      // gate blocked? check last alive enemy distance
+      let gateBlocked = false;
+      let lastDist = -1;
+      if (alive > 0) {
+        for (let i = list.length - 1; i >= 0; i--) {
+          if (list[i].isAlive()) {
+            lastDist = list[i].distToCenter(cx, cy);
+            gateBlocked = lastDist > gate;
+            break;
+          }
+        }
+      }
+
+      let status = '';
+      if (cdLeft > 0) status = 'CD:' + Math.round(cdLeft) + 'ms';
+      else if (gateBlocked) status = 'GATE:' + Math.round(lastDist);
+      else status = 'FREE';
+
+      s += '  ' + dir.padEnd(6) + ': ' + alive + ' alive';
+      if (ghost > 0) s += ' +' + ghost + '☠';
+      s += ' [' + status + ']\n';
     }
     return s;
   }
