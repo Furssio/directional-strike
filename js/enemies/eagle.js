@@ -10,7 +10,7 @@ EnemyRegistry.register({
   id:        'eagle',
   sprite:    'assets/enemies/eagle/idle.png',
   size:      72,
-  hpPct:     0.65,
+  hpPct:     0.80,
   damagePct: 0.25,
   speedMult: 1.9,
   points:    2810,

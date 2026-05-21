@@ -42,12 +42,17 @@ function startChallengeChoice(type) {
 
 function _buildAbilityChoice() {
   const allAbilities = AbilityRegistry.all();
-  const shuffled     = allAbilities.sort(() => Math.random() - 0.5);
-  const picks        = shuffled.slice(0, 4);
 
-  // pad if less than 4
-  while (picks.length < 4) {
-    picks.push(allAbilities[Math.floor(Math.random() * allAbilities.length)]);
+  // exclude currently equipped ability so player always switches
+  const currentId = player.ability ? player.ability.id : null;
+  const available = allAbilities.filter(a => a.id !== currentId);
+
+  const shuffled = available.sort(() => Math.random() - 0.5);
+  const picks    = shuffled.slice(0, 4);
+
+  // pad if less than 4 (only possible if fewer than 4 abilities exist)
+  while (picks.length < 4 && available.length > 0) {
+    picks.push(available[Math.floor(Math.random() * available.length)]);
   }
 
   const dirs     = ['up', 'down', 'left', 'right'];
@@ -79,6 +84,14 @@ function _buildAbilityChoice() {
 function _buildStatChoice() {
   // reuse adventure pool builder
   const pool = _buildAvailablePool();
+
+  // if no upgrades left, skip directly to next wave
+  if (pool.length === 0) {
+    _challengeChoiceActive = false;
+    _challengeChoiceType   = null;
+    ChallengeDirector.resumeAfterChoice();
+    return;
+  }
 
   const shuffled = pool.sort(() => Math.random() - 0.5);
   const picks    = shuffled.slice(0, 4);
@@ -164,21 +177,27 @@ function _showChallengeOverlay() {
   titleEl.style.opacity   = '0';
   titleEl.style.animation = 'upgradeTitleIn 0.6s ease-out forwards';
 
-  // arrow hint
+// arrow hint — always recreate in arena (same as adventure mode)
   let hintEl = document.getElementById('upgrade-arrow-hint');
-  if (!hintEl) {
-    hintEl = document.createElement('div');
-    hintEl.id = 'upgrade-arrow-hint';
-    hintEl.textContent = 'use arrow keys';
-    overlay.appendChild(hintEl);
-  }
+  if (hintEl) hintEl.remove();
+  hintEl = document.createElement('div');
+  hintEl.id = 'upgrade-arrow-hint';
+  hintEl.innerHTML =
+    '<img src="assets/ui/keyboard_arrows.png" alt="" class="upgrade-hint-img" />' +
+    '<div class="upgrade-hint-text">use arrows to select</div>';
+  arena.appendChild(hintEl);
 
-  // block input for 1.5s
+  // block input for 1.5s, hide hint until ready
   _challengeInputBlocked = true;
-  hintEl.style.visibility = 'hidden';
+  hintEl.style.opacity = '0';
+  hintEl.style.animation = 'none';
   setTimeout(() => {
     _challengeInputBlocked = false;
-    hintEl.style.visibility = 'visible';
+    const h = document.getElementById('upgrade-arrow-hint');
+    if (h) {
+      h.style.opacity = '';
+      h.style.animation = '';
+    }
   }, 1500);
 }
 
@@ -264,8 +283,8 @@ function _highlightChosen(dir) {
       el.classList.add('upgrade-faded');
     }
   }
-  const hintEl = document.getElementById('upgrade-arrow-hint');
-  if (hintEl) hintEl.style.opacity = '0';
+ const hintEl = document.getElementById('upgrade-arrow-hint');
+  if (hintEl) hintEl.remove();
 }
 
 /* ── CLEANUP OVERLAY ────────────────── */

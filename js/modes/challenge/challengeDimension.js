@@ -21,7 +21,7 @@ const ChallengeDimension = (() => {
     return {
       id:          'dimension',
       name:        'Dimension',
-      background:  null,
+      background:  'assets/maps/map13_dark/background_01.png',
       enemyPool:   {},
       isDimension: true,
     };

@@ -78,13 +78,22 @@ document.getElementById('pause-retry').addEventListener('click', () => {
   resumeGame();
   Transition.play('fast', () => {
     equippedAbilityId = getEquippedAbility();
-    if (ActiveDirector && ActiveDirector === AdventureDirector) {
+    if (ActiveDirector === ChallengeDirector) {
+      // reset challenge state and start fresh with ability choice
+      ChallengeDirector.init();
+      resetUpgradeChoices();
+      startGame(true);
+      _isFirstAbilityChoice = true;
+      startChallengeChoice('ability');
+    } else if (ActiveDirector === AdventureDirector) {
       if (!AdventureDirector.restart()) {
         showScreen(sMenu);
         return;
       }
+      startGame(true);
+    } else {
+      startGame(true);
     }
-    startGame(true);
   }, () => {
     startGameLoop();
   });

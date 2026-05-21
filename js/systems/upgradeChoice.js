@@ -44,11 +44,11 @@ const UPGRADE_CHAINS = [
 
   { id: 'long_reach', icon: '📡', tiers: [
     { name: 'Long Reach I',   desc: 'hit enemies further away',
-      apply(p) { p.attackRangePct *= 1.03; updateRangeCircle(); } },
-    { name: 'Long Reach II',  desc: 'hit enemies even further',
       apply(p) { p.attackRangePct *= 1.05; updateRangeCircle(); } },
+    { name: 'Long Reach II',  desc: 'hit enemies even further',
+      apply(p) { p.attackRangePct *= 1.10; updateRangeCircle(); } },
     { name: 'Long Reach III', desc: 'hit enemies much further',
-      apply(p) { p.attackRangePct *= 1.08; updateRangeCircle(); } },
+      apply(p) { p.attackRangePct *= 1.15; updateRangeCircle(); } },
   ]},
 
   { id: 'sharp_blade', icon: '🗡️', tiers: [
@@ -266,16 +266,15 @@ function startUpgradeChoice() {
   titleEl.style.opacity   = '0';
   titleEl.style.animation = 'upgradeTitleIn 0.6s ease-out forwards';
 
-  // arrow hint — under player (in arena, not overlay)
+  // arrow hint — always recreate fresh in arena to avoid stale refs
   let hintEl = document.getElementById('upgrade-arrow-hint');
-  if (!hintEl) {
-    hintEl = document.createElement('div');
-    hintEl.id = 'upgrade-arrow-hint';
-    arena.appendChild(hintEl);
-  }
+  if (hintEl) hintEl.remove();
+  hintEl = document.createElement('div');
+  hintEl.id = 'upgrade-arrow-hint';
   hintEl.innerHTML =
     '<img src="assets/ui/keyboard_arrows.png" alt="" class="upgrade-hint-img" />' +
     '<div class="upgrade-hint-text">use arrows to select</div>';
+  arena.appendChild(hintEl);
 
   // block input for 1.5s so player can read
   _inputBlocked = true;
