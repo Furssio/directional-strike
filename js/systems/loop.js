@@ -125,25 +125,47 @@ function endGame() {
   clearInterval(gameLoop);
   ActiveDirector.stop();
 
-  // challenge: save best wave
-  if (ActiveDirector === ChallengeDirector && typeof ChallengeDirector.onGameOver === 'function') {
-    ChallengeDirector.onGameOver();
-  }
-
-  const best  = getBestScore();
-  const isNew = player.score > best;
-  if (isNew) saveBestScore(player.score);
-
-  finalScoreEl.textContent = player.score.toLocaleString();
-  finalLevelEl.textContent = 'WAVE ' + ActiveDirector.getWave() + ' · ' + player.kills + ' KILLS';
-  bestLabel.textContent    = isNew
-    ? 'NEW RECORD!'
-    : 'BEST: ' + Math.max(best, player.score).toLocaleString();
-
-  updateMenuBest();
+  const isChallenge = typeof ChallengeDirector !== 'undefined' &&
+                      ActiveDirector === ChallengeDirector;
 
   // ── AD CONTINUE BUTTON ──
+  // Build BEFORE onGameOver so canContinue()
+  // compares current wave vs OLD best, not the
+  // just-updated best
   _buildAdContinueButton();
+
+  // challenge: save best wave AFTER ad button check
+  if (isChallenge && typeof ChallengeDirector.onGameOver === 'function') {
+    ChallengeDirector.onGameOver();
+  };
+
+  if (isChallenge) {
+    // ── CHALLENGE MODE: display waves, not score ──
+    const wave     = ChallengeDirector.getWave();
+    const bestWave = ChallengeDirector.getBestWave();
+    const isNew    = wave > bestWave;
+
+    document.getElementById('over-score-label').textContent = 'WAVE';
+    finalScoreEl.textContent = wave;
+    finalLevelEl.textContent = player.kills + ' KILLS';
+    bestLabel.textContent    = isNew
+      ? 'NEW RECORD!'
+      : 'BEST: WAVE ' + bestWave;
+  } else {
+    // ── ADVENTURE MODE: display score in points ──
+    const best  = getBestScore();
+    const isNew = player.score > best;
+    if (isNew) saveBestScore(player.score);
+
+    document.getElementById('over-score-label').textContent = 'SCORE';
+    finalScoreEl.textContent = player.score.toLocaleString();
+    finalLevelEl.textContent = 'WAVE ' + ActiveDirector.getWave() + ' · ' + player.kills + ' KILLS';
+    bestLabel.textContent    = isNew
+      ? 'NEW RECORD!'
+      : 'BEST: ' + Math.max(best, player.score).toLocaleString();
+  }
+
+   updateMenuBest();
 
   // show game over overlay
   overOverlay.classList.remove('hidden');

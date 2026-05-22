@@ -364,7 +364,7 @@ function _buildSlotButton() {
   const btn = document.getElementById('slot-menu-btn');
   if (!btn) return;
 
-  // hide if all abilities unlocked OR all 3 videos used
+  // hide if all abilities unlocked OR all videos used
   const hasLocked = Progress.getLockedAbilities().length > 0;
   const canVideo  = Progress.canUseMenuVideo();
 
@@ -373,10 +373,11 @@ function _buildSlotButton() {
     return;
   }
 
-  // update counter: show videos USED / MAX
+  // update counter: show videos remaining
   const used = Progress.getMenuVideosUsed();
   const max  = CONFIG.abilities.menuSlots.maxVideos;
-  document.getElementById('slot-menu-count').textContent = used + '/' + max;
+  const left = max - used;
+  document.getElementById('slot-menu-count').textContent = left + ' left';
 
   btn.classList.remove('hidden');
   btn.onclick = _onSlotMenuClick;

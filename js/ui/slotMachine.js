@@ -180,10 +180,9 @@ const SlotMachine = (() => {
       return;
     }
 
-    // --- MENU: more spins this video ---
+    // --- MENU: spin not done yet ---
     if (_spins < _maxSpins) {
-      const left = _maxSpins - _spins;
-      _spinCount.textContent = left + ' spin' + (left > 1 ? 's' : '') + ' left';
+      _spinCount.textContent = '';
       _btn.textContent = 'SPIN';
       _btn.classList.remove('slot-btn-done');
       _btn.disabled = false;
@@ -192,20 +191,16 @@ const SlotMachine = (() => {
       return;
     }
 
-    // --- MENU: 3 spins done, more videos? ---
+    // --- MENU: spin done, more videos available? ---
     const canNext = Progress.canUseMenuVideo()
       && Progress.getLockedAbilities().length > 0;
 
     if (canNext) {
       const videosLeft = _totalVideos - _videoNum;
-      const spinsLeft  = videosLeft * _maxSpins;
 
-      _spinCount.textContent =
-        spinsLeft + ' spin' + (spinsLeft > 1 ? 's' : '') + ' remaining';
+      _spinCount.textContent = videosLeft + ' ad' + (videosLeft > 1 ? 's' : '') + ' left';
 
-      _btn.textContent = videosLeft === 1
-        ? '▶ LAST CHANCE — 3 SPINS'
-        : '▶ WATCH AD — 3 MORE SPINS';
+      _btn.textContent = '▶ WATCH AD — NEW ABILITY';
       _btn.classList.remove('slot-btn-done');
       _btn.disabled = false;
       _btn.onclick  = _nextVideo;
@@ -217,7 +212,7 @@ const SlotMachine = (() => {
       }
     } else {
       // no more videos or all unlocked
-      _btn.textContent = _allResults.length > 0 ? 'CONTINUE' : 'CLOSE';
+      _btn.textContent = 'CONTINUE';
       _btn.classList.add('slot-btn-done');
       _btn.disabled = false;
       _btn.onclick  = _finish;
@@ -294,8 +289,8 @@ const SlotMachine = (() => {
       _spinCount.textContent = '';
     } else {
       _title.textContent     = 'ABILITY SLOT';
-      _subtitle.textContent  = 'Try your luck!';
-      _spinCount.textContent = _maxSpins + ' spins left';
+      _subtitle.textContent  = 'Unlock a random ability!';
+      _spinCount.textContent = '';
     }
 
     _btn.textContent = 'SPIN';

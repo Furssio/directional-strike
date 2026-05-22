@@ -91,7 +91,7 @@
   opacity: 0.6;
 }
 
-/* ── AD SLOT (future rewarded ad) ── */
+/* ── AD SLOT ── */
 #over-ad-slot {
   width: 100%;
   min-height: 0;
@@ -113,7 +113,7 @@
   font-size: 9px;
   letter-spacing: 1px;
   border-radius: 6px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(0, 0, 0, 0.5);
   color: var(--c-text-dim);
   cursor: pointer;
@@ -124,6 +124,7 @@
 .over-btn:hover {
   background: rgba(0, 0, 0, 0.7);
   color: var(--c-text);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .over-btn:active {
@@ -141,27 +142,31 @@
   color: var(--c-dark);
   border-color: var(--c-accent);
 }
-/* ── AD CONTINUE BUTTON ── */
+
+/* ── AD CONTINUE BUTTON ──
+   Same visual weight as other buttons.
+   Only the ▶ icon hints at video ad.
+   CrazyGames requirement: ad button and
+   skip button must be same size/style. ── */
 .over-btn-ad {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 16px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 1px;
   border-radius: 6px;
-  border: 1px solid rgba(76, 175, 80, 0.4);
-  background: rgba(76, 175, 80, 0.15);
-  color: #66bb6a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--c-text-dim);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, transform 0.1s;
+  transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
-  animation: adBtnPulse 2s ease-in-out infinite;
 }
 
 .over-btn-ad:hover {
-  background: rgba(76, 175, 80, 0.3);
-  color: #81c784;
-  border-color: rgba(76, 175, 80, 0.6);
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--c-text);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .over-btn-ad:active {
@@ -169,11 +174,6 @@
 }
 
 .over-btn-ad:disabled {
-  animation: none;
+  opacity: 0.4;
   cursor: default;
-}
-
-@keyframes adBtnPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-  50%      { box-shadow: 0 0 12px 2px rgba(76, 175, 80, 0.25); }
 }
