@@ -288,23 +288,25 @@ challenge: {
 
   /* wave duration in SECONDS */
   waveDuration: {
-    base:              12,
-    incrementPerWave:  0.8,
-    slowdownAfterWave: 20,
-    slowdownFactor:    0.5,
-    cap:               25,
+    base:              15,
+    incrementPerWave:  0,
+    slowdownAfterWave: 999,
+    slowdownFactor:    1,
+    cap:               15,
   },
 
   /* after this many map cycles, floor stops rising */
-  plateauAtCycle: 6,
+  plateauAtCycle: 2,
+
 
   /* maps challenge wave position (1-10) to adventure wave number */
   tierMapping: {
-    easy:     [2, 3],
-    medium:   [5, 6],
-    hard:     [8, 9],
-    peak:     [10, 11],
-    moonPeak: [7, 9],
+    easy:      [4, 5],
+    medium:    [5, 6],
+    hard:      [7, 8],
+    peak:      [9, 9],
+    peakEasy:  [10, 10],
+    moonPeak:  [7, 9],
   },
 
   waveTiers: {
@@ -316,10 +318,10 @@ challenge: {
 
   /* floor scaling per completed cycle (multipliers) */
   floorScaling: {
-    spawnIntervalMult: 0.03,
-    dirCooldownMult:   0.03,
-    maxAlivePlus:      0.3,
-  },
+    spawnIntervalMult: 0,
+    dirCooldownMult:   0,
+    maxAlivePlus:      0,
+},
 
   /* map rotation */
   mapRotation: {
@@ -342,13 +344,8 @@ challenge: {
     breatherChance: 0.15,
   },
 
-  /* dimension event */
-  dimensionEvent: {
-    afterCycles: 3,
-    chance: 0.20,
-    poolSize: 4,
-    rotatePerWave: 1,
-  },
+  /* dimension wave: always wave 10 of each cycle */
+  dimensionTier: 'hard',
 
   /* enemy classes for dimension pool */
   enemyClasses: {
@@ -361,10 +358,9 @@ challenge: {
   },
 
   /* choice schedule */
-  choiceSchedule: [
-    { untilWave: 10, every: 2 },
+ choiceSchedule: [
     { untilWave: 20, every: 3 },
-    { untilWave: 30, every: 4 },
+    { untilWave: 40, every: 4 },
     { every: 5 },
   ],
 

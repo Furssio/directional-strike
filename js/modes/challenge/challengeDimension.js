@@ -72,8 +72,7 @@ const ChallengeDimension = (() => {
       pool[entry.name] = 3;
     }
 
-    const waveInCyc = ChallengeScaling.getWaveInCycle(wave);
-    const tierName  = CONFIG.challenge.waveTiers[waveInCyc] || 'medium';
+    const tierName = CONFIG.challenge.dimensionTier || 'hard';
 
     let combos, dirCooldown, spawnInterval, maxAlive, minAlive;
 
@@ -82,12 +81,12 @@ const ChallengeDimension = (() => {
       dirCooldown   = 1100;
       spawnInterval = 2000;
       maxAlive      = 3;
-      minAlive      = 2;
+      minAlive      = 1;
     } else if (tierName === 'medium') {
       combos = {
         single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 550 },
+        pair_opposite: { weight: 3, stagger: 700 },
+        pair_adjacent: { weight: 2, stagger: 650 },
         burst_single: 1,
       };
       dirCooldown   = 1000;
@@ -97,10 +96,10 @@ const ChallengeDimension = (() => {
     } else if (tierName === 'hard') {
       combos = {
         single: 3,
-        pair_opposite: { weight: 3, stagger: 700 },
-        pair_adjacent: { weight: 2, stagger: 650 },
+        pair_opposite: { weight: 3, stagger: 800 },
+        pair_adjacent: { weight: 2, stagger: 750 },
         burst_single: 2,
-        triple: { weight: 1, stagger: 750 },
+        triple: { weight: 1, stagger: 850 },
       };
       dirCooldown   = 900;
       spawnInterval = 1600;
@@ -109,14 +108,14 @@ const ChallengeDimension = (() => {
     } else { // peak
       combos = {
         single: 2,
-        pair_opposite: { weight: 3, stagger: 750 },
+        pair_opposite: { weight: 3, stagger: 850 },
         burst_single: 2,
-        triple: { weight: 2, stagger: 800 },
-        rush: { weight: 1, stagger: 600 },
+        triple: { weight: 2, stagger: 900 },
+        rush: { weight: 1, stagger: 750 },
       };
       dirCooldown   = 800;
-      spawnInterval = 1400;
-      maxAlive      = 5;
+      spawnInterval = 1500;
+      maxAlive      = 4;
       minAlive      = 2;
     }
 

@@ -78,6 +78,10 @@ const ChallengeScaling = (() => {
     if (tier === 'peak' && currentMap.id === 'map12_moon') {
       tier = 'moonPeak';
     }
+    // Forest is easier — peak uses wave 10 instead of 9
+    if (tier === 'peak' && currentMap.id === 'map01_forest') {
+      tier = 'peakEasy';
+    }
 
     const range = c.tierMapping[tier] || c.tierMapping.medium;
     const minW  = range[0];

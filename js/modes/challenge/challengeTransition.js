@@ -29,13 +29,6 @@ const ChallengeTransition = (() => {
   function pickNextMap(cycle) {
     const c = CONFIG.challenge;
 
-    // dimension event check
-    const dim = c.dimensionEvent;
-    if (cycle > dim.afterCycles && Math.random() < dim.chance) {
-      ChallengeDimension.initPool();
-      return ChallengeDimension.buildMap();
-    }
-
     // determine pool based on cycle
     let pool;
     if (cycle <= c.mapRotation.earlyCycleEnd) {

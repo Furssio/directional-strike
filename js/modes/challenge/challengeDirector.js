@@ -27,7 +27,8 @@ const ChallengeDirector = (() => {
   let spawnTimer   = 0;
 
   /* ── CACHED WAVE CONFIG ────────────── */
-  let _currentWC = null;
+  let _currentWC    = null;
+  let _dimBackupMap = null;
 
   /* ── INPUT TRACKER ─────────────────── */
   let _inputTimes = [];
@@ -151,6 +152,7 @@ const ChallengeDirector = (() => {
       draining      = false;
       drainPauseMs  = 0;
       _currentWC    = null;
+      _dimBackupMap = null;
       _inputTimes   = [];
       bestWave      = _loadBestWave();
 
@@ -182,8 +184,33 @@ const ChallengeDirector = (() => {
     onKill()   {},
 
     nextWave() {
+      const nextW     = wave + 1;
+      const nextInCyc = ChallengeScaling.getWaveInCycle(nextW);
+      const isLastOfCycle = nextInCyc === CONFIG.challenge.wavesPerMap;
+
+      // entering dimension (last wave of cycle)
+      if (isLastOfCycle && !_dimBackupMap) {
+        active = false;
+        _dimBackupMap = currentMap;
+        ChallengeDimension.initPool();
+        const dimMap = ChallengeDimension.buildMap();
+        const self   = this;
+
+        ChallengeTransition.playChange(dimMap, () => {
+          currentMap = dimMap;
+          setArenaBackground(dimMap.background || null);
+          resetAdventureSpawner();
+        }).then(() => {
+          self._startWave(nextW);
+          active = true;
+        });
+        return;
+      }
+
+      // leaving dimension → map change
       if (_isMapChangeWave(wave)) {
         active = false;
+        _dimBackupMap = null;
         this._changeMap();
         return;
       }
@@ -200,8 +227,7 @@ const ChallengeDirector = (() => {
 
       this._startWave(wave + 1);
     },
-
-    _startWave(newWave) {
+   _startWave(newWave) {
       wave         = newWave;
       waveElapsed  = 0;
       spawnTimer   = 0;
@@ -209,13 +235,6 @@ const ChallengeDirector = (() => {
       drainPauseMs = 0;
       ChallengePool.resetQueue();
       resetAdventureSpawner();
-
-      // rotate dimension pool each wave
-      if (currentMap && currentMap.isDimension) {
-        if (ChallengeScaling.getWaveInCycle(wave) > 1) {
-          ChallengeDimension.rotatePool();
-        }
-      }
 
       _cacheWaveConfig();
 
