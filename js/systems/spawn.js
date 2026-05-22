@@ -33,10 +33,16 @@ const _isIntro = _map && _map.introWaves && _map.introWaves[_wave];
 
 let speedMult = 1;
 if (!_isIntro) {
-  const _speedIncrease = (_map && _map.speedIncreasePerLevel)
-    ? _map.speedIncreasePerLevel
-    : CONFIG.difficulty.speedIncreasePerLevel;
-  speedMult = 1 + (_wave - 1) * _speedIncrease;
+  if (ActiveDirector === ChallengeDirector) {
+    // challenge: +0.02 per completed cycle, cap at 1.18
+    const cycle = ChallengeScaling.getCycle(_wave);
+    speedMult = Math.min(1.18, 1 + (cycle - 1) * 0.02);
+  } else {
+    const _speedIncrease = (_map && _map.speedIncreasePerLevel)
+      ? _map.speedIncreasePerLevel
+      : CONFIG.difficulty.speedIncreasePerLevel;
+    speedMult = 1 + (_wave - 1) * _speedIncrease;
+  }
 }
 
   // adventure mode boss can apply an extra speed multiplier

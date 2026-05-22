@@ -80,10 +80,8 @@ const ChallengeScaling = (() => {
     if (mapRanges && mapRanges[tier]) {
       range = mapRanges[tier];
     } else if (mapRanges) {
-      // fallback to hard if tier not found
       range = mapRanges.hard || mapRanges.medium || [5, 6];
     } else {
-      // unknown map fallback
       range = [5, 6];
     }
 
@@ -91,7 +89,26 @@ const ChallengeScaling = (() => {
     const maxW    = range[1];
     const advWave = minW + Math.floor(Math.random() * (maxW - minW + 1));
 
-    return currentMap.waveConfig[advWave] || null;
+    const wc = currentMap.waveConfig[advWave];
+    if (!wc) return null;
+
+    // use map's enemyPool, NOT waveConfig pool
+    // only take spawn parameters from waveConfig
+    const mapPool = {};
+    if (currentMap.enemyPool) {
+      for (const [name, cfg] of Object.entries(currentMap.enemyPool)) {
+        mapPool[name] = cfg.weight || 1;
+      }
+    }
+
+    return {
+      pool:          mapPool,
+      spawnInterval: wc.spawnInterval,
+      maxAlive:      wc.maxAlive,
+      minAlive:      wc.minAlive,
+      combos:        wc.combos,
+      dirCooldown:   wc.dirCooldown,
+    };
   }
 
   /* ── PUBLIC API ────────────────────── */

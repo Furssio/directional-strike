@@ -303,12 +303,12 @@ challenge: {
   /* per-map tier ranges (adventure wave numbers) */
   mapTierRanges: {
     map01_forest:  { easy: [3, 4], medium: [5, 6], hard: [9, 9] },
-    map02_dungeon: { easy: [2, 3], medium: [5, 6], hard: [8, 8] },
-    map03_desert:  { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
-    map05_snow:    { easy: [3, 4], medium: [5, 7], hard: [8, 8] },
-    map06_beach:   { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
-    map07_clouds:  { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
-    map09_volcano: { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
+    map02_dungeon: { easy: [3, 4], medium: [5, 6], hard: [7, 8] },
+    map03_desert:  { easy: [3, 4], medium: [5, 6], hard: [7, 8] },
+    map05_snow:    { easy: [3, 4], medium: [5, 7], hard: [7, 8] },
+    map06_beach:   { easy: [3, 4], medium: [5, 6], hard: [7, 8] },
+    map07_clouds:  { easy: [3, 4], medium: [5, 6], hard: [7, 8] },
+    map09_volcano: { easy: [3, 4], medium: [5, 6], hard: [7, 8] },
     map12_moon:    { easy: [2, 3], medium: [4, 5], hard: [6, 6] },
   },
 
@@ -328,12 +328,13 @@ challenge: {
 
   /* map rotation */
   mapRotation: {
-    earlyMaps: [
-      'map01_forest', 'map02_dungeon', 'map03_desert',
-      'map05_snow', 'map06_beach',
+    easyMaps: [
+      'map01_forest', 'map02_dungeon', 'map03_desert', 'map05_snow',
     ],
-    lateMaps: [
-      'map07_clouds', 'map09_volcano',
+    mediumMaps: [
+      'map06_beach', 'map07_clouds', 'map09_volcano',
+    ],
+    hardMaps: [
       'map10_sakura', 'map12_moon',
     ],
     allMaps: [
@@ -342,13 +343,12 @@ challenge: {
       'map09_volcano', 'map10_sakura', 'map12_moon',
     ],
     historySize: 3,
-    earlyCycleEnd: 3,
     breatherMap: 'map01_forest',
-    breatherChance: 0.15,
+    breatherChance: 0.10,
   },
 
   /* dimension wave: always wave 10 of each cycle */
-  dimensionTier: 'medium',
+  dimensionTier: 'easy',
 
   /* enemy classes for dimension pool */
   enemyClasses: {

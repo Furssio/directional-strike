@@ -26,32 +26,31 @@ const ChallengeTransition = (() => {
 
   /* ── MAP PICKING ───────────────────── */
 
-  function pickNextMap(cycle) {
-    const c = CONFIG.challenge;
+ function pickNextMap(cycle) {
+    const c   = CONFIG.challenge;
+    const rot = c.mapRotation;
 
-    // determine pool based on cycle
+    // breather chance
+    if (cycle > 1 && Math.random() < rot.breatherChance) {
+      return MapRegistry.get(rot.breatherMap);
+    }
+
+    // pick pool based on cycle
     let pool;
-    if (cycle <= c.mapRotation.earlyCycleEnd) {
-      pool = c.mapRotation.earlyMaps.slice();
-      if (cycle >= 2) {
-        const late     = c.mapRotation.lateMaps;
-        const addCount = Math.min(cycle - 1, 2);
-        const shuffled = late.slice().sort(() => Math.random() - 0.5);
-        for (let i = 0; i < addCount; i++) {
-          if (shuffled[i]) pool.push(shuffled[i]);
-        }
-      }
+    if (cycle <= 3) {
+      // cycles 1-3: easy maps only
+      pool = rot.easyMaps.slice();
+    } else if (cycle <= 6) {
+      // cycles 4-6: easy + medium
+      pool = rot.easyMaps.concat(rot.mediumMaps);
     } else {
-      pool = c.mapRotation.allMaps.slice();
-      // breather chance
-      if (Math.random() < c.mapRotation.breatherChance) {
-        return MapRegistry.get(c.mapRotation.breatherMap);
-      }
+      // cycles 7+: all maps
+      pool = rot.allMaps.slice();
     }
 
     // filter recent
-    const history    = mapHistory.slice(-c.mapRotation.historySize);
-    let candidates   = pool.filter(id => !history.includes(id));
+    const history  = mapHistory.slice(-rot.historySize);
+    let candidates = pool.filter(id => !history.includes(id));
     if (candidates.length === 0) candidates = pool.slice();
 
     const mapId = candidates[Math.floor(Math.random() * candidates.length)];

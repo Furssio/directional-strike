@@ -77,9 +77,9 @@ const ChallengeDimension = (() => {
     let combos, dirCooldown, spawnInterval, maxAlive, minAlive;
 
     if (tierName === 'easy') {
-      combos        = { single: 5, pair_opposite: 3, burst_single: 2 };
-      dirCooldown   = 1100;
-      spawnInterval = 2000;
+      combos        = { single: 6, pair_opposite: 2, burst_single: 1 };
+      dirCooldown   = 1200;
+      spawnInterval = 2200;
       maxAlive      = 3;
       minAlive      = 1;
     } else if (tierName === 'medium') {
