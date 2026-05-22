@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Moon',
   theme: 'moon',
   icon:  '🌙',
-  background: 'assets/maps/map12_moon/background_01.png',
+  background: 'assets/maps/map12_moon/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,

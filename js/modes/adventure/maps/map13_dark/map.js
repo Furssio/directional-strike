@@ -3,7 +3,7 @@ MapRegistry.register({
   order:      13,
   name:       'Dark Dimension',
   theme:      'dark',
-  background: 'assets/maps/map13_dark/background_01.png',
+  background: 'assets/maps/map13_dark/background_01.webp',
   stressTarget: 70,
   enemyPool: {
     ravager: { fromWave: 1, weight: 5 },

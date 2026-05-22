@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Dungeon',
   theme: 'dungeon',
   icon:  '🪨',
-  background: 'assets/maps/map02_dungeon/background_01.png',
+ background: 'assets/maps/map02_dungeon/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,

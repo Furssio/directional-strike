@@ -3,7 +3,7 @@ MapRegistry.register({
   order:      8,
   name:       'Storm',
   theme:      'storm',
-  background: 'assets/maps/map08_storm/background_01.png',
+  background: 'assets/maps/map08_storm/background_01.webp',
   stressTarget: 55,
   enemyPool: {
     ravager: { fromWave: 1, weight: 6 },

@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Temple',
   theme: 'temple',
   icon:  '⛩️',
-  background: 'assets/maps/map04_temple/background_01.png',
+  background: 'assets/maps/map04_temple/background_01.webp',
 
   totalWaves: 1,
   minEnemiesAlive: 1,

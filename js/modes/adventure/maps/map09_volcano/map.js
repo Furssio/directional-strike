@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Volcano',
   theme: 'volcano',
   icon:  '🌋',
-  background: 'assets/maps/map09_volcano/background_01.png',
+  background: 'assets/maps/map09_volcano/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,

@@ -8,7 +8,7 @@
    Depends on: ChallengeDirector
    ═══════════════════════════════════════ */
 
-const CHALLENGE_BG = 'assets/maps/map13_dark/background_01.png';
+const CHALLENGE_BG = 'assets/maps/map13_dark/background_01.webp';
 
 function buildChallengeScreen() {
   // set card background

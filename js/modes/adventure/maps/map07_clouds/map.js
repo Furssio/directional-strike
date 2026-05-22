@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Clouds',
   theme: 'clouds',
   icon:  '⛈️',
-  background: 'assets/maps/map07_clouds/background_01.png',
+  background: 'assets/maps/map07_clouds/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,

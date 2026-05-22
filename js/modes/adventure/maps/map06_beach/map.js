@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Beach',
   theme: 'beach',
   icon:  '🏖️',
-  background: 'assets/maps/map06_beach/background_01.png',
+  background: 'assets/maps/map06_beach/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,

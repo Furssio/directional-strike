@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Forest',
   theme: 'forest',
   icon:  '🌲',
-  background: 'assets/maps/map01_forest/background_01.png',
+  background: 'assets/maps/map01_forest/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,

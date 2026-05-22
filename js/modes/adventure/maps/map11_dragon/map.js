@@ -3,7 +3,7 @@ MapRegistry.register({
   order:      11,
   name:       'Dragon Temple',
   theme:      'dragon',
-  background: 'assets/maps/map11_dragon/background_01.png',
+  background: 'assets/maps/map11_dragon/background_01.webp',
   stressTarget: 60,
   enemyPool: {
     ravager: { fromWave: 1, weight: 5 },
