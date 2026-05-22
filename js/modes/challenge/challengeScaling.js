@@ -72,20 +72,23 @@ const ChallengeScaling = (() => {
     if (!currentMap || !currentMap.waveConfig) return null;
 
     const c    = CONFIG.challenge;
-    let tier   = getTierName(wave);
+    const tier = getTierName(wave);
 
-    // Moon uses moonPeak instead of peak
-    if (tier === 'peak' && currentMap.id === 'map12_moon') {
-      tier = 'moonPeak';
-    }
-    // Forest is easier — peak uses wave 10 instead of 9
-    if (tier === 'peak' && currentMap.id === 'map01_forest') {
-      tier = 'peakEasy';
+    // per-map tier ranges
+    const mapRanges = c.mapTierRanges[currentMap.id];
+    let range;
+    if (mapRanges && mapRanges[tier]) {
+      range = mapRanges[tier];
+    } else if (mapRanges) {
+      // fallback to hard if tier not found
+      range = mapRanges.hard || mapRanges.medium || [5, 6];
+    } else {
+      // unknown map fallback
+      range = [5, 6];
     }
 
-    const range = c.tierMapping[tier] || c.tierMapping.medium;
-    const minW  = range[0];
-    const maxW  = range[1];
+    const minW    = range[0];
+    const maxW    = range[1];
     const advWave = minW + Math.floor(Math.random() * (maxW - minW + 1));
 
     return currentMap.waveConfig[advWave] || null;

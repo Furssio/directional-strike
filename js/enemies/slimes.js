@@ -18,7 +18,7 @@ EnemyRegistry.register({
   hpPct:       0.80,
   damagePct:   0.30,
   contactHits: 1,
-  speedMult:   0.75,
+  speedMult:   0.68,
   points:      855,
   hitSound:  'slime',
   shoots:      false,

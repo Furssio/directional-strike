@@ -300,20 +300,23 @@ challenge: {
 
 
   /* maps challenge wave position (1-10) to adventure wave number */
-  tierMapping: {
-    easy:      [4, 5],
-    medium:    [5, 6],
-    hard:      [7, 8],
-    peak:      [9, 9],
-    peakEasy:  [10, 10],
-    moonPeak:  [7, 9],
+  /* per-map tier ranges (adventure wave numbers) */
+  mapTierRanges: {
+    map01_forest:  { easy: [3, 4], medium: [5, 6], hard: [9, 9] },
+    map02_dungeon: { easy: [2, 3], medium: [5, 6], hard: [8, 8] },
+    map03_desert:  { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
+    map05_snow:    { easy: [3, 4], medium: [5, 7], hard: [8, 8] },
+    map06_beach:   { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
+    map07_clouds:  { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
+    map09_volcano: { easy: [3, 4], medium: [5, 6], hard: [8, 8] },
+    map12_moon:    { easy: [2, 3], medium: [4, 5], hard: [6, 6] },
   },
 
   waveTiers: {
     1: 'easy', 2: 'easy',
     3: 'medium', 4: 'medium', 5: 'medium',
     6: 'hard', 7: 'hard', 8: 'hard',
-    9: 'peak', 10: 'peak',
+    9: 'hard', 10: 'hard',
   },
 
   /* floor scaling per completed cycle (multipliers) */
@@ -345,7 +348,7 @@ challenge: {
   },
 
   /* dimension wave: always wave 10 of each cycle */
-  dimensionTier: 'hard',
+  dimensionTier: 'medium',
 
   /* enemy classes for dimension pool */
   enemyClasses: {

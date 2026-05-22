@@ -84,15 +84,15 @@ const ChallengeDimension = (() => {
       minAlive      = 1;
     } else if (tierName === 'medium') {
       combos = {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 700 },
-        pair_adjacent: { weight: 2, stagger: 650 },
+        single: 5,
+        pair_opposite: { weight: 3, stagger: 800 },
+        pair_adjacent: { weight: 2, stagger: 750 },
         burst_single: 1,
       };
-      dirCooldown   = 1000;
-      spawnInterval = 1800;
-      maxAlive      = 4;
-      minAlive      = 2;
+      dirCooldown   = 1100;
+      spawnInterval = 2000;
+      maxAlive      = 3;
+      minAlive      = 1;
     } else if (tierName === 'hard') {
       combos = {
         single: 3,
