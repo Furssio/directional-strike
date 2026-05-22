@@ -223,31 +223,41 @@ const SlotMachine = (() => {
 
   /* ── NEXT VIDEO ────────────────────── */
 
-  function _nextVideo() {
-    // consume 1 video
-    Progress.useMenuVideo();
-    _videoNum++;
-
-    // reset per-video state
-    _spins    = 0;
-    _foundAny = false;
-    _resultEl.classList.add('hidden');
-    _nearMissEl.classList.add('hidden');
-    _reelWindow.className = '';
-
-    const videosLeft = _totalVideos - _videoNum;
-    _subtitle.textContent = videosLeft === 0
-      ? 'Final spins — now or never!'
-      : 'Try your luck!';
-
-    // show spin button
-    const left = _maxSpins;
-    _spinCount.textContent = left + ' spin' + (left > 1 ? 's' : '') + ' left';
-    _btn.textContent = 'SPIN';
-    _btn.classList.remove('slot-btn-done');
-    _btn.disabled = false;
-    _btn.onclick  = _startSpin;
+function _nextVideo() {
+    // disable button while ad plays
+    _btn.disabled = true;
     if (_closeBtn) _closeBtn.classList.add('hidden');
+
+    AdPlaceholder.showRewarded(() => {
+      // ad finished — consume video and give spin
+      Progress.useMenuVideo();
+      _videoNum++;
+
+      // reset per-video state
+      _spins    = 0;
+      _foundAny = false;
+      _resultEl.classList.add('hidden');
+      _nearMissEl.classList.add('hidden');
+      _reelWindow.className = '';
+
+      const videosLeft = _totalVideos - _videoNum;
+      _subtitle.textContent = videosLeft === 0
+        ? 'Last chance!'
+        : 'Unlock a random ability!';
+
+      // show spin button
+      _spinCount.textContent = '';
+      _btn.textContent = 'SPIN';
+      _btn.classList.remove('slot-btn-done');
+      _btn.disabled = false;
+      _btn.onclick  = _startSpin;
+      if (_closeBtn) _closeBtn.classList.add('hidden');
+
+    }, () => {
+      // ad failed — re-enable buttons, no video consumed
+      _btn.disabled = false;
+      if (_closeBtn) _closeBtn.classList.remove('hidden');
+    });
   }
 
   /* ── FINISH ────────────────────────── */
@@ -310,7 +320,6 @@ const SlotMachine = (() => {
         return;
       }
 
-      _active   = true;
       _mode     = opts.mode || 'guaranteed';
       _onResult = opts.onResult || null;
       _onClose  = opts.onClose  || null;
@@ -323,16 +332,27 @@ const SlotMachine = (() => {
       _allResults = [];
 
       if (_mode === 'menu') {
-        // consume first video
-        Progress.useMenuVideo();
-        _videoNum    = Progress.getMenuVideosUsed();
         _totalVideos = CONFIG.abilities.menuSlots.maxVideos;
+
+        // show ad BEFORE opening slot
+        AdPlaceholder.showRewarded(() => {
+          // ad finished — consume video and open
+          Progress.useMenuVideo();
+          _videoNum = Progress.getMenuVideosUsed();
+          _active   = true;
+          _showUI();
+        }, () => {
+          // ad failed — don't open slot
+          if (opts.onClose) opts.onClose();
+        });
+
       } else {
+        // guaranteed mode — no ad needed
         _videoNum    = 0;
         _totalVideos = 0;
+        _active      = true;
+        _showUI();
       }
-
-      _showUI();
     },
 
     isActive() { return _active; },
