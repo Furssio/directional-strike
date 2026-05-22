@@ -13,7 +13,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: true,
+ debug: false,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -295,8 +295,9 @@ challenge: {
     cap:               15,
   },
 
-  /* after this many map cycles, floor stops rising */
-  plateauAtCycle: 2,
+/* speed scaling every 5 waves (index = step) */
+/* step = floor((wave-1) / 5), cap at last entry */
+speedSteps: [1.00, 1.10, 1.20, 1.30, 1.40, 1.50],
 
 
   /* maps challenge wave position (1-10) to adventure wave number */
@@ -348,7 +349,12 @@ challenge: {
   },
 
   /* dimension wave: always wave 10 of each cycle */
-  dimensionTier: 'easy',
+  /* dimension tier scales with wave */
+dimensionTiers: [
+    { untilWave: 10, tier: 'medium' },
+    { untilWave: 20, tier: 'hard' },
+    { tier: 'peak' },
+],
 
   /* enemy classes for dimension pool */
   enemyClasses: {
@@ -361,11 +367,9 @@ challenge: {
   },
 
   /* choice schedule */
- choiceSchedule: [
-    { untilWave: 20, every: 3 },
-    { untilWave: 40, every: 4 },
+choiceSchedule: [
     { every: 5 },
-  ],
+],
 
   choiceTypes: ['ability', 'stat'],
   abilityChoiceCount: 4,

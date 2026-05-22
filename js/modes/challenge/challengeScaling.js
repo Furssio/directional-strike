@@ -34,12 +34,9 @@ const ChallengeScaling = (() => {
 
   /* ── FLOOR SCALING ─────────────────── */
 
-  function getFloorMult(wave) {
-    const c      = CONFIG.challenge;
-    const cycle  = getCycle(wave);
-    const capped = Math.min(cycle - 1, c.plateauAtCycle - 1);
-    return capped; // 0 at cycle 1, max at plateauAtCycle-1
-  }
+  function getFloorMult(_wave) {
+    return 0; // floor scaling disabled — speed scales every 5 waves in spawn.js
+}
 
   function applyFloorSpawnInterval(spawnInterval, wave) {
     const floor = getFloorMult(wave);

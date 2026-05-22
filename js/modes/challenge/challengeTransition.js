@@ -11,9 +11,11 @@
 const ChallengeTransition = (() => {
 
   let mapHistory = [];
+  let _recentPool = []; // tracks unplayed maps in current rotation
 
   function reset() {
     mapHistory = [];
+    _recentPool = [];
   }
 
   function getHistory() {
@@ -22,38 +24,24 @@ const ChallengeTransition = (() => {
 
   function pushHistory(mapId) {
     mapHistory.push(mapId);
+    // remove from recent pool
+    const idx = _recentPool.indexOf(mapId);
+    if (idx !== -1) _recentPool.splice(idx, 1);
   }
 
   /* ── MAP PICKING ───────────────────── */
 
- function pickNextMap(cycle) {
-    const c   = CONFIG.challenge;
-    const rot = c.mapRotation;
+  function pickNextMap(_cycle) {
+    const allMaps = CONFIG.challenge.mapRotation.allMaps;
 
-    // breather chance
-    if (cycle > 1 && Math.random() < rot.breatherChance) {
-      return MapRegistry.get(rot.breatherMap);
+    // if pool is empty, refill with all maps
+    if (_recentPool.length === 0) {
+      _recentPool = allMaps.slice();
     }
 
-    // pick pool based on cycle
-    let pool;
-    if (cycle <= 3) {
-      // cycles 1-3: easy maps only
-      pool = rot.easyMaps.slice();
-    } else if (cycle <= 6) {
-      // cycles 4-6: easy + medium
-      pool = rot.easyMaps.concat(rot.mediumMaps);
-    } else {
-      // cycles 7+: all maps
-      pool = rot.allMaps.slice();
-    }
-
-    // filter recent
-    const history  = mapHistory.slice(-rot.historySize);
-    let candidates = pool.filter(id => !history.includes(id));
-    if (candidates.length === 0) candidates = pool.slice();
-
-    const mapId = candidates[Math.floor(Math.random() * candidates.length)];
+    // pick random from remaining pool
+    const idx   = Math.floor(Math.random() * _recentPool.length);
+    const mapId = _recentPool[idx];
     return MapRegistry.get(mapId);
   }
 

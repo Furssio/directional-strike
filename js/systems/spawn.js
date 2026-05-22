@@ -34,10 +34,11 @@ const _isIntro = _map && _map.introWaves && _map.introWaves[_wave];
 let speedMult = 1;
 if (!_isIntro) {
   if (ActiveDirector === ChallengeDirector) {
-    // challenge: +0.02 per completed cycle, cap at 1.18
-    const cycle = ChallengeScaling.getCycle(_wave);
-    speedMult = Math.min(1.18, 1 + (cycle - 1) * 0.02);
-  } else {
+    // challenge: step-based speed scaling every 5 waves
+    const steps = CONFIG.challenge.speedSteps;
+    const idx = Math.min(Math.floor((_wave - 1) / 5), steps.length - 1);
+    speedMult = steps[idx];
+}else {
     const _speedIncrease = (_map && _map.speedIncreasePerLevel)
       ? _map.speedIncreasePerLevel
       : CONFIG.difficulty.speedIncreasePerLevel;
