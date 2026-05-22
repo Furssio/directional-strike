@@ -69,6 +69,10 @@ function showMapComplete(map, hasSlot) {
   // stop game loop
   running = false;
   clearInterval(gameLoop);
+  if (typeof CrazySDKWrapper !== 'undefined') {
+    CrazySDKWrapper.gameplayStop();
+    CrazySDKWrapper.happytime();
+  }
 
   // populate overlay
   document.getElementById('complete-map-name').textContent = map.name || map.id;

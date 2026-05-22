@@ -29,9 +29,10 @@ function pauseGame() {
   // sync toggle states with menu buttons
   _syncPauseToggles();
 
-  // freeze ability audio
+// freeze ability audio
   if (typeof SFX !== 'undefined') SFX.pauseAll();
   SFX.pauseOpen();
+  if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
 }
 
 function resumeGame() {
@@ -44,6 +45,7 @@ function resumeGame() {
   // resume ability audio
   if (typeof SFX !== 'undefined') SFX.resumeAll();
   SFX.pauseClose();
+  if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
 }
 
 /* ── SYNC TOGGLE STATES ── */

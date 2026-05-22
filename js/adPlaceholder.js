@@ -80,18 +80,16 @@ const AdPlaceholder = (() => {
        (never happens in placeholder).     */
 
     showRewarded(onSuccess, onError) {
-      // mute game audio during ad
-      if (typeof SFX !== 'undefined') SFX.pauseAll();
-      if (typeof Music !== 'undefined') Music.stop();
-
-      const ov = _createAdOverlay();
-
-      setTimeout(() => {
-        ov.remove();
-        // unmute game audio after ad
-        if (typeof SFX !== 'undefined') SFX.resumeAll();
+      // delegate to CrazyGames SDK wrapper
+      // handles: real ads on CrazyGames,
+      // fake overlay on localhost,
+      // error callback on disabled
+      if (typeof CrazySDKWrapper !== 'undefined') {
+        CrazySDKWrapper.showRewarded(onSuccess, onError);
+      } else {
+        // fallback: no SDK loaded, just succeed
         if (onSuccess) onSuccess();
-      }, FAKE_AD_DURATION);
+      }
     },
 
     /* ── CAN CONTINUE ────────────────────

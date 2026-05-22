@@ -98,6 +98,7 @@ function startGame(delayLoop) {
   playerEl.classList.remove('special-ready');
 
 showScreen(sGame);
+  if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
   setTimeout(updateRangeCircle, 50);
 
   clearInterval(gameLoop);
@@ -120,7 +121,8 @@ function endGame() {
   cleanupAbilityEffects();
   SFX.gameOver();
 
-  running = false;
+running = false;
+  if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
 
   clearInterval(gameLoop);
   ActiveDirector.stop();
@@ -134,9 +136,13 @@ function endGame() {
   // just-updated best
   _buildAdContinueButton();
 
-  // challenge: save best wave AFTER ad button check
+// challenge: save best wave AFTER ad button check
   if (isChallenge && typeof ChallengeDirector.onGameOver === 'function') {
     ChallengeDirector.onGameOver();
+    // submit to CrazyGames leaderboard
+    if (typeof CrazySDKWrapper !== 'undefined') {
+      CrazySDKWrapper.submitScore(ChallengeDirector.getWave());
+    }
   };
 
   if (isChallenge) {
@@ -240,6 +246,7 @@ function _executeContinue() {
 
   // show countdown then start loop
   _showContinueCountdown(() => {
+    if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
     // apply defense buff AFTER countdown
     // so the 8s timer starts when gameplay begins
     if (typeof OrbSystem !== 'undefined') {

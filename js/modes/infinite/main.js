@@ -12,6 +12,9 @@ const SCRIPTS = [
   /* ── CONFIG ── */
   'js/config.js',
 
+  /* ── CRAZYGAMES SDK WRAPPER ── */
+  'js/crazysdk.js',
+
   /* ── CORE REGISTRIES ── */
   'js/core/EnemyRegistry.js',
   'js/core/AbilityRegistry.js',
@@ -63,7 +66,7 @@ const SCRIPTS = [
   'js/audio/index.js',
   'js/audio/uiBind.js',
   
-  /* ── AD SYSTEM ── */
+  /* ── AD SYSTEM (legacy — replaced by crazysdk.js) ── */
   'js/adPlaceholder.js',
 
   /* ── STATE ── */
@@ -114,7 +117,15 @@ const SCRIPTS = [
 ];
 
 (function loadScripts(scripts, index) {
-  if (index >= scripts.length) return;
+  if (index >= scripts.length) {
+    // all scripts loaded — init CrazyGames SDK
+    if (typeof CrazySDKWrapper !== 'undefined') {
+      CrazySDKWrapper.init().then(() => {
+        CrazySDKWrapper.loadingStop();
+      });
+    }
+    return;
+  }
   const s = document.createElement('script');
   s.src = scripts[index];
   s.onload = () => loadScripts(scripts, index + 1);
