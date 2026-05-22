@@ -26,7 +26,7 @@ const CrazySDKWrapper = (() => {
      Generate at: https://www.digitalsanctuary.com/aes-key-generator-free
      Set this BEFORE submitting to CrazyGames.
      ──────────────────────────────────── */
-  const ENCRYPTION_KEY = 'REPLACE_WITH_YOUR_32_BYTE_BASE64_KEY';
+ const ENCRYPTION_KEY = 'Rc0CclITzXe0aXddtkXac8ieQ0ELF/kgF7BvaFSIqDM=';
 
   /* ── SDK AVAILABLE CHECK ───────────── */
 
