@@ -33,20 +33,20 @@ const DemoMode = (() => {
   let spawnPool = DEFAULT_POOL;
 
   const MAP_BGS = [
-    'assets/maps/map01_forest/background_01.png',
-    'assets/maps/map02_dungeon/background_01.png',
-    'assets/maps/map03_desert/background_01.png',
-    'assets/maps/map04_temple/background_01.png',
-    'assets/maps/map05_snow/background_01.png',
-    'assets/maps/map06_beach/background_01.png',
-    'assets/maps/map07_clouds/background_01.png',
-    'assets/maps/map08_storm/background_01.png',
-    'assets/maps/map09_volcano/background_01.png',
-    'assets/maps/map10_sakura/background_01.png',
-    'assets/maps/map11_dragon/background_01.png',
-    'assets/maps/map12_moon/background_01.png',
-    'assets/maps/map13_dark/background_01.png',
-  ];
+    'assets/maps/map01_forest/background_01.webp',
+    'assets/maps/map02_dungeon/background_01.webp',
+    'assets/maps/map03_desert/background_01.webp',
+    'assets/maps/map04_temple/background_01.webp',
+    'assets/maps/map05_snow/background_01.webp',
+    'assets/maps/map06_beach/background_01.webp',
+    'assets/maps/map07_clouds/background_01.webp',
+    'assets/maps/map08_storm/background_01.webp',
+    'assets/maps/map09_volcano/background_01.webp',
+    'assets/maps/map10_sakura/background_01.webp',
+    'assets/maps/map11_dragon/background_01.webp',
+    'assets/maps/map12_moon/background_01.webp',
+    'assets/maps/map13_dark/background_01.webp',
+];
 
   let active      = false;
   let arenaEl     = null;

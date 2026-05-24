@@ -23,7 +23,7 @@ let _dimWeights = {};
     return {
       id:          'dimension',
       name:        'Dimension',
-      background:  'assets/maps/map13_dark/background_01.png',
+      background:  'assets/maps/map13_dark/background_01.webp',
       enemyPool:   {},
       isDimension: true,
     };
