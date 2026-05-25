@@ -20,7 +20,7 @@ const CONFIG = {
      unlocked. Set false to test real progression.
      Toggle with debug overlay (T key).
   ─────────────────────────────────────── */
-  devUnlockAll: false,       // unlock all maps + abilities
+  devUnlockAll: true,       // unlock all maps + abilities
 devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
 
   /* ── PLAYABLE MAP ORDER ─────────────────

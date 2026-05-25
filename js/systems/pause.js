@@ -31,6 +31,7 @@ function pauseGame() {
 
 // freeze ability audio
   if (typeof SFX !== 'undefined') SFX.pauseAll();
+  if (typeof RangeCircle !== 'undefined') RangeCircle.stop();
   SFX.pauseOpen();
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
 }
@@ -42,8 +43,9 @@ function resumeGame() {
   lastTick = performance.now();
   gameLoop = setInterval(tick, 16);
 
-  // resume ability audio
+ // resume ability audio
   if (typeof SFX !== 'undefined') SFX.resumeAll();
+  if (typeof RangeCircle !== 'undefined') RangeCircle.start();
   SFX.pauseClose();
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
 }

@@ -256,10 +256,11 @@ function updateRangeCircle() {
   const range = player.getAttackRange(size);
   const d     = range * 2;
 
-  rangeEl.style.width       = d + 'px';
-  rangeEl.style.height      = d + 'px';
-  rangeEl.style.borderColor = `rgba(${hexToRgb(player.color)}, 0.5)`;
-  rangeEl.style.background  = `rgba(${hexToRgb(player.color)}, 0.05)`;
+  rangeEl.style.width  = d + 'px';
+  rangeEl.style.height = d + 'px';
+
+  // blood ritual circle draws everything on canvas
+  RangeCircle.resize(d);
 }
 /* ── ACTION POP (MISS, PARRY, DOUBLE KILL etc.) ── */
 

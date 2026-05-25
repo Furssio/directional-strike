@@ -75,8 +75,9 @@ const SCRIPTS = [
   /* ── INFINITE MODE ── */
   'js/modes/infinite/director.js',
 
-  /* ── UI ── */
+ /* ── UI ── */
   'js/ui/dom.js',
+  'js/systems/rangeCircle.js',
   'js/ui/hud.js',
   'js/ui/screens.js',
   'js/ui/abilityScreen.js',

@@ -51,6 +51,9 @@ function cleanupAbilityEffects() {
   // restore range circle in case ability hid it
   if (typeof rangeEl !== 'undefined' && rangeEl) rangeEl.style.display = '';
 
+  // restart range circle animation (in case it was stopped)
+  if (typeof RangeCircle !== 'undefined') RangeCircle.start();
+
   if (player && player.specialActive && player.ability) {
     player.specialActive = false;
     player.specialTimer  = 0;

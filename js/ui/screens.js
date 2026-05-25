@@ -18,8 +18,14 @@ function showScreen(s) {
   if (overOverlay) overOverlay.classList.add('hidden');
   if (completeOverlay) completeOverlay.classList.add('hidden');
 
-  // stop all ability audio when leaving game screen
+ // stop all ability audio when leaving game screen
   if (s !== sGame && typeof SFX !== 'undefined') SFX.stopAll();
+
+  // cleanup challenge choice state when leaving game
+  if (s !== sGame) {
+    if (typeof resetChallengeChoices === 'function') resetChallengeChoices();
+    if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
+  }
 
   // fireflies only on menu
   if (s === sMenu) startMenuFireflies();
