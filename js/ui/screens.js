@@ -25,6 +25,8 @@ function showScreen(s) {
   if (s !== sGame) {
     if (typeof resetChallengeChoices === 'function') resetChallengeChoices();
     if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
+    const arrowHint = document.getElementById('upgrade-arrow-hint');
+    if (arrowHint) arrowHint.remove();
   }
 
   // fireflies only on menu
