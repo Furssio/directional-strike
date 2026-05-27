@@ -137,7 +137,8 @@ const ErrorHandler = (() => {
   }
 
   /* ── KEYBOARD SHORTCUT ─────────────── */
-  document.addEventListener('keydown', function(e) {
+ document.addEventListener('keydown', function(e) {
+    if (!CONFIG.debug) return;
     // CTRL+SHIFT+E — toggle error overlay
     if (e.ctrlKey && e.shiftKey && e.key === 'E') {
       e.preventDefault();
