@@ -13,27 +13,9 @@ MapRegistry.register({
 
   scalingAt: {},
 
-  /* ── WAVE CONFIG ─────────────────────────
-     Desert identity: scorpions (underground + poison),
-     crushers (bullets), tornados (fast + parryable).
-     Golems as rare lane-blockers.
-
-     Scorpions emerge in range = surprise factor.
-     Tornados are fast = pair_opposite with tornado
-     means player must react FAST to parry.
-     Crushers shoot = lanes stay dangerous even
-     after killing the immediate threat.
-
-     Rhythm: medium spawn intervals. Scorpions
-     don't split like slimes but poison adds
-     sustained pressure after each hit.
-  ─────────────────────────────────────────── */
   waveConfig: {
 
     // ── Wave 1 — Intro ──
-    // Scorpions + crushers. Player learns scorpion
-    // underground behavior and poison mechanic.
-    // All singles, gentle start.
     1: {
       duration: 15,
       spawnInterval: 1700,
@@ -49,8 +31,6 @@ MapRegistry.register({
     },
 
     // ── Wave 2 — First pairs ──
-    // Scorpion from one side + crusher from opposite.
-    // Player juggles poison threat + bullet threat.
     2: {
       duration: 15,
       spawnInterval: 1700,
@@ -69,9 +49,6 @@ MapRegistry.register({
     // ── UPGRADE 1 ──
 
     // ── Wave 3 — Tornado enters ──
-    // Fast + parryable. Comes in singles mostly
-    // so player can learn the parry timing.
-    // Burst_single: 2 scorpions same side = quick kills.
     3: {
       duration: 18,
       spawnInterval: 1700,
@@ -80,17 +57,14 @@ MapRegistry.register({
       pool: { scorpion: 5, crusher: 3, tornado: 2 },
       combos: {
         single: 4,
-        pair_opposite: 3, 
-        burst_single: 1, 
+        pair_opposite: 3,
+        burst_single: 1,
         pair_adjacent: 2,
       },
       dirCooldown: 900,
     },
 
     // ── Wave 4 — Tornado pressure ──
-    // More tornados in pool. Pair_opposite with
-    // tornado = fast enemy from one side, slow
-    // scorpion from other. Player prioritizes.
     4: {
       duration: 20,
       spawnInterval: 2000,
@@ -98,19 +72,16 @@ MapRegistry.register({
       minAlive: 2,
       pool: { scorpion: 4, crusher: 3, tornado: 3 },
       combos: {
-        single: 5, 
-        pair_opposite: 3, 
-        burst_single: 2, 
+        single: 5,
+        pair_opposite: 3,
+        burst_single: 2,
       },
       dirCooldown: 1000,
     },
 
     // ── UPGRADE 2 ──
 
-    // ── Wave 5 — Golem enters ──
-    // Rare but clogs a lane. While player chips
-    // golem, scorpion emerges from another side.
-    // Adjacent pairs: golem + scorpion from 90° = nasty.
+    // ── Wave 5 — Golem enters + stagger ──
     5: {
       duration: 22,
       spawnInterval: 2000,
@@ -118,19 +89,15 @@ MapRegistry.register({
       minAlive: 2,
       pool: { scorpion: 4, crusher: 2, tornado: 3, golem: 1 },
       combos: {
-        single: 4, stagger: 400,
-        pair_opposite: 3, 
-        pair_adjacent: 2, 
-        burst_single: 1, 
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
       dirCooldown: 1000,
     },
 
-    // ── Wave 6 — BREATHER ──
-    // Scorpion + tornado only. No crushers, no golems.
-    // Tornados are parryable = satisfying.
-    // Bursts of scorpions = quick poison kills.
-    // Player feels upgraded and powerful.
+    // ── Wave 6 — BREATHER + stagger ──
     6: {
       duration: 22,
       spawnInterval: 1800,
@@ -138,9 +105,9 @@ MapRegistry.register({
       minAlive: 2,
       pool: { scorpion: 7, tornado: 3 },
       combos: {
-        single: 4, stagger: 700,
-        burst_single: 4, 
-        pair_opposite: 2, 
+        single: 4,
+        burst_single:  { weight: 4, stagger: 350 },
+        pair_opposite: { weight: 2, stagger: 550 },
       },
       dirCooldown: 900,
     },
@@ -148,9 +115,6 @@ MapRegistry.register({
     // ── UPGRADE 3 ──
 
     // ── Wave 7 — Crusher + tornado hell ──
-    // Bullets flying + fast tornados.
-    // No scorpions = different feel, pure ranged chaos.
-    // Fewer on field but every enemy is dangerous.
     7: {
       duration: 22,
       spawnInterval: 2200,
@@ -159,16 +123,13 @@ MapRegistry.register({
       pool: { crusher: 5, tornado: 5 },
       combos: {
         single: 5,
-        pair_opposite: 3, 
-        pair_adjacent: 2, 
+        pair_opposite: { weight: 3, stagger: 600 },
+        pair_adjacent: { weight: 2, stagger: 550 },
       },
       dirCooldown: 1100,
     },
 
     // ── Wave 8 — Full mix returns ──
-    // Everything together. Scorpion surprise +
-    // crusher bullets + tornado speed.
-    // More enemies, faster rhythm.
     8: {
       duration: 22,
       spawnInterval: 2000,
@@ -177,9 +138,9 @@ MapRegistry.register({
       pool: { scorpion: 3, crusher: 4, tornado: 3 },
       combos: {
         single: 4,
-        pair_opposite: 3, 
-        burst_single: 2,
-        pair_adjacent: 1, 
+        pair_opposite: { weight: 3, stagger: 650 },
+        burst_single:  { weight: 2, stagger: 400 },
+        pair_adjacent: { weight: 1, stagger: 600 },
       },
       dirCooldown: 1000,
     },
@@ -187,9 +148,6 @@ MapRegistry.register({
     // ── UPGRADE 4 ──
 
     // ── Wave 9 — Triple intro ──
-    // 3 directions at once. Golem returns to
-    // clog one lane while scorpion + tornado
-    // come from other two. Intense.
     9: {
       duration: 25,
       spawnInterval: 1900,
@@ -198,17 +156,14 @@ MapRegistry.register({
       pool: { scorpion: 3, crusher: 3, tornado: 3, golem: 1 },
       combos: {
         single: 3,
-        pair_opposite: 3,
-        burst_single: 2,
-        triple: 2,
+        pair_opposite: { weight: 3, stagger: 600 },
+        burst_single:  { weight: 2, stagger: 400 },
+        triple:        { weight: 2, stagger: 550 },
       },
       dirCooldown: 1000,
     },
 
     // ── Wave 10 — Last stand ──
-    // Crusher-heavy. Bullets everywhere.
-    // Triple more common. Player must use
-    // special wisely to survive.
     10: {
       duration: 20,
       spawnInterval: 2100,
@@ -217,10 +172,10 @@ MapRegistry.register({
       pool: { scorpion: 2, crusher: 5, tornado: 2, golem: 1 },
       combos: {
         single: 2,
-        pair_opposite: 3,
-        pair_adjacent: 2, 
-        burst_single: 2, 
-        triple: 1,
+        pair_opposite: { weight: 3, stagger: 600 },
+        pair_adjacent: { weight: 2, stagger: 550 },
+        burst_single:  { weight: 2, stagger: 400 },
+        triple:        { weight: 1, stagger: 550 },
       },
       dirCooldown: 1000,
     },
@@ -228,10 +183,6 @@ MapRegistry.register({
     // ── UPGRADE 5 ──
 
     // ── Wave 11 — FINAL: Sandstorm ──
-    // Tornado + scorpion flood. Fast parryable
-    // enemies mixed with poison surprises.
-    // Rush = 3 tornados in a line, satisfying parry chain.
-    // Surround = panic moment to end the map.
     11: {
       duration: 25,
       spawnInterval: 1400,
@@ -239,10 +190,10 @@ MapRegistry.register({
       minAlive: 2,
       pool: { tornado: 5, scorpion: 5 },
       combos: {
-        pair_opposite: 3,
-        burst_single: 3,
-        rush: 2,
-        surround: 1,
+        pair_opposite: { weight: 3, stagger: 700 },
+        burst_single:  { weight: 3, stagger: 500 },
+        rush:          { weight: 2, stagger: 600 },
+        surround:      { weight: 1, stagger: 800 },
       },
       dirCooldown: 800,
     },

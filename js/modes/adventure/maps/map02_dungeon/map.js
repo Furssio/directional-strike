@@ -5,7 +5,7 @@ MapRegistry.register({
   name:  'Dungeon',
   theme: 'dungeon',
   icon:  '🪨',
- background: 'assets/maps/map02_dungeon/background_01.webp',
+  background: 'assets/maps/map02_dungeon/background_01.webp',
 
   totalWaves: 11,
   minEnemiesAlive: 1,
@@ -13,127 +13,100 @@ MapRegistry.register({
 
   scalingAt: {},
 
-  /* ── WAVE CONFIG ─────────────────────────
-     Dungeon identity: slimes that split + tanky golems.
-     Slimes create extra bodies on death → maxAlive stays
-     lower than Forest to avoid screen flood.
-     Golems are slow but 3-hit — they clog lanes.
-     Ravagers fill gaps as fast cannon fodder.
-
-     Rhythm: slower spawn intervals than Forest
-     because slime splits add "free" enemies.
-  ─────────────────────────────────────────── */
   waveConfig: {
 
     // ── Wave 1 — Intro ──
-    // Ravagers + first slimes. Player learns slimes split.
-    // All singles, gentle rhythm. No combos needed —
-    // slime splitting already adds complexity.
     1: {
-      duration: 15,
+      duration: 13,
       spawnInterval: 1400,
       maxAlive: 3,
       minAlive: 2,
       pool: { ravager: 6, slime_large: 4 },
       combos: {
         single: 3,
-        pair_opposite: 4, 
+        pair_opposite: 4,
         burst_single: 2,
-        triple: 2, 
+        triple: 2,
       },
       dirCooldown: 600,
     },
 
     // ── Wave 2 — Slimes from both sides ──
-    // First pair_opposite: slime + ravager from opposite ends.
-    // Player starts juggling split cleanup + new threats.
     2: {
-      duration: 15,
+      duration: 14,
       spawnInterval: 1400,
       maxAlive: 3,
       minAlive: 2,
       pool: { ravager: 6, slime_large: 4 },
       combos: {
-        single: 2, 
-        pair_opposite: 5, 
+        single: 2,
+        pair_opposite: 5,
         burst_single: 3,
       },
       dirCooldown: 600,
-},
+    },
+
     // ── UPGRADE 1 ──
 
     // ── Wave 3 — Golem enters ──
-    // First golem. Slow, tanky, clogs a lane.
-    // Mostly singles so player can focus on learning
-    // the 3-hit pattern without other pressure.
     3: {
-      duration: 20,
+      duration: 14,
       spawnInterval: 1900,
       maxAlive: 4,
       minAlive: 2,
       pool: { ravager: 3, slime_large: 4, golem: 3 },
       combos: {
-        single: 6, 
-        pair_opposite: 3, 
-        burst_single: 1, 
+        single: 6,
+        pair_opposite: 3,
+        burst_single: 1,
       },
       dirCooldown: 900,
     },
 
     // ── Wave 4 — Golem + slime pressure ──
-    // More golems in pool. Burst_single lets
-    // 2 ravagers come from same side — satisfying
-    // double kill while golem approaches from other side.
     4: {
-      duration: 20,
+      duration: 14,
       spawnInterval: 2000,
       maxAlive: 4,
       minAlive: 2,
       pool: { ravager: 4, slime_large: 3, golem: 3 },
       combos: {
-        single: 5, 
+        single: 5,
         pair_opposite: 3,
-        burst_single: 2, 
+        burst_single: 2,
       },
       dirCooldown: 1000,
     },
 
     // ── UPGRADE 2 ──
 
-    // ── Wave 5 — Adjacent pairs ──
-    // Slime from one side + golem from adjacent.
-    // Player must decide: kill slime fast (splits!)
-    // or chip golem first. Tactical moment.
+    // ── Wave 5 — Adjacent pairs + wider stagger ──
     5: {
-      duration: 20,
+      duration: 17,
       spawnInterval: 2000,
       maxAlive: 4,
       minAlive: 2,
       pool: { ravager: 3, slime_large: 4, golem: 3 },
       combos: {
-        single: 4, 
-        pair_opposite: 3,  
-        pair_adjacent: 2, 
-        burst_single: 1, 
-
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
       dirCooldown: 1000,
     },
 
-    // ── Wave 6 — BREATHER ──
-    // Ravager flood, minimal golems.
-    // Player just upgraded — let them feel powerful.
-    // Bursts and singles, fast kills, dopamine.
+    // ── Wave 6 — BREATHER + stagger ──
     6: {
-      duration: 20,
+      duration: 17,
       spawnInterval: 1800,
       maxAlive: 4,
       minAlive: 2,
       pool: { ravager: 8, golem: 2 },
       combos: {
-        single: 4, 
-        burst_single: 4, 
-        pair_opposite: 2, 
+        single: 4,
+        burst_single:  { weight: 4, stagger: 350 },
+        pair_opposite: { weight: 2, stagger: 550 },
       },
       dirCooldown: 900,
     },
@@ -141,39 +114,32 @@ MapRegistry.register({
     // ── UPGRADE 3 ──
 
     // ── Wave 7 — Slime swamp ──
-    // Heavy slime wave. Screen fills with splits.
-    // Lower maxAlive because splits add bodies.
-    // Golems mixed in to clog lanes while
-    // player deals with slime children.
     7: {
-      duration: 20,
+      duration: 17,
       spawnInterval: 2200,
       maxAlive: 4,
       minAlive: 2,
       pool: { slime_large: 6, golem: 3, ravager: 1 },
       combos: {
-        single: 5, 
-        pair_opposite: 3, 
-        pair_adjacent: 2, 
+        single: 5,
+        pair_opposite: { weight: 3, stagger: 600 },
+        pair_adjacent: { weight: 2, stagger: 550 },
       },
       dirCooldown: 1100,
     },
 
     // ── Wave 8 — Golem heavy ──
-    // More golems, fewer slimes. Lanes get clogged.
-    // Player must manage which golem to focus.
-    // Burst_single ravagers give breathing room kills.
     8: {
-      duration: 20,
+      duration: 17,
       spawnInterval: 2000,
       maxAlive: 4,
       minAlive: 2,
       pool: { ravager: 3, slime_large: 3, golem: 4 },
       combos: {
-        single: 4, 
-        pair_opposite: 3, 
-        burst_single: 2, 
-        pair_adjacent: 1, 
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 650 },
+        burst_single:  { weight: 2, stagger: 400 },
+        pair_adjacent: { weight: 1, stagger: 600 },
       },
       dirCooldown: 1000,
     },
@@ -181,40 +147,34 @@ MapRegistry.register({
     // ── UPGRADE 4 ──
 
     // ── Wave 9 — Triple intro ──
-    // First triple: 3 directions at once.
-    // Player has 4 upgrades, can handle it.
-    // Golem from one side + slime + ravager from others.
-    // Intense but fair.
     9: {
-      duration: 20,
+      duration: 17,
       spawnInterval: 1900,
       maxAlive: 5,
       minAlive: 2,
       pool: { ravager: 3, slime_large: 4, golem: 3 },
       combos: {
-        single: 3, 
-        pair_opposite: 3, 
-        burst_single: 2, 
-        triple: 2, 
+        single: 3,
+        pair_opposite: { weight: 3, stagger: 600 },
+        burst_single:  { weight: 2, stagger: 400 },
+        triple:        { weight: 2, stagger: 550 },
       },
       dirCooldown: 900,
     },
 
     // ── Wave 10 — Last stand ──
-    // Everything cranked up. More enemies, faster spawns.
-    // Triple more common. Player must use special wisely.
     10: {
-      duration: 25,
+      duration: 20,
       spawnInterval: 1800,
       maxAlive: 5,
       minAlive: 2,
       pool: { ravager: 3, slime_large: 4, golem: 3 },
       combos: {
-        single: 2, 
-        pair_opposite: 3, 
-        pair_adjacent: 2, 
-        burst_single: 2, 
-        triple: 1,
+        single: 2,
+        pair_opposite: { weight: 3, stagger: 600 },
+        pair_adjacent: { weight: 2, stagger: 550 },
+        burst_single:  { weight: 2, stagger: 400 },
+        triple:        { weight: 1, stagger: 550 },
       },
       dirCooldown: 800,
     },
@@ -222,22 +182,17 @@ MapRegistry.register({
     // ── UPGRADE 5 ──
 
     // ── Wave 11 — FINAL: Slime flood ──
-    // Pure slime chaos. They split everywhere.
-    // Rush = 3 slimes same direction, splits create a wall.
-    // Surround = slimes from all 4 sides, panic moment.
-    // Player with 5 upgrades mows through them.
-    // maxAlive stays at 5 because splits add tons more.
     11: {
-      duration: 30,
+      duration: 22,
       spawnInterval: 1400,
       maxAlive: 5,
       minAlive: 2,
       pool: { slime_large: 10 },
       combos: {
-        pair_opposite: 3, stagger: 800,
-        burst_single: 3, stagger: 600,
-        rush: 2, stagger: 700,
-        surround: 1, stagger: 900,
+        pair_opposite: { weight: 3, stagger: 800 },
+        burst_single:  { weight: 3, stagger: 600 },
+        rush:          { weight: 2, stagger: 700 },
+        surround:      { weight: 1, stagger: 900 },
       },
       dirCooldown: 600,
     },
