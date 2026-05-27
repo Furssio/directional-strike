@@ -301,26 +301,30 @@ document.addEventListener('keydown', e => {
     return;
   }
 
-  const map = {
+ const map = {
     ArrowUp:    'up',
     ArrowDown:  'down',
     ArrowLeft:  'left',
     ArrowRight: 'right',
+    KeyW:       'up',
+    KeyS:       'down',
+    KeyA:       'left',
+    KeyD:       'right',
   };
 
-  if (map[e.key]) {
+  if (map[e.code]) {
     e.preventDefault();
     if (paused) return;
     if (e.repeat) return;
     // tutorial intercept
     if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
-      Tutorial.onDirInput(map[e.key]);
+      Tutorial.onDirInput(map[e.code]);
       return;
     }
-    const btn = document.getElementById('btn-' + map[e.key]);
+    const btn = document.getElementById('btn-' + map[e.code]);
     if (btn) btn.classList.add('pressed');
     setTimeout(() => { if (btn) btn.classList.remove('pressed'); }, 120);
-    handleDir(map[e.key]);
+    handleDir(map[e.code]);
     if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
   }
 });

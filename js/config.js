@@ -408,7 +408,7 @@ abilities: {
         explosion:      'rare',
         full_heal:      'legendary',
         one_hit:        'rare',
-        range_boost:    'rare',
+        range_boost:    'epic',
         shield:         'epic',
         slash:          'legendary'
     },
