@@ -305,7 +305,7 @@ function cleanupArena() {
 
 function tick() {
   if (!running || paused) return;
-
+  try {
   const now = performance.now();
   const dt  = Math.min(now - lastTick, 50);
   lastTick  = now;
@@ -345,6 +345,7 @@ updateProgress();
   /* ── UPDATE ENEMIES ── */
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e    = enemies[i];
+    if (!e || !e.el) { enemies.splice(i, 1); continue; }
 
     // cleanup: remove enemies that died outside of combat
     // (e.g. crab emerging, self-destructing enemies)
@@ -439,6 +440,7 @@ updateProgress();
   /* ── UPDATE BULLETS ── */
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
+    if (!b || !b.el) { bullets.splice(i, 1); continue; }
     const sm = player.speedMultiplier;
     b.x += b.vx * sm;
     b.y += b.vy * sm;
@@ -474,6 +476,16 @@ updateProgress();
       setTimeout(() => flashEl.style.opacity = '0', 150);
 
       if (!player.isAlive()) { endGame(); return; }
+    }
+  }
+  } catch (err) {
+    console.error('[TICK ERROR]', err);
+    if (typeof ErrorHandler !== 'undefined') {
+      ErrorHandler._save && ErrorHandler._save({
+        type: 'tick', message: String(err.message).substring(0, 300),
+        stack: err.stack ? String(err.stack).substring(0, 500) : '',
+        time: new Date().toISOString(), source: 'loop.js', line: 0, col: 0, url: '', ua: ''
+      });
     }
   }
 }

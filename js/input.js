@@ -8,11 +8,17 @@
                audio.js
    ═══════════════════════════════════════ */
 
+/* ── SAFE BIND HELPER ── */
+function _safeBind(id, event, handler) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener(event, handler);
+}
+
 /* ── MENU NAVIGATION ── */
 
-document.getElementById('btn-restart').addEventListener('click', () => {
+_safeBind('btn-restart', 'click', () => {
   if (Transition.isPlaying()) return;
-  overOverlay.classList.add('hidden');
+  if (overOverlay) overOverlay.classList.add('hidden');
   cleanupArena();
   Transition.play('fast', () => {
     // challenge mode restart
@@ -34,24 +40,34 @@ document.getElementById('btn-restart').addEventListener('click', () => {
   });
 });
 
-document.getElementById('btn-adventure').addEventListener('click', () => {
+_safeBind('btn-adventure', 'click', () => {
   if (Transition.isPlaying()) return;
   if (typeof DemoMode !== 'undefined') DemoMode.stop();
   Transition.play('fast', () => {
-    loadAdventureMode(() => {
-      buildMapSelectScreen();
-      showScreen(sMapSelect);
-    });
+    try {
+      loadAdventureMode(() => {
+        buildMapSelectScreen();
+        showScreen(sMapSelect);
+      });
+    } catch (e) {
+      console.error('[INPUT] loadAdventureMode failed', e);
+      showScreen(sMenu);
+    }
   });
 });
 
 // challenge mode
-document.getElementById('btn-challenge').addEventListener('click', () => {
+_safeBind('btn-challenge', 'click', () => {
   if (Transition.isPlaying()) return;
   if (typeof DemoMode !== 'undefined') DemoMode.stop();
   Transition.play('fast', () => {
-    buildChallengeScreen();
-    showScreen(sChallenge);
+    try {
+      buildChallengeScreen();
+      showScreen(sChallenge);
+    } catch (e) {
+      console.error('[INPUT] buildChallengeScreen failed', e);
+      showScreen(sMenu);
+    }
   });
 });
 
@@ -78,22 +94,25 @@ if (_challengeCard && _splashEl) {
 }
 
 // how to play — info popup
-document.getElementById('btn-howtoplay').addEventListener('click', () => {
+_safeBind('btn-howtoplay', 'click', () => {
   const popup = document.getElementById('info-popup');
   if (popup) popup.classList.remove('hidden');
 });
 
-document.getElementById('info-close').addEventListener('click', () => {
+_safeBind('info-close', 'click', () => {
   const popup = document.getElementById('info-popup');
   if (popup) popup.classList.add('hidden');
 });
 
 // close info on click outside card
-document.getElementById('info-popup').addEventListener('click', (e) => {
-  if (e.target.id === 'info-popup') {
-    e.target.classList.add('hidden');
-  }
-});
+const _infoPopup = document.getElementById('info-popup');
+if (_infoPopup) {
+  _infoPopup.addEventListener('click', (e) => {
+    if (e.target.id === 'info-popup') {
+      e.target.classList.add('hidden');
+    }
+  });
+}
 
 const _btnAbilities = document.getElementById('btn-abilities');
 if (_btnAbilities) {
@@ -112,9 +131,9 @@ if (_btnAbilityBack) {
   });
 }
 
-document.getElementById('btn-home').addEventListener('click', () => {
+_safeBind('btn-home', 'click', () => {
   if (Transition.isPlaying()) return;
-  overOverlay.classList.add('hidden');
+  if (overOverlay) overOverlay.classList.add('hidden');
   cleanupArena();
   Transition.play('fast', () => {
     // challenge mode: go back to menu
@@ -129,7 +148,7 @@ document.getElementById('btn-home').addEventListener('click', () => {
   });
 });
 
-document.getElementById('btn-map-back').addEventListener('click', () => {
+_safeBind('btn-map-back', 'click', () => {
   if (Transition.isPlaying()) return;
   Transition.play('fast', () => {
     showScreen(sMenu);
@@ -139,7 +158,7 @@ document.getElementById('btn-map-back').addEventListener('click', () => {
 
 /* ── CHALLENGE SCREEN BUTTONS ── */
 
-document.getElementById('btn-challenge-back').addEventListener('click', () => {
+_safeBind('btn-challenge-back', 'click', () => {
   if (Transition.isPlaying()) return;
   if (typeof DemoMode !== 'undefined') DemoMode.stop();
   Transition.play('fast', () => {
@@ -148,10 +167,10 @@ document.getElementById('btn-challenge-back').addEventListener('click', () => {
   });
 });
 
-document.getElementById('btn-challenge-play').addEventListener('click', () => {
+_safeBind('btn-challenge-play', 'click', () => {
   if (Transition.isPlaying()) return;
-  SFX.mapConfirm();
-  Music.fadeOut(500);
+  if (typeof SFX !== 'undefined') SFX.mapConfirm();
+  if (typeof Music !== 'undefined') Music.fadeOut(500);
   if (typeof DemoMode !== 'undefined') DemoMode.stop();
   Transition.play('normal', () => {
     startChallengeGame();
@@ -159,8 +178,6 @@ document.getElementById('btn-challenge-play').addEventListener('click', () => {
     startGameLoop();
   });
 });
-
-
 
 
 /* ── AUDIO — VOLUME SLIDER ── */
@@ -179,14 +196,15 @@ function _syncVolumeUI() {
   // update menu button icon
   const icon = CONFIG.audio.volume <= 0 ? '🔇' : '🔊';
   if (_menuSoundBtn) {
-    _menuSoundBtn.querySelector('.menu-btn-icon').textContent = icon;
+    const iconEl = _menuSoundBtn.querySelector('.menu-btn-icon');
+    if (iconEl) iconEl.textContent = icon;
     _menuSoundBtn.classList.toggle('muted', CONFIG.audio.volume <= 0);
   }
 }
 
 // handle slider input
 function _onVolumeChange(e) {
-  AudioCore.setVolume(parseInt(e.target.value) / 100);
+  if (typeof AudioCore !== 'undefined') AudioCore.setVolume(parseInt(e.target.value) / 100);
   _syncVolumeUI();
 }
 
@@ -376,5 +394,4 @@ function startChallengeGame() {
   });
 }
 
-
-updateMenuBest();
+if (typeof updateMenuBest === 'function') updateMenuBest();

@@ -27,13 +27,13 @@ function spawnEnemyDirected(def, dir) {
   if (dir === 'up'   || dir === 'down')  x += (Math.random() - 0.5) * spread;
   if (dir === 'left' || dir === 'right') y += (Math.random() - 0.5) * spread;
 
-const _map = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
-const _wave = ActiveDirector.getWave();
+const _map = ActiveDirector && ActiveDirector.getCurrentMap ? ActiveDirector.getCurrentMap() : null;
+const _wave = ActiveDirector && ActiveDirector.getWave ? ActiveDirector.getWave() : 1;
 const _isIntro = _map && _map.introWaves && _map.introWaves[_wave];
 
 let speedMult = 1;
 if (!_isIntro) {
-  if (ActiveDirector === ChallengeDirector) {
+  if (typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector) {
     // challenge: step-based speed scaling every 5 waves
     const steps = CONFIG.challenge.speedSteps;
     const idx = Math.min(Math.floor((_wave - 1) / 5), steps.length - 1);

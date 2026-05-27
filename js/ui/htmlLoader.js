@@ -12,7 +12,11 @@ async function loadHTMLPartials() {
   const container = document.getElementById('G');
   for (const path of HTML_PARTIALS) {
     try {
-      const res  = await fetch(path);
+      const res = await fetch(path);
+      if (!res.ok) {
+        console.error('HTMLLoader: HTTP error', res.status, path);
+        continue;
+      }
       const html = await res.text();
       container.insertAdjacentHTML('beforeend', html);
     } catch(e) {
@@ -22,10 +26,12 @@ async function loadHTMLPartials() {
 }
 
 loadHTMLPartials().then(() => {
+  // init pause bindings now that screen-game.html is in DOM
+  if (typeof _initPauseBindings === 'function') _initPauseBindings();
+
   const s   = document.createElement('script');
   s.src     = 'js/modes/infinite/main.js';
   s.onload  = () => {
-    // bind UI sounds after all HTML + scripts are ready
     if (typeof UiBind !== 'undefined') UiBind.init();
   };
   s.onerror = e => console.error('Impossibile caricare main.js', e);

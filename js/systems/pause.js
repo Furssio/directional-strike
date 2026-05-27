@@ -20,131 +20,132 @@ function pauseGame() {
   paused = true;
   clearInterval(gameLoop);
   gameLoop = null;
-  document.getElementById('pause-overlay').classList.remove('hidden');
+
+  const pauseOv = document.getElementById('pause-overlay');
+  if (pauseOv) pauseOv.classList.remove('hidden');
 
   // update maps/menu button text based on mode
   const mapsBtn = document.getElementById('pause-maps');
-  mapsBtn.textContent = (ActiveDirector === ChallengeDirector) ? 'MENU' : 'MAPS';
+  if (mapsBtn) {
+    mapsBtn.textContent = (typeof ChallengeDirector !== 'undefined' &&
+      ActiveDirector === ChallengeDirector) ? 'MENU' : 'MAPS';
+  }
 
-  // sync toggle states with menu buttons
-  _syncPauseToggles();
+  // sync volume slider with current volume
+  _syncPauseVolume();
 
-// freeze ability audio
+  // freeze ability audio
   if (typeof SFX !== 'undefined') SFX.pauseAll();
   if (typeof RangeCircle !== 'undefined') RangeCircle.stop();
-  SFX.pauseOpen();
+  if (typeof SFX !== 'undefined') SFX.pauseOpen();
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
+
+  // retry pause bindings if not ready yet
+  if (!_pauseBindingsReady) _initPauseBindings();
 }
 
 function resumeGame() {
   if (!paused) return;
   paused = false;
-  document.getElementById('pause-overlay').classList.add('hidden');
+
+  const pauseOv = document.getElementById('pause-overlay');
+  if (pauseOv) pauseOv.classList.add('hidden');
+
   lastTick = performance.now();
   gameLoop = setInterval(tick, 16);
 
- // resume ability audio
+  // resume ability audio
   if (typeof SFX !== 'undefined') SFX.resumeAll();
   if (typeof RangeCircle !== 'undefined') RangeCircle.start();
-  SFX.pauseClose();
+  if (typeof SFX !== 'undefined') SFX.pauseClose();
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
 }
 
-/* ── SYNC TOGGLE STATES ── */
+/* ── SYNC VOLUME SLIDER ── */
 
-function _syncPauseToggles() {
-  // SFX
-  const pSfx = document.getElementById('pause-sfx');
-  const sfxOff = !CONFIG.audio.enabled;
-  pSfx.classList.toggle('muted', sfxOff);
-  pSfx.querySelector('.pause-btn-icon').textContent = sfxOff ? '🔇' : '🔊';
-
-  // Music
-  const pMusic = document.getElementById('pause-music');
-  const menuMusic = document.getElementById('btn-music');
-  const musicOff = menuMusic.classList.contains('muted');
-  pMusic.classList.toggle('muted', musicOff);
-  pMusic.querySelector('.pause-btn-icon').textContent = musicOff ? '🔇' : '🎵';
+function _syncPauseVolume() {
+  const slider = document.getElementById('pause-volume-slider');
+  if (!slider) return;
+  slider.value = Math.round(CONFIG.audio.volume * 100);
 }
 
 /* ── BUTTON BINDINGS ── */
 
-document.getElementById('btn-pause').addEventListener('click', () => {
-  togglePause();
-});
+let _pauseBindingsReady = false;
 
-document.getElementById('pause-continue').addEventListener('click', () => {
-  resumeGame();
-});
+function _initPauseBindings() {
+  if (_pauseBindingsReady) return;
 
-document.getElementById('pause-retry').addEventListener('click', () => {
-  if (Transition.isPlaying()) return;
-  resumeGame();
-  Transition.play('fast', () => {
-    equippedAbilityId = getEquippedAbility();
-    if (ActiveDirector === ChallengeDirector) {
-      // reset challenge state and start fresh with ability choice
-      ChallengeDirector.init();
-      resetUpgradeChoices();
-      startGame(true);
-      _isFirstAbilityChoice = true;
-      startChallengeChoice('ability');
-    } else if (ActiveDirector === AdventureDirector) {
-      if (!AdventureDirector.restart()) {
-        showScreen(sMenu);
-        return;
+  const btnPause    = document.getElementById('btn-pause');
+  const btnContinue = document.getElementById('pause-continue');
+  const btnRetry    = document.getElementById('pause-retry');
+  const btnMaps     = document.getElementById('pause-maps');
+
+  // only check elements that MUST exist
+  if (!btnPause || !btnContinue || !btnRetry || !btnMaps) {
+    return;
+  }
+
+  _pauseBindingsReady = true;
+
+  btnPause.addEventListener('click', () => {
+    togglePause();
+  });
+
+  btnContinue.addEventListener('click', () => {
+    resumeGame();
+  });
+
+  btnRetry.addEventListener('click', () => {
+    if (typeof Transition !== 'undefined' && Transition.isPlaying()) return;
+    resumeGame();
+    Transition.play('fast', () => {
+      equippedAbilityId = getEquippedAbility();
+      if (typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector) {
+        ChallengeDirector.init();
+        resetUpgradeChoices();
+        startGame(true);
+        _isFirstAbilityChoice = true;
+        startChallengeChoice('ability');
+      } else if (typeof AdventureDirector !== 'undefined' && ActiveDirector === AdventureDirector) {
+        if (!AdventureDirector.restart()) {
+          showScreen(sMenu);
+          return;
+        }
+        startGame(true);
+      } else {
+        startGame(true);
       }
-      startGame(true);
-    } else {
-      startGame(true);
-    }
-  }, () => {
-    startGameLoop();
+    }, () => {
+      startGameLoop();
+    });
   });
-});
 
-document.getElementById('pause-maps').addEventListener('click', () => {
-  if (Transition.isPlaying()) return;
-  resumeGame();
-  Transition.play('fast', () => {
-    endGame();
-    if (ActiveDirector === ChallengeDirector) {
-      showScreen(sMenu);
-    } else {
-     showScreen(sMapSelect);
-      if (typeof initMapSelect === 'function') initMapSelect();
-    }
+  btnMaps.addEventListener('click', () => {
+    if (typeof Transition !== 'undefined' && Transition.isPlaying()) return;
+    resumeGame();
+    Transition.play('fast', () => {
+      endGame();
+      if (typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector) {
+        showScreen(sMenu);
+      } else {
+        showScreen(sMapSelect);
+        if (typeof initMapSelect === 'function') initMapSelect();
+      }
+    });
   });
-});
 
-/* ── SFX TOGGLE ── */
-document.getElementById('pause-sfx').addEventListener('click', () => {
-  SFX.init();
-  CONFIG.audio.enabled = !CONFIG.audio.enabled;
-  const off = !CONFIG.audio.enabled;
+  // volume slider binding
+  const volSlider = document.getElementById('pause-volume-slider');
+  if (volSlider) {
+    volSlider.addEventListener('input', (e) => {
+      const vol = parseInt(e.target.value) / 100;
+      CONFIG.audio.volume = vol;
+      if (typeof AudioCore !== 'undefined') AudioCore.vol(vol);
+      try { localStorage.setItem('ds_volume', vol); } catch(x) {}
+    });
+  }
+}
 
-  // update pause button
-  const pSfx = document.getElementById('pause-sfx');
-  pSfx.classList.toggle('muted', off);
-  pSfx.querySelector('.pause-btn-icon').textContent = off ? '🔇' : '🔊';
-
-  // sync menu button
-  const mSfx = document.getElementById('btn-sfx');
-  mSfx.classList.toggle('muted', off);
-  mSfx.querySelector('.menu-btn-icon').textContent = off ? '🔇' : '🔊';
-});
-
-/* ── MUSIC TOGGLE ── */
-document.getElementById('pause-music').addEventListener('click', () => {
-  const off = !document.getElementById('pause-music').classList.contains('muted');
-
-  // update pause button
-  const pMusic = document.getElementById('pause-music');
-  pMusic.classList.toggle('muted', off);
-  pMusic.querySelector('.pause-btn-icon').textContent = off ? '🔇' : '🎵';
-
-  // sync menu button
-  const mMusic = document.getElementById('btn-music');
-  mMusic.classList.toggle('muted', off);
-  mMusic.querySelector('.menu-btn-icon').textContent = off ? '🔇' : '🎵';
-});
+// DOM is ready (htmlLoader loaded partials before main.js)
+_initPauseBindings();

@@ -118,7 +118,7 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
   ─────────────────────────────────────── */
  audio: {
     enabled: true,
-    volume:  parseFloat(localStorage.getItem('ds_volume')) || 1.0,
+    volume: (() => { try { return parseFloat(localStorage.getItem('ds_volume')) || 1.0; } catch(e) { return 1.0; } })(),
 },
   /* ── JUICE ──────────────────────────────
      Visual feedback parameters.
