@@ -72,6 +72,9 @@ function startGame(delayLoop) {
   // cleanup any active ability effects from previous game
   cleanupAbilityEffects();
 
+  // remove any leftover orbs from previous game
+  if (typeof OrbSystem !== 'undefined') OrbSystem.reset();
+
   player      = new Player(equippedAbilityId);
   enemies     = [];
   bullets     = [];
@@ -300,9 +303,10 @@ function _showContinueCountdown(onComplete) {
 
 /* cleanup enemies/bullets — called when leaving game over */
 function cleanupArena() {
-  document.querySelectorAll('.enemy, .bullet, .particle').forEach(e => e.remove());
+  document.querySelectorAll('.enemy, .bullet, .particle, .orb').forEach(e => e.remove());
   enemies = [];
   bullets = [];
+  if (typeof OrbSystem !== 'undefined') OrbSystem.reset();
 }
 
 /* ── TICK ── */

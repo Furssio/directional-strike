@@ -17,7 +17,7 @@
 const OrbSystem = (() => {
 
   let _activeOrb   = null;
-  let _cooldownMs  = 0;
+  let _cooldownMs  = 8000;
   let _rollTimerMs = 0;
 
   const ORB_ROLL_INTERVAL = 3000;
@@ -308,7 +308,7 @@ const OrbSystem = (() => {
     reset() {
       if (_activeOrb) _activeOrb.el.remove();
       _activeOrb     = null;
-      _cooldownMs    = 0;
+      _cooldownMs    = 8000;
       _rollTimerMs   = 0;
       _attackBuffMs  = 0;
       _defenseBuffMs = 0;
