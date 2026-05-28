@@ -412,6 +412,7 @@ updateProgress();
       }
 
      e.hp = 0;  // mark dead so gate system cleans up
+      if (e.frozen) e.clearFreeze();
       e.el.remove();
       enemies.splice(i, 1);
 

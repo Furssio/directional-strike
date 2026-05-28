@@ -21,7 +21,7 @@ const CONFIG = {
      Toggle with debug overlay (T key).
   ─────────────────────────────────────── */
   devUnlockAll: false,       // unlock all maps + abilities
-devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
+devUnlockMapsOnly: true,  // unlock maps but NOT abilities (for slot testing)
 
   /* ── PLAYABLE MAP ORDER ─────────────────
      Progression order for adventure mode.
@@ -80,6 +80,13 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
   attack: {
     hitCooldownMs:  80,
     missCooldownMs: 190,
+  },
+
+  /* ── COMBAT ─────────────────────────────
+     freezeDuration: ms enemy stays frozen
+  ─────────────────────────────────────── */
+  combat: {
+    freezeDuration: 2000,
   },
 
   /* ── DIFFICULTY ─────────────────────────

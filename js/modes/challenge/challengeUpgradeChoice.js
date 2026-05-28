@@ -284,7 +284,7 @@ function _highlightChosen(dir) {
     }
   }
  const hintEl = document.getElementById('upgrade-arrow-hint');
-  if (hintEl) hintEl.remove();
+if (hintEl) hintEl.remove();
 }
 
 /* ── CLEANUP OVERLAY ────────────────── */
@@ -319,6 +319,8 @@ function resetChallengeChoices() {
   _challengeCountdown    = false;
   _isFirstAbilityChoice  = false;
   document.getElementById('upgrade-choice').classList.remove('active');
+  const hintEl = document.getElementById('upgrade-arrow-hint');
+  if (hintEl) hintEl.remove();
 }
 
 /* ── QUERY (used by combat.js) ──────── */

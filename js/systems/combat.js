@@ -207,9 +207,7 @@ function handleDir(dir) {
 
         // frost touch — freeze BEFORE onHit so enemy can't teleport/jump
         if (e.isAlive() && player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
-          e.frozen = true;
-          e.speed = 0;
-          if (e.el) e.el.classList.add('frozen');
+          e.freeze(CONFIG.combat.freezeDuration || 2000);
           SFX.freeze();
           showActionPop(d, 'FREEZE!', '#44ddff');
         }
@@ -225,6 +223,7 @@ function handleDir(dir) {
 
         if (!e.isAlive()) {
           _killsThisSwing++;
+          if (e.frozen) e.clearFreeze();
           spawnParticles(e.x, e.y, e.def);
           e.el.remove();
           enemies.splice(i, 1);
@@ -262,11 +261,10 @@ function handleDir(dir) {
         e.hit(hitDmg);
         if (e.hpFill) e.hpFill.style.width = Math.round(e.hpPercent() * 100) + '%';
 
+        
         // frost touch — freeze BEFORE onHit so enemy can't teleport/jump
         if (e.isAlive() && player._frostChance > 0 && Math.random() < player._frostChance && !e.frozen) {
-          e.frozen = true;
-          e.speed = 0;
-          if (e.el) e.el.classList.add('frozen');
+          e.freeze(CONFIG.combat.freezeDuration || 2000);
           SFX.freeze();
           showActionPop(d, 'FREEZE!', '#44ddff');
         }
@@ -287,6 +285,7 @@ function handleDir(dir) {
 
         if (!e.isAlive()) {
           _killsThisSwing++;
+          if (e.frozen) e.clearFreeze();
           spawnParticles(e.x, e.y, e.def);
           e.el.remove();
           enemies.splice(i, 1);

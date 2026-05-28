@@ -102,4 +102,93 @@ class Enemy {
     }, CONFIG.juice.hitFlashMs);
   }
 
+  /* ── FREEZE WITH TIMED THAW ── */
+
+  freeze(duration) {
+    if (this.frozen) return;
+    this.frozen = true;
+    this._frozenSpeed = this.speed;
+    this.speed = 0;
+    if (this.el) this.el.classList.add('frozen');
+
+    // crack shake at 35% and 70% of duration
+    const crack1 = Math.round(duration * 0.35);
+    const crack2 = Math.round(duration * 0.70);
+
+    this._freezeTimers = [];
+
+    this._freezeTimers.push(setTimeout(() => {
+      this._freezeCrack();
+    }, crack1));
+
+    this._freezeTimers.push(setTimeout(() => {
+      this._freezeCrack();
+    }, crack2));
+
+    // thaw at end
+    this._freezeTimers.push(setTimeout(() => {
+      this._thaw();
+    }, duration));
+  }
+
+  _freezeCrack() {
+    if (!this.el || !this.frozen) return;
+
+    // mini-shake
+    this.el.classList.remove('freeze-crack');
+    void this.el.offsetWidth;
+    this.el.classList.add('freeze-crack');
+    setTimeout(() => {
+      if (this.el) this.el.classList.remove('freeze-crack');
+    }, 300);
+
+    // ice pixel particles
+    for (let i = 0; i < 4; i++) {
+      const p = document.createElement('div');
+      p.className = 'ice-particle';
+      const ox = (Math.random() - 0.5) * this.size * 0.8;
+      const oy = (Math.random() - 0.5) * this.size * 0.8;
+      p.style.left = (this.x + ox) + 'px';
+      p.style.top  = (this.y + oy) + 'px';
+      arena.appendChild(p);
+      setTimeout(() => p.remove(), 500);
+    }
+  }
+
+  _thaw() {
+    if (!this.frozen) return;
+    this.frozen = false;
+    this._freezeTimers = [];
+
+    if (this.el) {
+      this.el.classList.remove('frozen', 'freeze-crack');
+    }
+
+    // reset to base speed — loses any custom state (wolf accel, oni boost, etc.)
+    this.speed = this.baseSpeed;
+
+    // thaw particles burst
+    if (this.el) {
+      for (let i = 0; i < 6; i++) {
+        const p = document.createElement('div');
+        p.className = 'ice-particle ice-particle-burst';
+        const ox = (Math.random() - 0.5) * this.size;
+        const oy = (Math.random() - 0.5) * this.size;
+        p.style.left = (this.x + ox) + 'px';
+        p.style.top  = (this.y + oy) + 'px';
+        arena.appendChild(p);
+        setTimeout(() => p.remove(), 600);
+      }
+    }
+  }
+
+  clearFreeze() {
+    // cleanup when enemy dies while frozen
+    if (this._freezeTimers) {
+      this._freezeTimers.forEach(t => clearTimeout(t));
+      this._freezeTimers = [];
+    }
+    this.frozen = false;
+  }
+
 }

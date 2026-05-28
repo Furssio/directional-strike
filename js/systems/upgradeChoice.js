@@ -392,4 +392,6 @@ function resetUpgradeChoices() {
   _countdownActive = false;
   _inputBlocked    = false;
   document.getElementById('upgrade-choice').classList.remove('active');
+  const hintEl = document.getElementById('upgrade-arrow-hint');
+  if (hintEl) hintEl.remove();
 }
