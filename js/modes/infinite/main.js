@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════
    MAIN.JS
    Entry point for Infinite Mode.
-   Loads all scripts in order.
+   Defines SCRIPTS array — loaded by htmlLoader.
    ═══════════════════════════════════════ */
 
 const SCRIPTS = [
@@ -45,7 +45,7 @@ const SCRIPTS = [
   'js/enemies/frog.js',
   'js/enemies/star.js',
 
- /* ── PLAYER ── */
+  /* ── PLAYER ── */
   'js/player/stats.js',
   'js/player/Player.js',
   'js/player/abilities/bulletTime.js',
@@ -65,7 +65,7 @@ const SCRIPTS = [
   'js/audio/music.js',
   'js/audio/index.js',
   'js/audio/uiBind.js',
-  
+
   /* ── AD SYSTEM (legacy — replaced by crazysdk.js) ── */
   'js/adPlaceholder.js',
 
@@ -75,7 +75,7 @@ const SCRIPTS = [
   /* ── INFINITE MODE ── */
   'js/modes/infinite/director.js',
 
- /* ── UI ── */
+  /* ── UI ── */
   'js/ui/dom.js',
   'js/systems/rangeCircle.js',
   'js/ui/hud.js',
@@ -99,7 +99,6 @@ const SCRIPTS = [
   /* ── INPUT ── */
   'js/input.js',
 
-  
   /* ── ADVENTURE (entry, does not auto-run) ── */
   'js/modes/adventure/main.js',
 
@@ -112,24 +111,9 @@ const SCRIPTS = [
   'js/modes/challenge/challengeTransition.js',
   'js/modes/challenge/challengeDimension.js',
 
-
   /* ── DEBUG (must be last) ── */
   'js/debug.js',
 ];
 
-(function loadScripts(scripts, index) {
-  if (index >= scripts.length) {
-    // all scripts loaded — init CrazyGames SDK
-    if (typeof CrazySDKWrapper !== 'undefined') {
-      CrazySDKWrapper.init().then(() => {
-        CrazySDKWrapper.loadingStop();
-      });
-    }
-    return;
-  }
-  const s = document.createElement('script');
-  s.src = scripts[index];
-  s.onload = () => loadScripts(scripts, index + 1);
-  s.onerror = (e) => console.error('Failed to load script:', scripts[index], e);
-  document.head.appendChild(s);
-})(SCRIPTS, 0);
+// SCRIPTS array is now loaded by htmlLoader.js
+// No self-executing loader here anymore.

@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Directional Strike</title>
-<!-- ── FONT ── -->
+
+  <!-- ── FONT ── -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
-  
+
+  <!-- ── LOADING (must be first) ── -->
+  <link rel="stylesheet" href="css/loading.css">
+
   <!-- ── BASE ── -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/effects.css">
@@ -31,37 +35,47 @@
   <link rel="stylesheet" href="css/screens/slot-machine.css">
   <link rel="stylesheet" href="css/screens/challenge.css">
   <link rel="stylesheet" href="css/transition.css">
-<link rel="stylesheet" href="css/map-transition.css">
-<link rel="stylesheet" href="css/screens/info.css">
-<link rel="stylesheet" href="css/screens/menu-wind.css">
-  
-<link rel="stylesheet" href="css/abilities/bullet-time.css">
-<link rel="stylesheet" href="css/abilities/explosion.css">
-<link rel="stylesheet" href="css/abilities/shield.css">
-<link rel="stylesheet" href="css/abilities/range-boost.css">
-<link rel="stylesheet" href="css/abilities/one-hit.css">
-<link rel="stylesheet" href="css/abilities/slash.css">
+  <link rel="stylesheet" href="css/map-transition.css">
+  <link rel="stylesheet" href="css/screens/info.css">
+  <link rel="stylesheet" href="css/screens/menu-wind.css">
 
-<!-- ── ENEMIES EFFECTS ── -->
-<link rel="stylesheet" href="css/enemies/bullets.css">
-<link rel="stylesheet" href="css/enemies/bear.css">
-<link rel="stylesheet" href="css/enemies/thunder_hound.css">
-<link rel="stylesheet" href="css/enemies/wolf.css">
-<link rel="stylesheet" href="css/enemies/oni.css">
-<link rel="stylesheet" href="css/enemies/kitsune.css">
-<link rel="stylesheet" href="css/enemies/turtle.css">
-<link rel="stylesheet" href="css/enemies/eagle.css">
+  <link rel="stylesheet" href="css/abilities/bullet-time.css">
+  <link rel="stylesheet" href="css/abilities/explosion.css">
+  <link rel="stylesheet" href="css/abilities/shield.css">
+  <link rel="stylesheet" href="css/abilities/range-boost.css">
+  <link rel="stylesheet" href="css/abilities/one-hit.css">
+  <link rel="stylesheet" href="css/abilities/slash.css">
 
-  
+  <!-- ── ENEMIES EFFECTS ── -->
+  <link rel="stylesheet" href="css/enemies/bullets.css">
+  <link rel="stylesheet" href="css/enemies/bear.css">
+  <link rel="stylesheet" href="css/enemies/thunder_hound.css">
+  <link rel="stylesheet" href="css/enemies/wolf.css">
+  <link rel="stylesheet" href="css/enemies/oni.css">
+  <link rel="stylesheet" href="css/enemies/kitsune.css">
+  <link rel="stylesheet" href="css/enemies/turtle.css">
+  <link rel="stylesheet" href="css/enemies/eagle.css">
+
   <link rel="stylesheet" href="css/tutorial.css">
 
   <!-- ── CRAZYGAMES SDK ── -->
- <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" onerror="console.warn('[SDK] CrazyGames SDK failed to load — continuing without SDK')"></script>
+  <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" onerror="console.warn('[SDK] CrazyGames SDK failed to load — continuing without SDK')"></script>
 </head>
 <body>
   <script src="js/errorHandler.js"></script>
-  <div id="G"></div>
+
+  <!-- ── LOADING SCREEN (hardcoded, visible immediately) ── -->
+  <div id="loading-screen">
+    <img id="loading-logo" src="assets/ui/logo.png" alt="Directional Strike">
+    <div id="loading-bar-wrap">
+      <div id="loading-bar-fill"></div>
+    </div>
+    <div id="loading-text">LOADING</div>
+  </div>
+
+  <!-- ── GAME CONTAINER (hidden until boot complete) ── -->
+  <div id="G" style="display:none"></div>
+
   <script src="js/ui/htmlLoader.js"></script>
 </body>
-
 </html>

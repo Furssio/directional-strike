@@ -275,5 +275,3 @@ function stopMenuFireflies() {
   }
   menuFireflies = [];
 }
-startMenuFireflies();
-Music.playMenu();
