@@ -13,7 +13,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: true,
+ debug: false,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -21,7 +21,7 @@ const CONFIG = {
      Toggle with debug overlay (T key).
   ─────────────────────────────────────── */
   devUnlockAll: false,       // unlock all maps + abilities
-devUnlockMapsOnly: true,  // unlock maps but NOT abilities (for slot testing)
+devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
 
   /* ── PLAYABLE MAP ORDER ─────────────────
      Progression order for adventure mode.
