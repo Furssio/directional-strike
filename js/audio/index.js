@@ -86,6 +86,15 @@ const SFX = {
   slotStop:     () => SfxUi.slotStop(),
   slotWin:      () => SfxUi.slotWin(),
   slotNearMiss: () => SfxUi.slotNearMiss(),
+ mapNormalRise:    () => SfxUi.mapNormalRise(),
+  mapNormalCover:   () => SfxUi.mapNormalCover(),
+  mapNormalFlash:   () => SfxUi.mapNormalFlash(),
+  mapNormalReveal:  () => SfxUi.mapNormalReveal(),
+  mapDimDrone:      () => SfxUi.mapDimDrone(),
+  mapDimCracks:     () => SfxUi.mapDimCracks(),
+  mapDimGlitch:     () => SfxUi.mapDimGlitch(),
+  mapDimExplode:    () => SfxUi.mapDimExplode(),
+  mapDimReveal:     () => SfxUi.mapDimReveal(),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),

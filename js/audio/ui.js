@@ -249,6 +249,135 @@ const SfxUi = (() => {
       nd(100, { duration: 0.15, gain: 0.06, highpass: 200, lowpass: 1200 });
     },
 
+    /* ═══ NORMAL MAP CHANGE — magical portal ═══ */
+
+    /* Phase 1: mystical energy gathering */
+    mapNormalRise() {
+      // warm magic hum rising
+      t({ type: 'sine', freq: 220, freq2: 440, duration: 0.9,
+          attack: 0.05, decay: 0.15, sustain: 0.45, release: 0.35, gain: 0.3 });
+      // shimmering harmonic
+      t({ type: 'sine', freq: 660, freq2: 1100, duration: 0.8,
+          attack: 0.06, decay: 0.12, sustain: 0.3, release: 0.3, gain: 0.15 });
+      // crystal sparkle overtone
+      t({ type: 'sine', freq: 1320, freq2: 1760, duration: 0.6,
+          attack: 0.08, decay: 0.1, sustain: 0.2, release: 0.25, gain: 0.08 });
+      // soft airy breath
+      n({ duration: 0.5, gain: 0.08, highpass: 2000, lowpass: 8000 });
+    },
+
+    /* Phase 2: magic surge expanding */
+    mapNormalCover() {
+      // portal whoosh — ascending sweep
+      t({ type: 'sine', freq: 300, freq2: 800, duration: 0.5,
+          attack: 0.008, decay: 0.1, sustain: 0.4, release: 0.2, gain: 0.35 });
+      // bright bell chime
+      t({ type: 'sine', freq: 880, freq2: 1320, duration: 0.4,
+          attack: 0.005, decay: 0.08, sustain: 0.35, release: 0.18, gain: 0.25 });
+      // high sparkle layer
+      t({ type: 'sine', freq: 2200, freq2: 2800, duration: 0.3,
+          attack: 0.01, decay: 0.06, sustain: 0.2, release: 0.15, gain: 0.1 });
+      // magical shimmer noise
+      n({ duration: 0.35, gain: 0.12, highpass: 3000, lowpass: 10000 });
+    },
+
+    /* Phase 3: flash — bright burst of energy */
+    mapNormalFlash() {
+      // warm deep pulse
+      t({ type: 'sine', freq: 180, freq2: 100, duration: 0.3,
+          attack: 0.003, decay: 0.08, sustain: 0.35, release: 0.15, gain: 0.35 });
+      // bright chime burst
+      t({ type: 'sine', freq: 1047, freq2: 784, duration: 0.25,
+          attack: 0.002, decay: 0.06, sustain: 0.3, release: 0.12, gain: 0.3 });
+      // crystal ring
+      t({ type: 'sine', freq: 1568, duration: 0.2,
+          attack: 0.003, decay: 0.05, sustain: 0.25, release: 0.1, gain: 0.15 });
+      // sparkle noise burst
+      n({ duration: 0.15, gain: 0.15, highpass: 4000, lowpass: 12000 });
+    },
+
+    /* Phase 4: gentle magical echo fading */
+    mapNormalReveal() {
+      // warm fading bell
+      t({ type: 'sine', freq: 440, freq2: 330, duration: 0.7,
+          attack: 0.02, decay: 0.15, sustain: 0.25, release: 0.35, gain: 0.2 });
+      // harmonic fifth above
+      t({ type: 'sine', freq: 660, freq2: 500, duration: 0.6,
+          attack: 0.025, decay: 0.12, sustain: 0.2, release: 0.3, gain: 0.12 });
+      // soft high shimmer tail
+      t({ type: 'sine', freq: 1320, freq2: 1000, duration: 0.5,
+          attack: 0.03, decay: 0.1, sustain: 0.15, release: 0.25, gain: 0.06 });
+      // gentle breath out
+      n({ duration: 0.3, gain: 0.05, highpass: 2500, lowpass: 7000 });
+    },
+
+    /* ═══ DIMENSION MAP CHANGE — 5 phases ═══ */
+
+    /* Phase 1: ominous drone as particles appear */
+    mapDimDrone() {
+      // sub bass drone — long and ominous
+      t({ type: 'sine', freq: 35, freq2: 55, duration: 1.0,
+          attack: 0.03, decay: 0.2, sustain: 0.5, release: 0.4, gain: 0.45 });
+      // dark mid hum — unsettling
+      t({ type: 'triangle', freq: 110, freq2: 160, duration: 0.9,
+          attack: 0.04, decay: 0.15, sustain: 0.4, release: 0.35, gain: 0.3 });
+      // low rumble noise
+      n({ duration: 0.7, gain: 0.15, highpass: 50, lowpass: 800 });
+    },
+
+    /* Phase 2: cracks + glitch — dissonant rising tension */
+    mapDimCracks() {
+      // dissonant rising tone
+      t({ type: 'triangle', freq: 180, freq2: 500, duration: 0.8,
+          attack: 0.005, decay: 0.12, sustain: 0.45, release: 0.3, gain: 0.4 });
+      // clashing overtone
+      t({ type: 'sine', freq: 270, freq2: 700, duration: 0.7,
+          attack: 0.008, decay: 0.1, sustain: 0.35, release: 0.25, gain: 0.25 });
+      // chaotic noise building
+      n({ duration: 0.6, gain: 0.25, highpass: 200, lowpass: 3500 });
+      // glitch bursts scattered
+      td(200, { type: 'square', freq: 600, freq2: 200, duration: 0.06,
+          attack: 0.001, decay: 0.02, sustain: 0.3, release: 0.02, gain: 0.3 });
+      td(450, { type: 'square', freq: 900, freq2: 350, duration: 0.05,
+          attack: 0.001, decay: 0.015, sustain: 0.25, release: 0.02, gain: 0.25 });
+      nd(350, { duration: 0.08, gain: 0.2, highpass: 1000, lowpass: 6000 });
+    },
+
+    /* Phase 3: electric burst at each glitch flash */
+    mapDimGlitch() {
+      // electric zap
+      t({ type: 'square', freq: 800, freq2: 300, duration: 0.07,
+          attack: 0.001, decay: 0.02, sustain: 0.3, release: 0.03, gain: 0.35 });
+      // crackle noise
+      n({ duration: 0.06, gain: 0.25, highpass: 1500, lowpass: 8000 });
+    },
+
+    /* Phase 4: massive explosion at final shake */
+    mapDimExplode() {
+      // massive sub slam
+      t({ type: 'sine', freq: 45, freq2: 18, duration: 0.5,
+          attack: 0.002, decay: 0.12, sustain: 0.45, release: 0.25, gain: 0.6 });
+      // destructive mid crunch
+      t({ type: 'triangle', freq: 400, freq2: 180, duration: 0.3,
+          attack: 0.001, decay: 0.07, sustain: 0.35, release: 0.15, gain: 0.5 });
+      // explosion noise — heavy
+      n({ duration: 0.35, gain: 0.4, highpass: 100, lowpass: 4000 });
+      // bright shatter
+      td(80, { type: 'sine', freq: 1200, freq2: 600, duration: 0.2,
+          attack: 0.002, decay: 0.05, sustain: 0.25, release: 0.1, gain: 0.3 });
+    },
+
+    /* Phase 5: dark echo while DIMENSION name shows */
+    mapDimReveal() {
+      // dark deep echo
+      t({ type: 'sine', freq: 80, freq2: 45, duration: 0.8,
+          attack: 0.015, decay: 0.2, sustain: 0.35, release: 0.35, gain: 0.3 });
+      // ominous overtone
+      t({ type: 'sine', freq: 160, freq2: 90, duration: 0.7,
+          attack: 0.02, decay: 0.15, sustain: 0.25, release: 0.3, gain: 0.18 });
+      // dark tail noise
+      n({ duration: 0.4, gain: 0.1, highpass: 80, lowpass: 1200 });
+    },
   };
 
 })();

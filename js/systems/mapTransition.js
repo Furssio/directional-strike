@@ -398,6 +398,7 @@ const MapTransition = (() => {
     _stopRender();
 
     // Phase 1 — scatter particles from center
+    SFX.mapNormalRise();
     _spawnScatter(color, colorDark, 80);
     _startRender();
 
@@ -407,11 +408,13 @@ const MapTransition = (() => {
     await _wait(500);
 
     // Phase 2 — cover screen with pixel flood
+    SFX.mapNormalCover();
     _spawnCover(color, colorDark);
 
     await _wait(700);
 
     // Phase 3 — flash + swap background
+    SFX.mapNormalFlash();
     flashEl.style.background = color;
     flashEl.style.transition = 'opacity 0.12s ease-in';
     flashEl.style.opacity = '0.6';
@@ -430,6 +433,7 @@ const MapTransition = (() => {
     await _wait(400);
 
     // Phase 4 — show map name
+    SFX.mapNormalReveal();
     _showName(mapName, color, false);
 
     await _wait(2000);
@@ -455,12 +459,14 @@ const MapTransition = (() => {
     const colorDark = '#880088';
 
     // Phase 1 — ominous particles
+    SFX.mapDimDrone();
     _spawnScatter(color, colorDark, 40);
     _startRender();
 
     await _wait(300);
 
     // Phase 2 — glitch + cracks
+    SFX.mapDimCracks();
     _glitchShake(3500);
     _spawnCracks(color);
     _spawnScatter(color, colorDark, 60);
@@ -473,6 +479,7 @@ const MapTransition = (() => {
 
     // Phase 3 — glitch flashes
     for (let i = 0; i < 5; i++) {
+      SFX.mapDimGlitch();
       const c = i % 2 === 0 ? color : '#ffffff';
       flashEl.style.background = c;
       flashEl.style.transition = 'opacity 0.04s';
@@ -489,6 +496,7 @@ const MapTransition = (() => {
     await _wait(600);
 
     // big shake + white flash
+    SFX.mapDimExplode();
     _shake(500, 8);
 
     flashEl.style.background = '#ffffff';
@@ -509,6 +517,7 @@ const MapTransition = (() => {
     await _wait(600);
 
     // Phase 5 — DIMENSION name with pulse
+    SFX.mapDimReveal();
     _showName('DIMENSION', color, true);
 
     await _wait(2500);
