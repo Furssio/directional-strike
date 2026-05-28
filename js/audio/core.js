@@ -70,6 +70,7 @@ const AudioCore = (() => {
     sustain = 0.6, release = 0.1, gain = 1.0, detune = 0,
   } = {}) {
     if (!ctx || _isMuted()) return;
+  if (ctx.state === 'suspended') ctx.resume();
     try {
       const g   = ctx.createGain();
       g.connect(ctx.destination);
@@ -99,6 +100,7 @@ const AudioCore = (() => {
     highpass = 0, lowpass = 4000,
   } = {}) {
     if (!ctx || _isMuted()) return;
+    if (ctx.state === 'suspended') ctx.resume();
     try {
       const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
       const d   = buf.getChannelData(0);
@@ -132,6 +134,7 @@ const AudioCore = (() => {
   /* ── FILE PLAYBACK ── */
   function playFile(path, { loop = false, volume = 1.0 } = {}) {
     if (_isMuted()) return null;
+    if (ctx && ctx.state === 'suspended') ctx.resume();
     try {
       const audio  = new Audio(path);
       audio.volume = volume * vol();
