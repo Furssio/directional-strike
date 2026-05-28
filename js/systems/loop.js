@@ -124,6 +124,10 @@ function endGame() {
   cleanupAbilityEffects();
   SFX.gameOver();
 
+  // mark first play as done (for first-time direct play flow)
+  try { localStorage.setItem('ds_first_play_done', '1'); }
+  catch (e) { /* silent */ }
+
 running = false;
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
 

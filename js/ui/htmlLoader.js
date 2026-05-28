@@ -138,19 +138,48 @@ function _showGame() {
   // re-run scaler now that G is visible
   window.dispatchEvent(new Event('resize'));
 
-  // start menu (fireflies + music)
-  if (typeof startMenuFireflies === 'function') startMenuFireflies();
-  if (typeof Music !== 'undefined') Music.playMenu();
-
   // tell CrazyGames loading is done
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.loadingStop();
 
-  // fade out loading screen
-  if (loadScreen) {
-    loadScreen.classList.add('fade-out');
-    setTimeout(() => {
-      loadScreen.remove();
-    }, 600);
+  // check if first time ever playing
+  let isFirstPlay = false;
+  try {
+    isFirstPlay = !localStorage.getItem('ds_first_play_done') &&
+                  !localStorage.getItem('ds_tutorial_done');
+  }
+  catch (e) { isFirstPlay = false; }
+
+  if (isFirstPlay && typeof AdventureDirector !== 'undefined') {
+    // FIRST PLAY: skip menu, go straight to map 1
+    ActiveDirector = AdventureDirector;
+
+    if (typeof getEquippedAbility === 'function') {
+      equippedAbilityId = getEquippedAbility();
+    }
+    AdventureDirector.init('map01_forest');
+    startGame(true);
+
+    // fade out loading, then start game loop
+    if (loadScreen) {
+      loadScreen.classList.add('fade-out');
+      setTimeout(() => {
+        loadScreen.remove();
+        startGameLoop();
+      }, 600);
+    } else {
+      startGameLoop();
+    }
+  } else {
+    // RETURNING PLAYER: normal menu
+    if (typeof startMenuFireflies === 'function') startMenuFireflies();
+    if (typeof Music !== 'undefined') Music.playMenu();
+
+    if (loadScreen) {
+      loadScreen.classList.add('fade-out');
+      setTimeout(() => {
+        loadScreen.remove();
+      }, 600);
+    }
   }
 }
 

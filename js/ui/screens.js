@@ -77,6 +77,10 @@ function showMapComplete(map, hasSlot) {
   // stop game loop
   running = false;
   clearInterval(gameLoop);
+
+  // mark first play as done
+  try { localStorage.setItem('ds_first_play_done', '1'); }
+  catch (e) { /* silent */ }
   if (typeof CrazySDKWrapper !== 'undefined') {
     CrazySDKWrapper.gameplayStop();
     CrazySDKWrapper.happytime();

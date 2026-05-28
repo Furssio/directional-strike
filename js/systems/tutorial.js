@@ -48,7 +48,7 @@ const Tutorial = (() => {
     const el = document.createElement('div');
     el.id = 'tutorial-hint';
     el.style.cssText =
-      'position:absolute;z-index:200;' +
+      'position:absolute;z-index:90;' +
       'left:50%;top:50%;transform:translate(-50%,40px);' +
       'pointer-events:none;' +
       'animation:tutorialPulse 0.6s ease-in-out infinite alternate;';
@@ -323,6 +323,11 @@ const Tutorial = (() => {
     /* Start tutorial — called by adventureDirector at wave 1 */
     start() {
       if (!isNeeded()) return false;
+
+      // mark tutorial done IMMEDIATELY so exiting mid-tutorial
+      // doesn't block spawning on other maps
+      _markDone();
+
       _active    = true;
       _phase     = 0;
       _step      = 0;
@@ -401,6 +406,19 @@ const Tutorial = (() => {
     /* Force skip (for debug) */
     skip() {
       _complete();
+    },
+
+    /* Reset state — called when restarting a map */
+    reset() {
+      _active       = false;
+      _phase        = 0;
+      _step         = 0;
+      _frozen       = false;
+      _completed    = false;
+      _waitingDir   = null;
+      _waitingSpace = false;
+      _spawned      = [];
+      _removeHint();
     },
 
   };

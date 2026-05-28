@@ -526,6 +526,9 @@ const AdventureDirector = (() => {
       if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
       setArenaBackground(currentMap.background || null);
 
+      // always reset tutorial state to prevent stale isActive blocking spawns
+      if (typeof Tutorial !== 'undefined') Tutorial.reset();
+
       // tutorial on wave 1 of first map (first time only)
       if (wave === 1 && currentMap.id === 'map01_forest' &&
           typeof Tutorial !== 'undefined' && Tutorial.isNeeded()) {
