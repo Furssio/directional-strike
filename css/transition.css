@@ -12,11 +12,16 @@
   display: grid;
   grid-template-columns: repeat(var(--tr-cols), 1fr);
   grid-template-rows: repeat(var(--tr-rows), 1fr);
+  gap: 0;
 }
 
 .tr-cell {
-  background: #000;
   opacity: 0;
+  background-color: #0a0a0f;
+  background-image: url('../assets/ui/logo.png');
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  margin: -0.5px;
 }
 
 .tr-cell.active {

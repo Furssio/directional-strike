@@ -82,6 +82,34 @@ const Transition = (() => {
     });
   }
 
+  /* ── Calculate logo background positions ── */
+  function _updateCellPositions() {
+    if (!overlay || cells.length === 0) return;
+
+    const oW = overlay.offsetWidth;
+    const oH = overlay.offsetHeight;
+    if (oW === 0 || oH === 0) return;
+
+    const cellW = oW / COLS;
+    const cellH = oH / ROWS;
+
+    // logo: 55% of overlay width, centered
+    const logoW = oW * 0.55;
+    const logoH = logoW / (1456 / 720);
+    const logoX = (oW - logoW) / 2;
+    const logoY = (oH - logoH) / 2;
+
+    for (let i = 0; i < TOTAL; i++) {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      const bgX = logoX - (col * cellW);
+      const bgY = logoY - (row * cellH);
+
+      cells[i].style.backgroundSize = logoW + 'px ' + logoH + 'px';
+      cells[i].style.backgroundPosition = bgX + 'px ' + bgY + 'px';
+    }
+  }
+
   /* ── Public: play transition ── */
   async function play(speedOrCb, middleOrCb, maybeComplete) {
     if (busy) return;
@@ -108,6 +136,11 @@ const Transition = (() => {
 
     busy = true;
     init();
+    _updateCellPositions();
+
+    // show logo for entire transition
+    const tLogo = document.getElementById('transition-logo');
+    if (tLogo) tLogo.classList.add('visible');
 
     // transition sound — cover
     try { if (typeof SFX !== 'undefined') SFX.transIn(); } catch(e) {}
@@ -128,6 +161,9 @@ const Transition = (() => {
     // Phase 3: dissolve OUT
     const orderOut = shuffle([...Array(TOTAL).keys()]);
     await animateCells(orderOut, false, speed.cellDelay);
+
+    // hide logo
+    if (tLogo) tLogo.classList.remove('visible');
 
     busy = false;
 
