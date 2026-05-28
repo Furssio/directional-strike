@@ -280,12 +280,12 @@ multiKill(count) {
       const pitch = base + progress * range;
       const rnd = 1 + (Math.random() - 0.5) * 0.04;
       // volume grows with tier
-      const vol = Math.min(0.6, 0.25 + tierIndex * 0.05);
+      const vol = Math.min(0.3, 0.12 + tierIndex * 0.03);
 
       // main chime — ascending within tier
       t({ type: 'sine', freq: pitch * rnd, freq2: pitch * 1.1, duration: 0.16, attack: 0.002, decay: 0.04, sustain: 0.35, release: 0.08, gain: vol });
       // harmonic overtone — richer at higher tiers
-      const overtoneGain = Math.min(0.25, 0.06 + tierIndex * 0.03);
+      const overtoneGain = Math.min(0.12, 0.03 + tierIndex * 0.015);
       t({ type: 'sine', freq: pitch * 2 * rnd, duration: 0.12, attack: 0.003, decay: 0.03, sustain: 0.2, release: 0.06, gain: overtoneGain });
       // shimmer noise from tier 3 (orange) onward
       if (tierIndex >= 3) {
@@ -307,7 +307,7 @@ multiKill(count) {
       ];
       const rnd = 1 + (Math.random() - 0.5) * 0.03;
       const chord = TIER_CHORDS[tierIndex] || TIER_CHORDS[6];
-      const vol = Math.min(0.6, 0.35 + tierIndex * 0.04);
+      const vol = Math.min(0.3, 0.15 + tierIndex * 0.02);
       const dur = 0.2 + tierIndex * 0.015;
 
       // three-note ascending chord
@@ -319,11 +319,11 @@ multiKill(count) {
         t({ type: 'sine', freq: chord[2] * rnd, duration: dur * 0.9, attack: 0.004, decay: 0.06, sustain: 0.3, release: 0.1, gain: vol * 0.8 })
       , 90);
       // shimmer — grows with tier
-      n({ duration: 0.1 + tierIndex * 0.02, gain: 0.1 + tierIndex * 0.02, highpass: 3000, lowpass: 9000 });
+      n({ duration: 0.1 + tierIndex * 0.02, gain: 0.04 + tierIndex * 0.01, highpass: 3000, lowpass: 9000 });
       // rainbow tier (6): extra octave tail for epic feel
       if (tierIndex >= 6) {
         setTimeout(() =>
-          t({ type: 'sine', freq: chord[2] * 2 * rnd, duration: 0.25, attack: 0.005, decay: 0.08, sustain: 0.25, release: 0.12, gain: 0.25 })
+          t({ type: 'sine', freq: chord[2] * 2 * rnd, duration: 0.25, attack: 0.005, decay: 0.08, sustain: 0.25, release: 0.12, gain: 0.12 })
         , 150);
       }
     },

@@ -53,13 +53,7 @@ const UiBind = (() => {
         }
       });
 
-      // hover sound (pointer only, not touch)
-      container.addEventListener('pointerenter', (e) => {
-        if (e.pointerType === 'touch') return;
-        if (_findClickable(e.target, container)) {
-          SFX.hover();
-        }
-      }, true); // capture phase for delegation
+      
     });
   }
 

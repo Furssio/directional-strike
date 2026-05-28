@@ -33,12 +33,11 @@ const SfxUi = (() => {
     },
 
     /* ── CLICK: crisp confirmation ping ── */
-    click() {
-      t({ type: 'triangle', freq: 800, duration: 0.06, attack: 0.003,
-          decay: 0.025, sustain: 0.3, release: 0.02, gain: 0.18 });
-      t({ type: 'sine', freq: 1200, duration: 0.08, attack: 0.005,
-          decay: 0.03, sustain: 0.2, release: 0.03, gain: 0.1 });
-      n({ duration: 0.03, gain: 0.04, highpass: 4000, lowpass: 8000 });
+  click() {
+      t({ type: 'sine', freq: 1400, duration: 0.05, attack: 0.003,
+          decay: 0.02, sustain: 0.15, release: 0.02, gain: 0.04 });
+      t({ type: 'sine', freq: 2100, duration: 0.04, attack: 0.003,
+          decay: 0.015, sustain: 0.1, release: 0.015, gain: 0.02 });
     },
 
     /* ── BACK: gentle descending tone ── */

@@ -56,7 +56,6 @@ function registerKill(e, multiKill) {
     return;
   }
 
-  SFX.kill();
 
   const mkMult = multiKill && multiKill >= 2 ? multiKill : 1;
   const mult   = player.getComboMult() * mkMult;
