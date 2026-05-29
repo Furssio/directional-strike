@@ -91,6 +91,10 @@ function startGame(delayLoop) {
   scoreEl.textContent = '0';
   levelEl.textContent = 'wave 1';
 
+  // preload attack spritesheet
+  const _atkPreload = new Image();
+  _atkPreload.src = 'assets/characters/attack.png';
+
   playerEl.textContent   = '';
   playerEl.style.backgroundImage = 'url(assets/characters/player_idle.png)';
   playerEl.style.backgroundSize  = '1152px 96px';

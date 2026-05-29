@@ -8,6 +8,39 @@
                audio.js, hud.js, juice.js
    ═══════════════════════════════════════ */
 
+/* ── ATTACK SPRITE ────────────────────
+   Swaps player sprite to attack frame
+   for the slash duration, then restores idle.
+   Frame map: 1=down, 2=right, 3=left, 4=up */
+
+let _atkSpriteTimer = null;
+
+const _ATK_FRAMES = { down: 1, right: 2, left: 3, up: 4 };
+
+function showAttackSprite(dir) {
+  if (!playerEl) return;
+
+  // clear pending restore
+  if (_atkSpriteTimer) clearTimeout(_atkSpriteTimer);
+
+  const frame = _ATK_FRAMES[dir] || 1;
+
+  // swap to attack spritesheet, show correct frame
+  playerEl.style.animation          = 'none';
+  playerEl.style.backgroundImage    = 'url(assets/characters/attack.png)';
+  playerEl.style.backgroundSize     = '480px 96px';
+  playerEl.style.backgroundPosition = `-${frame * 96}px 0px`;
+
+  // restore idle after attack flash (120ms)
+  _atkSpriteTimer = setTimeout(() => {
+    playerEl.style.backgroundImage    = 'url(assets/characters/player_idle.png)';
+    playerEl.style.backgroundSize     = '1152px 96px';
+    playerEl.style.backgroundPosition = '0px 0px';
+    playerEl.style.animation          = 'playerIdle 1.2s steps(12) infinite';
+    _atkSpriteTimer = null;
+  }, 120);
+}
+
 function showSlashEffect(dir) {
   // full-line trail when slash ability is active
   if (player && player.slashActive) {
@@ -111,6 +144,7 @@ function handleDir(dir) {
   }
   isAttacking = true;
   SFX.slash();
+  showAttackSprite(dir);
 
   const hitDmg      = player.getHitDamage();
   const { w, h }    = getArenaSize();
