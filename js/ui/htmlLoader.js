@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════
    HTMLLOADER.JS
-   Loads HTML partials, then all game
-   scripts, then boots the game.
+   Loads HTML partials, then the game
+   bundle, then boots the game.
    Shows loading progress on #loading-screen.
    ═══════════════════════════════════════ */
 
@@ -25,11 +25,11 @@ function _setProgress(pct, label) {
   if (_loadText && label) _loadText.textContent = label;
 }
 
-/* ── LOAD HTML PARTIALS (0% → 15%) ── */
+/* ── LOAD HTML PARTIALS (0% → 30%) ── */
 
 async function _loadHTMLPartials() {
   const container = document.getElementById('G');
-  const step = 15 / HTML_PARTIALS.length;
+  const step = 30 / HTML_PARTIALS.length;
 
   for (let i = 0; i < HTML_PARTIALS.length; i++) {
     try {
@@ -47,32 +47,18 @@ async function _loadHTMLPartials() {
   }
 }
 
-/* ── LOAD SCRIPTS SEQUENTIALLY (15% → 85%) ── */
+/* ── LOAD SINGLE SCRIPT ── */
 
-function _loadScripts(scripts, startPct, endPct) {
+function _loadScript(src) {
   return new Promise((resolve) => {
-    const range = endPct - startPct;
-    let loaded = 0;
-
-    (function next(i) {
-      if (i >= scripts.length) {
-        resolve();
-        return;
-      }
-      const s = document.createElement('script');
-      s.src = scripts[i];
-      s.onload = () => {
-        loaded++;
-        _setProgress(startPct + (loaded / scripts.length) * range, 'LOADING');
-        next(i + 1);
-      };
-      s.onerror = (e) => {
-        console.error('Failed to load script:', scripts[i], e);
-        loaded++;
-        next(i + 1);
-      };
-      document.head.appendChild(s);
-    })(0);
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = (e) => {
+      console.error('Failed to load:', src, e);
+      resolve();
+    };
+    document.head.appendChild(s);
   });
 }
 
@@ -85,44 +71,29 @@ async function _boot() {
     catch (e) { /* ignore */ }
   }
 
-  // Phase 1: load HTML partials (0% → 15%)
+  // Phase 1: load HTML partials (0% → 30%)
   _setProgress(0, 'LOADING');
   await _loadHTMLPartials();
 
-  // init pause bindings now that screen-game.html is in DOM
+  // Phase 2: load game bundle (30% → 80%)
+  _setProgress(30, 'LOADING');
+  await _loadScript('js/game.bundle.js');
+  _setProgress(80, 'LOADING');
+
+  // init pause bindings now that DOM + code are ready
   if (typeof _initPauseBindings === 'function') _initPauseBindings();
 
-  // Phase 2: load main.js to get SCRIPTS array (15% → 16%)
-  _setProgress(15, 'LOADING');
-  await _loadScripts(['js/modes/infinite/main.js'], 15, 16);
-
-  // Phase 3: load all game scripts from SCRIPTS array (16% → 80%)
-  if (typeof SCRIPTS !== 'undefined') {
-    await _loadScripts(SCRIPTS, 16, 80);
-  }
-
-  // Phase 4: init CrazyGames SDK (80% → 85%)
-  _setProgress(80, 'LOADING');
+  // Phase 3: init CrazyGames SDK (80% → 90%)
   if (typeof CrazySDKWrapper !== 'undefined') {
     await CrazySDKWrapper.init();
   }
+  _setProgress(90, 'LOADING');
 
-  // Phase 5: preload adventure mode (85% → 95%)
-  _setProgress(85, 'LOADING');
-  await new Promise((resolve) => {
-    if (typeof loadAdventureMode === 'function') {
-      loadAdventureMode(resolve);
-    } else {
-      resolve();
-    }
-  });
-  _setProgress(95, 'LOADING');
-
-  // Phase 6: init UI bindings (95%)
+  // Phase 4: init UI bindings (90% → 100%)
   if (typeof UiBind !== 'undefined') UiBind.init();
-
-  // Phase 7: boot complete — show game (95% → 100%)
   _setProgress(100, 'READY');
+
+  // Phase 5: boot complete — show game
   _showGame();
 }
 
