@@ -20,3 +20,7 @@ let isAttacking     = false;
 let equippedAbilityId = null;
 let ActiveDirector = null;
 
+// ── MOBILE DETECTION ──
+// true for phones/tablets with coarse pointer (not desktop touchscreen)
+const _isMobile = navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches;
+function isMobile() { return _isMobile; }

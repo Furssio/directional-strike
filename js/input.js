@@ -277,6 +277,71 @@ if (specialBtn) {
   });
 }
 
+/* ── TOUCH INPUT (mobile) ── */
+
+const _touchArena = document.getElementById('arena');
+if (_touchArena && navigator.maxTouchPoints > 0) {
+  _touchArena.addEventListener('touchstart', (e) => {
+    // let interactive elements handle their own taps
+    const t = e.target;
+    if (t.closest('button, a, .game-btn, #over-overlay, #complete-overlay, #slot-overlay, #upgrade-choice, #pause-overlay, #hud-right, #slot-card, .menu-btn')) {
+      return; // don't preventDefault, let click fire
+    }
+
+    e.preventDefault();
+    if (paused) return;
+    if (!running) return;
+
+    // don't intercept when overlays are showing
+    const overEl = document.getElementById('over-overlay');
+    const compEl = document.getElementById('complete-overlay');
+    if (overEl && !overEl.classList.contains('hidden')) return;
+    if (compEl && !compEl.classList.contains('hidden')) return;
+
+    const touch = e.touches[0];
+    const rect = _touchArena.getBoundingClientRect();
+
+    // normalized position 0→1
+    const nx = (touch.clientX - rect.left) / rect.width;
+    const ny = (touch.clientY - rect.top) / rect.height;
+
+    // distance from center (player position)
+    const dx = nx - 0.5;
+    const dy = ny - 0.5;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // center tap = special (radius = player size 96px / arena 620px)
+    const deadZone = 48 / 620;
+
+    if (dist <= deadZone) {
+      // tutorial intercept
+      if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+        Tutorial.onSpaceInput();
+        return;
+      }
+      activateSpecial();
+      if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
+      return;
+    }
+
+    // angle → direction
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    let dir;
+    if (angle >= -45 && angle < 45)        dir = 'right';
+    else if (angle >= 45 && angle < 135)   dir = 'down';
+    else if (angle >= -135 && angle < -45) dir = 'up';
+    else                                   dir = 'left';
+
+    // tutorial intercept
+    if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+      Tutorial.onDirInput(dir);
+      return;
+    }
+
+    handleDir(dir);
+    if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
+  }, { passive: false });
+}
 /* ── KEYBOARD ── */
 
 document.addEventListener('keydown', e => {

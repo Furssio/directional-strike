@@ -13,8 +13,38 @@
   function rescale() {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    // contain: fit the largest scale without overflow
-    const scale = Math.min(vw / BASE, vh / BASE);
+
+    const isMobileDevice = navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches;
+    const isPortrait = vh > vw;
+
+    let scale;
+    if (isMobileDevice && isPortrait) {
+      // fill width, shift down ~25% of empty space
+      scale = vw / BASE;
+      const scaledH = BASE * scale;
+      const gap = vh - scaledH;
+      const offsetY = gap > 0 ? gap * 0.45 : 0;
+      G.style.position = 'fixed';
+      G.style.top = offsetY + 'px';
+      G.style.left = '0';
+      G.style.transformOrigin = 'top left';
+    } else if (isMobileDevice) {
+      // landscape: fill height, center horizontally
+      scale = vh / BASE;
+      const offsetX = (vw - BASE * scale) / 2;
+      G.style.position = 'fixed';
+      G.style.top = '0';
+      G.style.left = offsetX + 'px';
+      G.style.transformOrigin = 'top left';
+    } else {
+      // desktop: centered as before
+      scale = Math.min(vw / BASE, vh / BASE);
+      G.style.position = '';
+      G.style.top = '';
+      G.style.left = '';
+      G.style.transformOrigin = 'center center';
+    }
+
     G.style.transform = 'scale(' + scale + ')';
   }
 
@@ -45,7 +75,7 @@ const CONFIG = {
      unlocked. Set false to test real progression.
      Toggle with debug overlay (T key).
   ─────────────────────────────────────── */
-  devUnlockAll: false,       // unlock all maps + abilities
+  devUnlockAll: true,       // unlock all maps + abilities
 devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
 
   /* ── PLAYABLE MAP ORDER ─────────────────
@@ -4397,6 +4427,12 @@ AbilityRegistry.register({
    Web Audio API context with auto-init on
    first user gesture. Provides tone(), noise(),
    playFile(), stopFile() utilities.
+
+   playFile() uses Web Audio API (fetch +
+   decodeAudioData + BufferSourceNode) instead
+   of HTMLAudioElement to avoid Media Session
+   notifications on mobile.
+
    Master volume via setVolume() — persisted
    in localStorage.
 
@@ -4407,6 +4443,8 @@ const AudioCore = (() => {
 
   let ctx = null;
   let _bound = false;
+  const _bufferCache = {};   // path → AudioBuffer
+  const _pendingLoads = {};  // path → Promise<AudioBuffer>
 
   /* ── AUTO-INIT ON FIRST USER GESTURE ── */
   function _autoInit() {
@@ -4441,9 +4479,7 @@ const AudioCore = (() => {
     return !CONFIG.audio.enabled || CONFIG.audio.volume <= 0;
   }
 
-  /* ── SET VOLUME ──
-     Sets master volume 0.0–1.0. Persists to localStorage.
-     When volume hits 0: stops all active ability audio + music. */
+  /* ── SET VOLUME ── */
   function setVolume(val) {
     CONFIG.audio.volume = Math.max(0, Math.min(1, val));
     localStorage.setItem('ds_volume', CONFIG.audio.volume.toFixed(2));
@@ -4458,13 +4494,16 @@ const AudioCore = (() => {
     return _isMuted();
   }
 
+  /* ═══════════════════════════════════
+     TONE — procedural oscillator
+     ═══════════════════════════════════ */
   function tone({
     type = 'sine', freq = 440, freq2 = null,
     duration = 0.15, attack = 0.005, decay = 0.05,
     sustain = 0.6, release = 0.1, gain = 1.0, detune = 0,
   } = {}) {
     if (!ctx || _isMuted()) return;
-  if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state === 'suspended') ctx.resume();
     try {
       const g   = ctx.createGain();
       g.connect(ctx.destination);
@@ -4489,6 +4528,9 @@ const AudioCore = (() => {
     } catch (e) {}
   }
 
+  /* ═══════════════════════════════════
+     NOISE — procedural noise burst
+     ═══════════════════════════════════ */
   function noise({
     duration = 0.1, gain = 0.5,
     highpass = 0, lowpass = 4000,
@@ -4525,23 +4567,202 @@ const AudioCore = (() => {
     } catch (e) {}
   }
 
-  /* ── FILE PLAYBACK ── */
-  function playFile(path, { loop = false, volume = 1.0 } = {}) {
-    if (_isMuted()) return null;
-    if (ctx && ctx.state === 'suspended') ctx.resume();
-    try {
-      const audio  = new Audio(path);
-      audio.volume = volume * vol();
-      audio.loop   = loop;
-      audio.play();
-      return audio;
-    } catch (e) { return null; }
+  /* ═══════════════════════════════════
+     BUFFER CACHE — fetch once, reuse
+     ═══════════════════════════════════ */
+  function _getBuffer(path) {
+    if (_bufferCache[path]) return Promise.resolve(_bufferCache[path]);
+    if (_pendingLoads[path]) return _pendingLoads[path];
+
+    _pendingLoads[path] = fetch(path)
+      .then(r => r.arrayBuffer())
+      .then(ab => ctx.decodeAudioData(ab))
+      .then(buf => {
+        _bufferCache[path] = buf;
+        delete _pendingLoads[path];
+        return buf;
+      })
+      .catch(e => {
+        delete _pendingLoads[path];
+        console.warn('AudioCore: failed to load', path, e);
+        return null;
+      });
+
+    return _pendingLoads[path];
   }
 
-  function stopFile(audio) {
-    if (!audio) return;
-    audio.pause();
-    audio.currentTime = 0;
+  /* ═══════════════════════════════════
+     AUDIO HANDLE — wraps BufferSourceNode
+     Mimics HTMLAudioElement interface:
+       .volume, .paused, .currentTime,
+       .loop, .pause(), .play()
+     Used by sfx-abilities and music for
+     pause/resume/fade without changes.
+     ═══════════════════════════════════ */
+  function _createHandle(opts) {
+    const h = {
+      _gain:      null,
+      _source:    null,
+      _buffer:    null,
+      _startCtx:  0,     // ctx.currentTime when last started
+      _offset:    0,     // playback offset in seconds
+      _volume:    opts.volume * vol(),
+      _loop:      opts.loop,
+      _paused:    false,
+      _stopped:   false,
+      _playing:   false,
+
+      /* ── GETTERS / SETTERS ── */
+      get volume()  { return this._volume; },
+      set volume(v) {
+        this._volume = Math.max(0, Math.min(1, v));
+        if (this._gain) {
+          try { this._gain.gain.value = this._volume; } catch (e) {}
+        }
+      },
+
+      get paused() {
+        return this._paused || this._stopped || !this._playing;
+      },
+
+      get currentTime() {
+        if (this._stopped) return 0;
+        if (this._paused)  return this._offset;
+        if (!this._playing || !ctx) return 0;
+        const pos = this._offset + (ctx.currentTime - this._startCtx);
+        if (this._buffer && this._loop) return pos % this._buffer.duration;
+        return pos;
+      },
+
+      get loop()  { return this._loop; },
+      set loop(v) {
+        this._loop = v;
+        if (this._source) this._source.loop = v;
+      },
+
+      /* ── START PLAYBACK (internal) ── */
+      _start(buffer) {
+        if (this._stopped) return;
+        this._buffer = buffer;
+        if (!ctx) return;
+
+        // create gain node
+        this._gain = ctx.createGain();
+        this._gain.gain.value = this._volume;
+        this._gain.connect(ctx.destination);
+
+        // create source
+        this._source = ctx.createBufferSource();
+        this._source.buffer = buffer;
+        this._source.loop   = this._loop;
+        this._source.connect(this._gain);
+
+        // cleanup when sound ends naturally
+        this._source.onended = () => {
+          if (!this._paused && !this._stopped) {
+            this._playing = false;
+            this._stopped = true;
+            // disconnect for GC
+            if (this._gain) { this._gain.disconnect(); this._gain = null; }
+            this._source = null;
+          }
+        };
+
+        this._startCtx = ctx.currentTime;
+        this._source.start(0, this._offset);
+        this._playing = true;
+        this._paused  = false;
+      },
+
+      /* ── PAUSE ── */
+      pause() {
+        if (!this._playing || this._paused || this._stopped) return;
+        // save current offset
+        const elapsed = ctx.currentTime - this._startCtx;
+        this._offset = this._offset + elapsed;
+        if (this._buffer && this._loop) {
+          this._offset = this._offset % this._buffer.duration;
+        }
+        this._paused  = true;
+        this._playing = false;
+        // stop source node (can't reuse — will recreate on play)
+        if (this._source) {
+          try { this._source.onended = null; this._source.stop(); } catch (e) {}
+          this._source = null;
+        }
+        if (this._gain) {
+          this._gain.disconnect();
+          this._gain = null;
+        }
+      },
+
+      /* ── PLAY (resume from pause) ── */
+      play() {
+        if (this._stopped) return;
+        if (!this._paused || !this._buffer) return;
+        this._start(this._buffer);
+      },
+
+      /* ── STOP (permanent) ── */
+      stop() {
+        this._stopped = true;
+        this._playing = false;
+        this._paused  = false;
+        this._offset  = 0;
+        if (this._source) {
+          try { this._source.onended = null; this._source.stop(); } catch (e) {}
+          this._source = null;
+        }
+        if (this._gain) {
+          this._gain.disconnect();
+          this._gain = null;
+        }
+      },
+    };
+
+    return h;
+  }
+
+  /* ═══════════════════════════════════
+     playFile — PUBLIC API
+     Returns a handle immediately.
+     Buffer loads async; playback starts
+     as soon as buffer is decoded.
+     ═══════════════════════════════════ */
+  function playFile(path, { loop = false, volume = 1.0 } = {}) {
+    if (_isMuted()) return null;
+    if (!ctx) { init(); }
+    if (!ctx) return null;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const handle = _createHandle({ loop, volume });
+
+    _getBuffer(path).then(buffer => {
+      if (buffer && !handle._stopped) {
+        handle._start(buffer);
+      }
+    });
+
+    return handle;
+  }
+
+  /* ═══════════════════════════════════
+     stopFile — PUBLIC API
+     Works with new handles and legacy
+     HTMLAudioElement (safety fallback).
+     ═══════════════════════════════════ */
+  function stopFile(handle) {
+    if (!handle) return;
+    // new Web Audio handle
+    if (typeof handle.stop === 'function') {
+      handle.stop();
+      return;
+    }
+    // legacy HTMLAudioElement fallback (safety)
+    if (handle.pause) {
+      handle.pause();
+      try { handle.currentTime = 0; } catch (e) {}
+    }
   }
 
   // auto-bind on script load
@@ -5850,7 +6071,10 @@ let isAttacking     = false;
 let equippedAbilityId = null;
 let ActiveDirector = null;
 
-
+// ── MOBILE DETECTION ──
+// true for phones/tablets with coarse pointer (not desktop touchscreen)
+const _isMobile = navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches;
+function isMobile() { return _isMobile; }
 
 /* === js/modes/infinite/director.js === */
 /* ═══════════════════════════════════════
@@ -11082,6 +11306,71 @@ if (specialBtn) {
   });
 }
 
+/* ── TOUCH INPUT (mobile) ── */
+
+const _touchArena = document.getElementById('arena');
+if (_touchArena && navigator.maxTouchPoints > 0) {
+  _touchArena.addEventListener('touchstart', (e) => {
+    // let interactive elements handle their own taps
+    const t = e.target;
+    if (t.closest('button, a, .game-btn, #over-overlay, #complete-overlay, #slot-overlay, #upgrade-choice, #pause-overlay, #hud-right, #slot-card, .menu-btn')) {
+      return; // don't preventDefault, let click fire
+    }
+
+    e.preventDefault();
+    if (paused) return;
+    if (!running) return;
+
+    // don't intercept when overlays are showing
+    const overEl = document.getElementById('over-overlay');
+    const compEl = document.getElementById('complete-overlay');
+    if (overEl && !overEl.classList.contains('hidden')) return;
+    if (compEl && !compEl.classList.contains('hidden')) return;
+
+    const touch = e.touches[0];
+    const rect = _touchArena.getBoundingClientRect();
+
+    // normalized position 0→1
+    const nx = (touch.clientX - rect.left) / rect.width;
+    const ny = (touch.clientY - rect.top) / rect.height;
+
+    // distance from center (player position)
+    const dx = nx - 0.5;
+    const dy = ny - 0.5;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // center tap = special (radius = player size 96px / arena 620px)
+    const deadZone = 48 / 620;
+
+    if (dist <= deadZone) {
+      // tutorial intercept
+      if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+        Tutorial.onSpaceInput();
+        return;
+      }
+      activateSpecial();
+      if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
+      return;
+    }
+
+    // angle → direction
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    let dir;
+    if (angle >= -45 && angle < 45)        dir = 'right';
+    else if (angle >= 45 && angle < 135)   dir = 'down';
+    else if (angle >= -135 && angle < -45) dir = 'up';
+    else                                   dir = 'left';
+
+    // tutorial intercept
+    if (typeof Tutorial !== 'undefined' && Tutorial.isActive() && Tutorial.isFrozen()) {
+      Tutorial.onDirInput(dir);
+      return;
+    }
+
+    handleDir(dir);
+    if (ActiveDirector && ActiveDirector.trackInput) ActiveDirector.trackInput();
+  }, { passive: false });
+}
 /* ── KEYBOARD ── */
 
 document.addEventListener('keydown', e => {
@@ -11135,7 +11424,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = false;
+const DEV_CHEATS = true;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;
@@ -13402,7 +13691,8 @@ function spawnGroupForMap(state, wave, map, isBoss) {
    TUTORIAL.JS
    First-time tutorial during Wave 1.
    Freezes game at key moments, shows
-   keyboard hints, teaches attack/parry/special.
+   hints (touch hand on mobile, keyboard
+   keys on desktop). Skip button available.
 
    Only runs once — sets localStorage flag.
    After completion, Wave 1 plays normally.
@@ -13417,56 +13707,125 @@ const Tutorial = (() => {
   const STORAGE_KEY = 'ds_tutorial_done';
 
   let _active       = false;
-  let _phase        = 0;       // 0=not started, 1=attack, 2=parry, 3=special
-  let _step         = 0;       // sub-step within phase
-  let _frozen       = false;   // game frozen waiting for input
-  let _waitingDir   = null;    // direction we're waiting player to press
-  let _waitingSpace = false;   // waiting for spacebar
-  let _hintEl       = null;    // DOM element for keyboard hint
-  let _spawned      = [];      // enemies spawned by tutorial
+  let _phase        = 0;
+  let _step         = 0;
+  let _frozen       = false;
+  let _waitingDir   = null;
+  let _waitingSpace = false;
+  let _hintEl       = null;
+  let _skipEl       = null;
+  let _spawned      = [];
   let _completed    = false;
+
+  /* ── HINT ASSETS ── */
+  const _TOUCH_HAND = 'assets/ui/touch_hand.png';
+  const _KEY_IMAGES = {
+    right:  'assets/ui/keys_arrow_right.png',
+    left:   'assets/ui/keys_arrow_left.png',
+    up:     'assets/ui/keys_arrow_up.png',
+    down:   'assets/ui/keys_arrow_down.png',
+    center: 'assets/ui/key_space.png',
+  };
+
+ // hand position per direction (% of arena)
+  const _HAND_POS = {
+    right:  { left: '75%', top: '50%' },
+    left:   { left: '25%', top: '50%' },
+    up:     { left: '50%', top: '20%' },
+    down:   { left: '50%', top: '80%' },
+    center: { left: '50%', top: '42%' },
+  };
 
   /* ── CHECK IF TUTORIAL NEEDED ─────── */
   function isNeeded() {
-    try {
-      return !localStorage.getItem(STORAGE_KEY);
-    } catch (e) {
-      return true;
-    }
+    try { return !localStorage.getItem(STORAGE_KEY); }
+    catch (e) { return true; }
   }
 
   function _markDone() {
-    try {
-      localStorage.setItem(STORAGE_KEY, '1');
-    } catch (e) { /* silent */ }
+    try { localStorage.setItem(STORAGE_KEY, '1'); }
+    catch (e) { /* silent */ }
   }
 
   /* ── HINT DISPLAY ─────────────────── */
 
-  function _showHint(imagePath) {
+  function _showHint(dir) {
     _removeHint();
     const el = document.createElement('div');
     el.id = 'tutorial-hint';
-    el.style.cssText =
-      'position:absolute;z-index:90;' +
-      'left:50%;top:50%;transform:translate(-50%,40px);' +
-      'pointer-events:none;' +
-      'animation:tutorialPulse 0.6s ease-in-out infinite alternate;';
 
-    const img = document.createElement('img');
-    img.src = imagePath;
-    img.style.cssText =
-      'width:96px;height:auto;image-rendering:pixelated;';
-    el.appendChild(img);
+    const mobile = typeof isMobile === 'function' && isMobile();
+
+    if (mobile) {
+      // touch hand — rotated + positioned in direction
+      const pos = _HAND_POS[dir] || _HAND_POS.center;
+      el.className = 'tutorial-hint-touch';
+      el.style.cssText =
+        'position:absolute;z-index:90;pointer-events:none;' +
+        'left:' + pos.left + ';top:' + pos.top + ';' +
+        'transform:translate(-50%,-50%);';
+
+      const img = document.createElement('img');
+      img.src = _TOUCH_HAND;
+      img.style.cssText = 'width:64px;height:64px;image-rendering:pixelated;';
+      el.appendChild(img);
+    } else {
+      // desktop keyboard hint — centered below player
+      const imgPath = _KEY_IMAGES[dir] || _KEY_IMAGES.center;
+      el.className = 'tutorial-hint-key';
+      el.style.cssText =
+        'position:absolute;z-index:90;pointer-events:none;' +
+        'left:50%;top:50%;transform:translate(-50%,40px);';
+
+      const img = document.createElement('img');
+      img.src = imgPath;
+      img.style.cssText = 'width:96px;height:auto;image-rendering:pixelated;';
+      el.appendChild(img);
+    }
 
     arena.appendChild(el);
     _hintEl = el;
   }
 
   function _removeHint() {
-    if (_hintEl) {
-      _hintEl.remove();
-      _hintEl = null;
+    if (_hintEl) { _hintEl.remove(); _hintEl = null; }
+  }
+
+  /* ── SKIP BUTTON ──────────────────── */
+
+  function _showSkip() {
+    _removeSkip();
+    const btn = document.createElement('div');
+    btn.id = 'tutorial-skip';
+    btn.textContent = 'SKIP';
+    btn.addEventListener('click', () => { _doSkip(); });
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      _doSkip();
+    }, { passive: false });
+    arena.appendChild(btn);
+    _skipEl = btn;
+  }
+
+  function _removeSkip() {
+    if (_skipEl) { _skipEl.remove(); _skipEl = null; }
+  }
+
+  function _doSkip() {
+    _complete();
+    // stop game and go to map select
+    running = false;
+    if (gameLoop) { clearInterval(gameLoop); gameLoop = null; }
+    if (typeof cleanupArena === 'function') cleanupArena();
+    if (typeof Transition !== 'undefined') {
+      Transition.play('fast', () => {
+        if (typeof showScreen === 'function') showScreen(sMapSelect);
+        if (typeof initMapSelect === 'function') initMapSelect();
+      });
+    } else {
+      if (typeof showScreen === 'function') showScreen(sMapSelect);
+      if (typeof initMapSelect === 'function') initMapSelect();
     }
   }
 
@@ -13491,14 +13850,12 @@ const Tutorial = (() => {
     const def = EnemyRegistry.get(enemyId);
     if (!def) return null;
 
-    // temporarily override speed for tutorial enemies
     const origSpeed = def.speedMult;
     if (speedOverride) def.speedMult = speedOverride;
 
     spawnEnemyDirected(def, dir);
     const enemy = enemies[enemies.length - 1];
 
-    // register in gate system
     dirGateEnemies[dir].push(enemy);
 
     def.speedMult = origSpeed;
@@ -13511,25 +13868,20 @@ const Tutorial = (() => {
   function _isInRange(enemy) {
     if (!enemy || !enemy.isAlive()) return false;
     const { w, h } = getArenaSize();
-    const cx = w / 2;
-    const cy = h / 2;
+    const cx = w / 2, cy = h / 2;
     const arenaSize = Math.min(w, h);
     const range = player.getAttackRange(arenaSize);
-    const dist = enemy.distToCenter(cx, cy);
-    return dist <= range;
+    return enemy.distToCenter(cx, cy) <= range;
   }
 
   function _isInRangeBullet(bullet) {
     if (!bullet) return false;
     const { w, h } = getArenaSize();
-    const cx = w / 2;
-    const cy = h / 2;
+    const cx = w / 2, cy = h / 2;
     const arenaSize = Math.min(w, h);
     const range = player.getAttackRange(arenaSize);
-    const dx = bullet.x - cx;
-    const dy = bullet.y - cy;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    return dist <= range;
+    const dx = bullet.x - cx, dy = bullet.y - cy;
+    return Math.sqrt(dx * dx + dy * dy) <= range;
   }
 
   /* ── PHASE A: ATTACK ──────────────── */
@@ -13539,63 +13891,47 @@ const Tutorial = (() => {
   function _startPhaseA() {
     _phase = 1;
     _step  = 0;
-    // step 0: spawn ravager from right
     _phaseAEnemy = _spawnFromDir('ravager', 'right', 0.9);
   }
 
   function _tickPhaseA() {
-    // step 0: ravager from right — wait for range, freeze, show hint
     if (_step === 0) {
       if (_phaseAEnemy && _isInRange(_phaseAEnemy)) {
         _freeze();
-        _showHint('assets/ui/keys_arrow_right.png');
+        _showHint('right');
         _waitingDir = 'right';
         _step = 1;
       }
-      // if enemy died before range (shouldn't happen), skip
       if (_phaseAEnemy && !_phaseAEnemy.isAlive()) _step = 2;
       return;
     }
-
-    // step 1: waiting for player to press right (handled by onInput)
     if (_step === 1) return;
 
-    // step 2: spawn ravager from up
     if (_step === 2) {
       _phaseAEnemy = _spawnFromDir('ravager', 'up', 0.8);
       _step = 3;
       return;
     }
-
-    // step 3: wait for range, freeze, show hint
     if (_step === 3) {
       if (_phaseAEnemy && _isInRange(_phaseAEnemy)) {
         _freeze();
-        _showHint('assets/ui/keys_arrow_up.png');
+        _showHint('up');
         _waitingDir = 'up';
         _step = 4;
       }
       if (_phaseAEnemy && !_phaseAEnemy.isAlive()) _step = 5;
       return;
     }
-
-    // step 4: waiting for player to press up (handled by onInput)
     if (_step === 4) return;
 
-    // step 5: spawn 2 ravagers (left + down) — no freeze, player handles alone
     if (_step === 5) {
       _spawnFromDir('ravager', 'left', 1.2);
       _spawnFromDir('ravager', 'down', 1.2);
       _step = 6;
       return;
     }
-
-    // step 6: wait for both to die
     if (_step === 6) {
-      const alive = enemies.filter(e => e.isAlive()).length;
-      if (alive === 0) {
-        _startPhaseB();
-      }
+      if (enemies.filter(e => e.isAlive()).length === 0) _startPhaseB();
       return;
     }
   }
@@ -13603,54 +13939,32 @@ const Tutorial = (() => {
   /* ── PHASE B: PARRY ───────────────── */
 
   let _phaseBCrusher = null;
-  let _phaseBWaiting = false;
 
   function _startPhaseB() {
     _phase = 2;
     _step  = 0;
-    _phaseBWaiting = false;
-    // spawn crusher from top, slow
     _phaseBCrusher = _spawnFromDir('crusher', 'up', 0.6);
   }
 
   function _tickPhaseB() {
-    // step 0: wait for crusher to fire bullet
     if (_step === 0) {
-      // check if any bullet exists
-      if (bullets.length > 0) {
-        _step = 1;
-      }
-      // if crusher died somehow, skip to phase C
-      if (_phaseBCrusher && !_phaseBCrusher.isAlive()) {
-        _startPhaseC();
-      }
+      if (bullets.length > 0) _step = 1;
+      if (_phaseBCrusher && !_phaseBCrusher.isAlive()) _startPhaseC();
       return;
     }
-
-    // step 1: wait for bullet to enter range, then freeze
     if (_step === 1) {
       if (bullets.length > 0 && _isInRangeBullet(bullets[0])) {
         _freeze();
-        _showHint('assets/ui/keys_arrow_up.png');
+        _showHint('up');
         _waitingDir = 'up';
         _step = 2;
       }
-      // if bullet missed or was destroyed
-      if (bullets.length === 0) {
-        _step = 3;
-      }
+      if (bullets.length === 0) _step = 3;
       return;
     }
-
-    // step 2: waiting for player to press up for parry (handled by onInput)
     if (_step === 2) return;
-
-    // step 3: let crusher approach and die naturally
     if (_step === 3) {
-      const alive = enemies.filter(e => e.isAlive()).length;
-      if (alive === 0) {
-        _startPhaseC();
-      }
+      if (enemies.filter(e => e.isAlive()).length === 0) _startPhaseC();
       return;
     }
   }
@@ -13661,11 +13975,9 @@ const Tutorial = (() => {
     _phase = 3;
     _step  = 0;
 
-    // fill special bar to 100%
     player.specialCharge = 100;
     updateSpecialBar();
 
-    // spawn 4 ravagers from all directions
     _spawnFromDir('ravager', 'up',    1.3);
     _spawnFromDir('ravager', 'down',  1.3);
     _spawnFromDir('ravager', 'left',  1.3);
@@ -13673,31 +13985,22 @@ const Tutorial = (() => {
   }
 
   function _tickPhaseC() {
-    // step 0: wait for enemies to get close, then freeze
     if (_step === 0) {
-      // check if at least 2 are in range
       let inRange = 0;
       for (const e of enemies) {
         if (e.isAlive() && _isInRange(e)) inRange++;
       }
       if (inRange >= 2) {
         _freeze();
-        _showHint('assets/ui/key_space.png');
+        _showHint('center');
         _waitingSpace = true;
         _step = 1;
       }
       return;
     }
-
-    // step 1: waiting for spacebar (handled by onInput)
     if (_step === 1) return;
-
-    // step 2: tutorial done, let remaining enemies die naturally
     if (_step === 2) {
-      const alive = enemies.filter(e => e.isAlive()).length;
-      if (alive === 0) {
-        _complete();
-      }
+      if (enemies.filter(e => e.isAlive()).length === 0) _complete();
       return;
     }
   }
@@ -13708,6 +14011,7 @@ const Tutorial = (() => {
     _active    = false;
     _completed = true;
     _removeHint();
+    _removeSkip();
     _markDone();
   }
 
@@ -13715,17 +14019,11 @@ const Tutorial = (() => {
 
   return {
 
-    /* Check if tutorial should run */
-    isNeeded() {
-      return isNeeded();
-    },
+    isNeeded() { return isNeeded(); },
 
-    /* Start tutorial — called by adventureDirector at wave 1 */
     start() {
       if (!isNeeded()) return false;
 
-      // mark tutorial done IMMEDIATELY so exiting mid-tutorial
-      // doesn't block spawning on other maps
       _markDone();
 
       _active    = true;
@@ -13737,7 +14035,9 @@ const Tutorial = (() => {
       _waitingDir   = null;
       _waitingSpace = false;
 
-      // small delay before first spawn so player sees the arena
+      // show skip button
+      _showSkip();
+
       setTimeout(() => {
         if (_active) _startPhaseA();
       }, 800);
@@ -13745,70 +14045,46 @@ const Tutorial = (() => {
       return true;
     },
 
-    /* Called every tick by adventureDirector */
     tick(dt) {
       if (!_active || _frozen) return;
-
       if (_phase === 1) _tickPhaseA();
       if (_phase === 2) _tickPhaseB();
       if (_phase === 3) _tickPhaseC();
     },
 
-    /* Called from input.js when player presses a direction */
     onDirInput(dir) {
       if (!_active || !_frozen) return false;
-
-      // waiting for specific direction
       if (_waitingDir && dir === _waitingDir) {
         _waitingDir = null;
         _unfreeze();
-
-        // let combat handle the actual hit
         handleDir(dir);
-
-        // advance to next step
         if (_phase === 1) {
-          // after right press → go to step 2 (spawn up)
-          // after up press → go to step 5 (spawn left+down)
           if (_step === 1) _step = 2;
           else if (_step === 4) _step = 5;
         }
         if (_phase === 2) {
-          // after parry → go to step 3 (let crusher die)
           if (_step === 2) _step = 3;
         }
-
         return true;
       }
-
-      return false; // wrong direction, ignore
+      return false;
     },
 
-    /* Called from input.js when player presses spacebar */
     onSpaceInput() {
       if (!_active || !_frozen || !_waitingSpace) return false;
-
       _waitingSpace = false;
       _unfreeze();
-
-      // let combat handle the special activation
       activateSpecial();
-
-      _step = 2; // go to cleanup step
+      _step = 2;
       return true;
     },
 
-    /* Getters */
     isActive()    { return _active; },
     isFrozen()    { return _frozen; },
     isCompleted() { return _completed; },
 
-    /* Force skip (for debug) */
-    skip() {
-      _complete();
-    },
+    skip() { _doSkip(); },
 
-    /* Reset state — called when restarting a map */
     reset() {
       _active       = false;
       _phase        = 0;
@@ -13819,8 +14095,8 @@ const Tutorial = (() => {
       _waitingSpace = false;
       _spawned      = [];
       _removeHint();
+      _removeSkip();
     },
-
   };
 
 })();
