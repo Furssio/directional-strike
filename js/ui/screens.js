@@ -134,41 +134,7 @@ function showMapComplete(map, hasSlot) {
   }
 }
 
-function _setupCompleteButtons() {
-  const btnAgain = document.getElementById('btn-play-again');
-  const btnMaps  = document.getElementById('btn-complete-maps');
 
-  const newAgain = btnAgain.cloneNode(true);
-  btnAgain.parentNode.replaceChild(newAgain, btnAgain);
-  newAgain.addEventListener('click', () => {
-    if (Transition.isPlaying()) return;
-    completeOverlay.classList.add('hidden');
-    cleanupArena();
-    Transition.play('fast', () => {
-      equippedAbilityId = getEquippedAbility();
-      if (AdventureDirector.restart()) {
-        startGame(true);
-      } else {
-        showScreen(sMapSelect);
-      if (typeof initMapSelect === 'function') initMapSelect();
-      }
-    }, () => {
-      startGameLoop();
-    });
-  });
-
-  const newMaps = btnMaps.cloneNode(true);
-  btnMaps.parentNode.replaceChild(newMaps, btnMaps);
-  newMaps.addEventListener('click', () => {
-    if (Transition.isPlaying()) return;
-    completeOverlay.classList.add('hidden');
-    cleanupArena();
-    Transition.play('fast', () => {
-      showScreen(sMapSelect);
-      if (typeof initMapSelect === 'function') initMapSelect();
-    });
-  });
-}
 
 function _setupCompleteButtons() {
   const btnAgain = document.getElementById('btn-play-again');
@@ -199,6 +165,11 @@ function _setupCompleteButtons() {
     if (Transition.isPlaying()) return;
     completeOverlay.classList.add('hidden');
     cleanupArena();
+    // stamp animation for the just-completed map
+    const completedMap = AdventureDirector.getCurrentMap();
+    if (completedMap && typeof setPendingStamp === 'function') {
+      setPendingStamp(completedMap.id);
+    }
     Transition.play('fast', () => {
       showScreen(sMapSelect);
       if (typeof initMapSelect === 'function') initMapSelect();

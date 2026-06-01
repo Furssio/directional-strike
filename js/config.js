@@ -280,6 +280,31 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
   },
   },
 
+  /* ── MAP DIFFICULTY TIERS ─────────────
+   Visual difficulty system (Geometry Dash style).
+   Each playable map has a tier that controls
+   border color, label, and CSS effects.
+─────────────────────────────────────── */
+mapDifficulty: {
+  tiers: {
+    easy:   { label: 'EASY',   color: '#4ade80' },
+    normal: { label: 'NORMAL', color: '#fbbf24' },
+    hard:   { label: 'HARD',   color: '#f97316' },
+    insane: { label: 'INSANE', color: '#ef4444' },
+    demon:  { label: 'DEMON',  color: '#a855f7' },
+  },
+  maps: {
+    map01_forest:  'easy',
+    map02_dungeon: 'easy',
+    map03_desert:  'normal',
+    map05_snow:    'normal',
+    map06_beach:   'hard',
+    map07_clouds:  'hard',
+    map09_volcano: 'insane',
+    map10_sakura:  'insane',
+    map12_moon:    'demon',
+  },
+},
 
 
 /* ── CHALLENGE ─────────────────────────

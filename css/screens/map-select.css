@@ -1,7 +1,6 @@
 /* ══════════════════════════════════════
    MAP SELECT — Adventure mode carousel
-   All elements positioned independently.
-   Uses % so it scales with screen size.
+   Difficulty tiers + cleared stamps.
    ══════════════════════════════════════ */
 
 #screen-map-select {
@@ -63,6 +62,7 @@
   color: var(--c-text-dim);
   margin-bottom: 4px;
   min-height: 14px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
 }
 
 /* ── CAROUSEL ── */
@@ -107,7 +107,9 @@
 #carousel-prev:hover,
 #carousel-next:hover { opacity: 1; }
 
-/* ── MAP SLIDES ── */
+/* ══════════════════════════════════════
+   MAP SLIDES — base + positions
+   ══════════════════════════════════════ */
 .map-slide {
   position: absolute;
   border-radius: 12px;
@@ -117,7 +119,6 @@
   image-rendering: pixelated;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
-  /* hidden by default */
   opacity: 0;
   pointer-events: none;
   width: 16%;
@@ -126,6 +127,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 0;
+  box-sizing: border-box;
 }
 
 .map-slide.pos-center {
@@ -184,24 +186,216 @@
   pointer-events: none;
 }
 
-/* slides out of range */
 .map-slide.pos-hidden {
   opacity: 0;
   pointer-events: none;
 }
 
-.map-slide.is-boss {
-  border: 3px solid #E24B4A;
-  box-shadow: 0 6px 24px rgba(226,75,74,0.3);
+/* ══════════════════════════════════════
+   DIFFICULTY TIER EFFECTS
+   Applied via data-tier on .map-slide
+   ══════════════════════════════════════ */
+
+/* ── EASY — clean green border, no effects ── */
+.map-slide[data-tier="easy"].pos-center {
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.5),
+    0 0 8px rgba(74, 222, 128, 0.2);
 }
 
-.map-slide.is-locked {
-  filter: brightness(0.12) !important;
-  cursor: default;
+/* ── NORMAL — subtle warm glow ── */
+.map-slide[data-tier="normal"].pos-center {
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.5),
+    0 0 12px rgba(251, 191, 36, 0.3);
+}
+
+/* ── HARD — pulsing orange glow ── */
+.map-slide[data-tier="hard"].pos-center {
+  animation: tierHardPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes tierHardPulse {
+  0%, 100% {
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.5),
+      0 0 10px rgba(249, 115, 22, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.5),
+      0 0 20px rgba(249, 115, 22, 0.5),
+      0 0 40px rgba(249, 115, 22, 0.15);
+  }
+}
+
+/* ── INSANE — intense red pulse + subtle shake ── */
+.map-slide[data-tier="insane"].pos-center {
+  animation: tierInsanePulse 2s ease-in-out infinite;
+}
+
+@keyframes tierInsanePulse {
+  0%, 100% {
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.5),
+      0 0 12px rgba(239, 68, 68, 0.3);
+    transform: translate(-50%, -50%);
+  }
+  25% {
+    transform: translate(calc(-50% + 1px), calc(-50% - 1px));
+  }
+  50% {
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.5),
+      0 0 24px rgba(239, 68, 68, 0.6),
+      0 0 48px rgba(239, 68, 68, 0.2);
+    transform: translate(calc(-50% - 1px), -50%);
+  }
+  75% {
+    transform: translate(calc(-50% + 1px), calc(-50% + 1px));
+  }
+}
+
+/* ── DEMON — purple glow + flicker + dark aura ── */
+.map-slide[data-tier="demon"].pos-center {
+  animation: tierDemonPulse 3s ease-in-out infinite;
+}
+
+/* dark aura behind demon card */
+.map-slide[data-tier="demon"].pos-center::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 16px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(168, 85, 247, 0.15) 0%,
+    transparent 70%
+  );
+  z-index: -1;
+  animation: demonAura 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tierDemonPulse {
+  0%, 100% {
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.5),
+      0 0 14px rgba(168, 85, 247, 0.35),
+      inset 0 0 15px rgba(168, 85, 247, 0.08);
+    transform: translate(-50%, -50%);
+    filter: brightness(0.85);
+  }
+  15% {
+    transform: translate(calc(-50% + 2px), calc(-50% - 1px));
+    filter: brightness(0.9) saturate(1.3);
+  }
+  30% {
+    transform: translate(calc(-50% - 1px), calc(-50% + 1px));
+  }
+  50% {
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.5),
+      0 0 28px rgba(168, 85, 247, 0.6),
+      0 0 56px rgba(168, 85, 247, 0.2),
+      inset 0 0 20px rgba(168, 85, 247, 0.1);
+    transform: translate(calc(-50% + 1px), -50%);
+    filter: brightness(0.85);
+  }
+  65% {
+    transform: translate(calc(-50% - 2px), calc(-50% - 1px));
+    filter: brightness(0.8) saturate(1.2);
+  }
+  80% {
+    transform: translate(-50%, calc(-50% + 1px));
+  }
+}
+
+@keyframes demonAura {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.08); }
 }
 
 /* ══════════════════════════════════════
-   STATUS — under player, centered
+   CLEARED STAMP
+   ══════════════════════════════════════ */
+.slide-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: #4ade80;
+  text-shadow:
+    0 0 8px rgba(0,0,0,0.9),
+    0 0 16px currentColor;
+  border: 3px solid currentColor;
+  border-radius: 6px;
+  padding: 6px 14px;
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0.85;
+  box-shadow:
+    inset 0 0 12px rgba(0,0,0,0.5),
+    0 0 12px currentColor;
+}
+
+/* scale stamp with slide size */
+.map-slide:not(.pos-center) .slide-stamp {
+  font-size: 8px;
+  padding: 3px 8px;
+  border-width: 2px;
+  letter-spacing: 1px;
+}
+
+/* hidden before slam */
+.slide-stamp.stamp-pending {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-12deg) scale(3);
+}
+
+/* slam animation */
+.slide-stamp.stamp-slam {
+  animation: stampSlam 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes stampSlam {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(3);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(0.9);
+  }
+  70% {
+    transform: translate(-50%, -50%) rotate(-12deg) scale(1.05);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(1);
+  }
+}
+
+/* screen shake on stamp slam */
+.map-slide.pos-center:has(.stamp-slam) {
+  animation:
+    tierStampShake 0.3s ease-out 0.15s 1;
+}
+
+@keyframes tierStampShake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  20%      { transform: translate(calc(-50% + 3px), calc(-50% - 2px)); }
+  40%      { transform: translate(calc(-50% - 3px), calc(-50% + 1px)); }
+  60%      { transform: translate(calc(-50% + 2px), calc(-50% + 2px)); }
+  80%      { transform: translate(calc(-50% - 1px), calc(-50% - 1px)); }
+}
+
+/* ══════════════════════════════════════
+   STATUS — under carousel, centered
    ══════════════════════════════════════ */
 #map-status {
   position: absolute;
@@ -233,7 +427,7 @@
 }
 
 /* ══════════════════════════════════════
-   PLAY BUTTON — centered under status
+   PLAY BUTTON
    ══════════════════════════════════════ */
 #btn-map-play {
   position: absolute;
@@ -267,7 +461,7 @@
 }
 
 /* ══════════════════════════════════════
-   ABILITY CARD — bottom left
+   SIDE CARDS — ability + enemy
    ══════════════════════════════════════ */
 .map-side-card {
   position: absolute;
@@ -284,13 +478,8 @@
   z-index: 10;
 }
 
-#ability-card-select {
-  left: 3%;
-}
-
-#enemy-card-select {
-  right: 3%;
-}
+#ability-card-select { left: 3%; }
+#enemy-card-select  { right: 3%; }
 
 .card-label {
   font-family: 'Press Start 2P', monospace;
@@ -307,7 +496,7 @@
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
 }
 
-/* ── ABILITY ROW (horizontal arrows) ── */
+/* ── ABILITY ROW ── */
 .ability-row {
   display: flex;
   align-items: center;
@@ -325,9 +514,7 @@
   transition: color 0.15s;
 }
 
-#ability-card-select .ability-arrow:hover {
-  color: var(--c-text);
-}
+#ability-card-select .ability-arrow:hover { color: var(--c-text); }
 
 #ability-pick-img {
   width: 48px;
@@ -335,10 +522,7 @@
   image-rendering: pixelated;
 }
 
-#ability-pick-name {
-  font-size: 6px;
-  min-height: 10px;
-}
+#ability-pick-name { font-size: 6px; min-height: 10px; }
 
 #ability-pick-desc {
   font-family: 'Press Start 2P', monospace;
@@ -387,7 +571,7 @@
 }
 
 /* ══════════════════════════════════════
-   MAP PREVIEW BG — full bottom
+   MAP PREVIEW BG
    ══════════════════════════════════════ */
 #mapselect-demo {
   position: absolute;
@@ -405,7 +589,6 @@
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.5) 45%, black 70%);
 }
 
-/* ── PLAYER IN DEMO ── */
 #mapselect-demo .demo-player-instance {
   position: absolute;
   top: 50%;
@@ -420,11 +603,10 @@
   animation: playerIdle 1.2s steps(12) infinite;
   z-index: 10;
 }
-/* ══════════════════════════════════════
-   BOSS MAP — lock icon + glitch effect
-   ══════════════════════════════════════ */
 
-/* ── Lock icon — bottom right of slide ── */
+/* ══════════════════════════════════════
+   BOSS MAP — lock + glitch
+   ══════════════════════════════════════ */
 .slide-lock {
   position: absolute;
   bottom: 6px;
@@ -441,13 +623,11 @@
   opacity: 0.8;
 }
 
-/* ── Boss cards — no red border ── */
 .map-slide.is-boss {
-  border: none;
+  border: none !important;
   box-shadow: none;
 }
 
-/* ── Boss locked — nearly invisible ── */
 .map-slide.is-boss.is-locked {
   filter: brightness(0.05) !important;
 }
@@ -456,7 +636,6 @@
   filter: brightness(0.1) !important;
 }
 
-/* ── Boss revealed (moon completed) — dark but visible ── */
 .map-slide.is-boss.is-locked.is-glitch {
   filter: brightness(0.15) saturate(0.5) !important;
 }
@@ -465,7 +644,6 @@
   filter: brightness(0.35) saturate(1.2) !important;
 }
 
-/* ── Glitch effect — after moon completed ── */
 .map-slide.is-glitch.pos-center {
   filter: brightness(0.5) saturate(1.4) !important;
   animation: bossGlitch 3s steps(1) infinite;
@@ -510,7 +688,6 @@
   }
 }
 
-/* ── Glitch scanline overlay ── */
 .map-slide.is-glitch::after {
   content: '';
   position: absolute;
@@ -527,7 +704,6 @@
   mix-blend-mode: multiply;
 }
 
-/* ── COMING SOON sub text pulse ── */
 #carousel-map-sub.coming-soon {
   color: #E24B4A;
   animation: comingSoonPulse 2s ease-in-out infinite;
@@ -537,8 +713,9 @@
   0%, 100% { opacity: 0.6; }
   50%      { opacity: 1; }
 }
+
 /* ══════════════════════════════════════
-   SLOT BUTTON — watch ad for spins
+   SLOT BUTTON
    ══════════════════════════════════════ */
 .slot-menu-btn {
   position: absolute;
@@ -601,8 +778,7 @@
 }
 
 /* ══════════════════════════════════════
-   SLOT BADGE — corner tag on map slides
-   that give a guaranteed free spin
+   SLOT BADGE — corner tag on slides
    ══════════════════════════════════════ */
 .slide-slot-badge {
   position: absolute;
@@ -632,12 +808,10 @@
   text-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
 }
 
-/* hide on non-center slides */
 .map-slide:not(.pos-center) .slide-slot-badge {
   opacity: 0;
 }
 
-/* bigger on center slide */
 .map-slide.pos-center .slide-slot-badge {
   padding: 8px 14px 8px 8px;
 }

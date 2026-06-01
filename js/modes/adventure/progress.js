@@ -106,17 +106,12 @@ const Progress = (() => {
     },
 
     isMapUnlocked(mapId) {
+  // all playable maps are always open
+  if (CONFIG.playableOrder.includes(mapId)) return true;
+
+  // boss maps — locked unless dev flags
   if (CONFIG.devUnlockAll || CONFIG.devUnlockMapsOnly) return true;
-
-  const order = CONFIG.playableOrder;
-  const idx = order.indexOf(mapId);
-
-  // boss maps or unknown maps — always locked
-  if (idx < 0) return false;
-  // first map — always unlocked
-  if (idx === 0) return true;
-  // unlocked if previous map in playable order is completed
-  return this.isMapCompleted(order[idx - 1]);
+  return false;
 },
 
     markMapCompleted(mapId) {
