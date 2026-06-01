@@ -29,6 +29,7 @@ const Progress = (() => {
   const KEY_ABILITIES    = 'ds_adv_abilities_unlocked';
   const KEY_MENU_VIDEOS  = 'ds_menu_videos_used';
   const KEY_SLOTS_GIVEN  = 'ds_slots_given';
+  const KEY_BEST_WAVE = 'ds_best_wave_';
 
   /* ── INTERNAL STORAGE ──────────────── */
 
@@ -120,6 +121,25 @@ const Progress = (() => {
         list.push(mapId);
         _save(KEY_MAPS, list);
       }
+    },
+
+    /* ── BEST WAVE REACHED ────────────── */
+
+    getBestWave(mapId) {
+      try {
+        return parseInt(localStorage.getItem(KEY_BEST_WAVE + mapId)) || 0;
+      } catch(e) {
+        return 0;
+      }
+    },
+
+    saveBestWave(mapId, wave) {
+      try {
+        const current = this.getBestWave(mapId);
+        if (wave > current) {
+          localStorage.setItem(KEY_BEST_WAVE + mapId, String(wave));
+        }
+      } catch(e) {}
     },
 
     /* ── ABILITIES ────────────────────── */
@@ -234,6 +254,10 @@ const Progress = (() => {
       localStorage.removeItem(KEY_ABILITIES);
       localStorage.removeItem(KEY_MENU_VIDEOS);
       localStorage.removeItem(KEY_SLOTS_GIVEN);
+// clear best waves
+CONFIG.playableOrder.forEach(id => {
+  localStorage.removeItem(KEY_BEST_WAVE + id);
+});
     },
 
   };

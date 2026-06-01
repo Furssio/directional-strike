@@ -16,6 +16,15 @@ let _pendingStampMap = null;
 
 const BOSS_MAP_IDS = ['map04_temple', 'map08_storm', 'map11_dragon', 'map13_dark'];
 
+const WAVE_COLORS = [
+  '#4ade80', '#4ade80',   // wave 1-2: green
+  '#a3e635', '#a3e635',   // wave 3-4: lime
+  '#fbbf24', '#fbbf24',   // wave 5-6: yellow
+  '#f97316', '#f97316',   // wave 7-8: orange
+  '#ef4444', '#ef4444',   // wave 9-10: red
+  '#a855f7',              // wave 11: purple
+];
+
 const DISPLAY_ORDER = [
   'map01_forest', 'map02_dungeon', 'map03_desert',
   'map05_snow', 'map06_beach', 'map07_clouds',
@@ -269,6 +278,7 @@ function _renderCarousel() {
   }
 
   _renderEnemyCard(map);
+  _renderProgressBar(map);
 }
 
 
@@ -405,6 +415,52 @@ const ENEMY_HINTS = {
   turtle:        'Armored shell, slow without it',
   wolf:          'Leaps back, charges again faster',
 };
+
+/* ── WAVE PROGRESS BAR ── */
+function _renderProgressBar(map) {
+  const container = document.getElementById('map-progress-bar');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // hide for boss maps
+  if (_isBossMap(map.id)) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'flex';
+
+  const totalWaves = map.totalWaves || 11;
+  const isCompleted = Progress.isMapCompleted(map.id);
+  const bestWave = isCompleted ? totalWaves : Progress.getBestWave(map.id);
+  const pct = totalWaves > 0 ? Math.round((bestWave / totalWaves) * 100) : 0;
+
+  // track container
+  const track = document.createElement('div');
+  track.className = 'progress-track' + (isCompleted ? ' complete' : '');
+
+  // 11 segments
+  for (let i = 0; i < totalWaves; i++) {
+    const seg = document.createElement('div');
+    seg.className = 'progress-segment';
+    if (i < bestWave) {
+      seg.classList.add('filled');
+      const col = WAVE_COLORS[i] || '#a855f7';
+      seg.style.background = col;
+      seg.style.boxShadow = '0 0 3px ' + col + '66';
+    } else {
+      seg.classList.add('empty');
+    }
+    track.appendChild(seg);
+  }
+
+  // percentage label
+  const pctEl = document.createElement('div');
+  pctEl.className = 'progress-pct' + (isCompleted ? ' complete' : '');
+  pctEl.textContent = pct + '%';
+
+  container.appendChild(track);
+  container.appendChild(pctEl);
+}
 
 function _renderEnemyCard(map) {
   const list = document.getElementById('enemy-preview-list');

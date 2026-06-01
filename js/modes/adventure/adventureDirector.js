@@ -526,6 +526,9 @@ const AdventureDirector = (() => {
       if (typeof resetUpgradeChoices === 'function') resetUpgradeChoices();
       setArenaBackground(currentMap.background || null);
 
+      // save wave 1 as minimum progress
+Progress.saveBestWave(currentMap.id, 1);
+
       // always reset tutorial state to prevent stale isActive blocking spawns
       if (typeof Tutorial !== 'undefined') Tutorial.reset();
 
@@ -569,7 +572,10 @@ const AdventureDirector = (() => {
 
     /* ── START WAVE ───────────────────── */
     _startWave(newWave) {
-      wave         = newWave;
+      // save best wave reached
+  if (currentMap) Progress.saveBestWave(currentMap.id, newWave);
+
+  wave         = newWave;
       waveElapsed  = 0;
       spawnTimer   = 0;
       draining     = false;
