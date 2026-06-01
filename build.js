@@ -157,11 +157,34 @@ function bundleCSS() {
   let count = 0;
   let missing = 0;
 
+  // output lives in css/ — so one ../ reaches root
+  const outDir = path.dirname(CSS_OUTPUT);
+
   for (const f of CSS_FILES) {
     const fp = path.join(__dirname, f);
     if (fs.existsSync(fp)) {
+      const srcDir = path.dirname(f);
+      let content = fs.readFileSync(fp, 'utf8');
+
+      // rewrite relative url() paths based on directory difference
+      content = content.replace(
+        /url\(\s*['"]?(\.\.?\/[^'")]+)['"]?\s*\)/g,
+        (match, relPath) => {
+          // resolve original absolute path from source file location
+          const absPath = path.posix.normalize(
+            path.posix.join(srcDir.replace(/\\/g, '/'), relPath)
+          );
+          // compute new relative path from bundle output directory
+          let newRel = path.posix.relative(
+            outDir.replace(/\\/g, '/'),
+            absPath
+          );
+          return `url('${newRel}')`;
+        }
+      );
+
       bundle += `/* === ${f} === */\n`;
-      bundle += fs.readFileSync(fp, 'utf8');
+      bundle += content;
       bundle += '\n\n';
       count++;
     } else {

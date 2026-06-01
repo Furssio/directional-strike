@@ -753,7 +753,7 @@ button.game-btn:hover{background:#333;}
   width: 100%;
   aspect-ratio: 1;
   max-width: 620px;
-  background-image: url('../../assets/ui/menu_ruins.png');
+  background-image: url('../assets/ui/menu_ruins.png');
   background-size: cover;
   background-position: center top;
   image-rendering: pixelated;
@@ -779,7 +779,7 @@ button.game-btn:hover{background:#333;}
   transform: translateX(-50%);
   width: 96px;
   height: 96px;
-  background-image: url('../../assets/characters/player_idle.png');
+  background-image: url('../assets/characters/player_idle.png');
   background-size: 1152px 96px;
   background-repeat: no-repeat;
   image-rendering: pixelated;
@@ -1110,7 +1110,7 @@ button.game-btn:hover{background:#333;}
   z-index: 2;
   width: 72%;
   max-width: 320px;
-  background: url('../../assets/ui/menu_bg.png') center center / cover;
+  background: url('../assets/ui/menu_bg.png') center center / cover;
   image-rendering: pixelated;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
@@ -1874,7 +1874,7 @@ button.game-btn:hover{background:#333;}
   transform: translate(-50%, -50%);
   width: 96px;
   height: 96px;
-  background-image: url('../../assets/characters/player_idle.png');
+  background-image: url('../assets/characters/player_idle.png');
   background-size: 1152px 96px;
   background-repeat: no-repeat;
   image-rendering: pixelated;
@@ -2382,7 +2382,7 @@ button.game-btn:hover{background:#333;}
   z-index: 1;
   width: 72%;
   max-width: 320px;
-  background-image: url('../../assets/ui/menu_bg.png');
+  background-image: url('../assets/ui/menu_bg.png');
   background-size: 128px 128px;
   background-repeat: repeat;
   image-rendering: pixelated;
@@ -2739,7 +2739,7 @@ button.game-btn:hover{background:#333;}
   position: relative;
   width: 72%;
   max-width: 320px;
-  background-image: url('../../assets/ui/menu_bg.png');
+  background-image: url('../assets/ui/menu_bg.png');
   background-size: 256px 256px;
   background-repeat: repeat;
   image-rendering: pixelated;
@@ -2853,7 +2853,7 @@ button.game-btn:hover{background:#333;}
   z-index: 1;
   width: 85%;
   max-width: 320px;
-  background-image: url('../../assets/ui/menu_bg.png');
+  background-image: url('../assets/ui/menu_bg.png');
   background-size: 128px 128px;
   background-repeat: repeat;
   image-rendering: pixelated;
@@ -3345,7 +3345,7 @@ button.game-btn:hover{background:#333;}
   transform: translate(-50%, -50%);
   width: 96px;
   height: 96px;
-  background-image: url('../../assets/characters/player_idle.png');
+  background-image: url('../assets/characters/player_idle.png');
   background-size: 1152px 96px;
   background-repeat: no-repeat;
   image-rendering: pixelated;
@@ -4032,7 +4032,7 @@ button.game-btn:hover{background:#333;}
   position: absolute;
   width: 64px;
   height: 47px;
-  background-image: url('../../assets/effects/slash.png');
+  background-image: url('../assets/effects/slash.png');
   background-size: 192px 141px;
   image-rendering: pixelated;
   pointer-events: none;
