@@ -14997,6 +14997,7 @@ Progress.saveBestWave(currentMap.id, 1);
       active    = false;
 
       Progress.markMapCompleted(currentMap.id);
+      Progress.saveBestWave(currentMap.id, _getTotalWaves());
 
       const hasSlot = Progress.shouldTriggerSlot(currentMap.id);
       if (hasSlot) Progress.markSlotGiven(currentMap.id);
@@ -17861,7 +17862,6 @@ function _renderProgressBar(map) {
   if (!container) return;
   container.innerHTML = '';
 
-  // hide for boss maps
   if (_isBossMap(map.id)) {
     container.style.display = 'none';
     return;
@@ -17873,11 +17873,24 @@ function _renderProgressBar(map) {
   const bestWave = isCompleted ? totalWaves : Progress.getBestWave(map.id);
   const pct = totalWaves > 0 ? Math.round((bestWave / totalWaves) * 100) : 0;
 
-  // track container
+  // labels row: wave numbers + percentage
+  const labels = document.createElement('div');
+  labels.className = 'progress-labels';
+  for (let i = 0; i < totalWaves; i++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'progress-label' + (i < bestWave ? ' filled' : '');
+    lbl.textContent = i + 1;
+    labels.appendChild(lbl);
+  }
+  const pctEl = document.createElement('div');
+  pctEl.className = 'progress-pct' + (isCompleted ? ' complete' : '');
+  pctEl.textContent = pct + '%';
+  labels.appendChild(pctEl);
+
+  // track
   const track = document.createElement('div');
   track.className = 'progress-track' + (isCompleted ? ' complete' : '');
 
-  // 11 segments
   for (let i = 0; i < totalWaves; i++) {
     const seg = document.createElement('div');
     seg.className = 'progress-segment';
@@ -17885,20 +17898,15 @@ function _renderProgressBar(map) {
       seg.classList.add('filled');
       const col = WAVE_COLORS[i] || '#a855f7';
       seg.style.background = col;
-      seg.style.boxShadow = '0 0 3px ' + col + '66';
+      seg.style.boxShadow = '0 0 4px ' + col + '88';
     } else {
       seg.classList.add('empty');
     }
     track.appendChild(seg);
   }
 
-  // percentage label
-  const pctEl = document.createElement('div');
-  pctEl.className = 'progress-pct' + (isCompleted ? ' complete' : '');
-  pctEl.textContent = pct + '%';
-
+  container.appendChild(labels);
   container.appendChild(track);
-  container.appendChild(pctEl);
 }
 
 function _renderEnemyCard(map) {

@@ -598,6 +598,7 @@ Progress.saveBestWave(currentMap.id, 1);
       active    = false;
 
       Progress.markMapCompleted(currentMap.id);
+      Progress.saveBestWave(currentMap.id, _getTotalWaves());
 
       const hasSlot = Progress.shouldTriggerSlot(currentMap.id);
       if (hasSlot) Progress.markSlotGiven(currentMap.id);

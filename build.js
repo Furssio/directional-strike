@@ -1,6 +1,55 @@
 const fs = require('fs');
 const path = require('path');
 
+/* ═══════════════════════════════════════
+   BUILD.JS
+   Bundles JS and CSS into single files.
+   Run: node build.js
+   ═══════════════════════════════════════ */
+
+/* ── CSS FILES (order matters for cascade) ── */
+
+const CSS_FILES = [
+  'css/base.css',
+  'css/effects.css',
+  'css/arena.css',
+  'css/hud.css',
+  'css/controls.css',
+  'css/screens/menu.css',
+  'css/screens/game-over.css',
+  'css/screens/ability.css',
+  'css/screens/map-select.css',
+  'css/screens/map-complete.css',
+  'css/screens/menu-anim.css',
+  'css/demo.css',
+  'css/screens/pause.css',
+  'css/screens/slot-machine.css',
+  'css/screens/challenge.css',
+  'css/transition.css',
+  'css/map-transition.css',
+  'css/screens/info.css',
+  'css/screens/menu-wind.css',
+  'css/abilities/bullet-time.css',
+  'css/abilities/explosion.css',
+  'css/abilities/shield.css',
+  'css/abilities/range-boost.css',
+  'css/abilities/one-hit.css',
+  'css/abilities/slash.css',
+  'css/enemies/bullets.css',
+  'css/enemies/bear.css',
+  'css/enemies/thunder_hound.css',
+  'css/enemies/wolf.css',
+  'css/enemies/oni.css',
+  'css/enemies/kitsune.css',
+  'css/enemies/turtle.css',
+  'css/enemies/eagle.css',
+  'css/tutorial.css',
+];
+
+const CSS_OUTPUT = 'css/game.bundle.css';
+
+/* ── JS FILES (order matters for dependencies) ── */
+
 const FILES = [
   'js/scaler.js',
   'js/config.js',
@@ -99,28 +148,85 @@ const FILES = [
   'js/debug.js',
 ];
 
-const OUTPUT = 'js/game.bundle.js';
-let bundle = '';
-let count = 0;
-let missing = 0;
+const JS_OUTPUT = 'js/game.bundle.js';
 
-for (const f of FILES) {
-  const fp = path.join(__dirname, f);
-  if (fs.existsSync(fp)) {
-    bundle += `/* === ${f} === */\n`;
-    bundle += fs.readFileSync(fp, 'utf8');
-    bundle += '\n\n';
-    count++;
-  } else {
-    console.log('  WARNING: ' + f + ' NOT FOUND');
-    missing++;
+/* ── BUNDLE CSS ── */
+
+function bundleCSS() {
+  let bundle = '';
+  let count = 0;
+  let missing = 0;
+
+  for (const f of CSS_FILES) {
+    const fp = path.join(__dirname, f);
+    if (fs.existsSync(fp)) {
+      let css = fs.readFileSync(fp, 'utf8');
+
+      // Fix relative paths: css/screens/menu.css references ../assets
+      // In bundle at css/game.bundle.css, paths need adjusting
+      const dir = path.dirname(f); // e.g. 'css/screens' or 'css'
+      const bundleDir = path.dirname(CSS_OUTPUT); // 'css'
+      const relDepth = path.relative(bundleDir, dir); // e.g. 'screens' or ''
+
+      if (relDepth) {
+        // Rewrite url('../ to url(' + correct relative path
+        // From css/screens/file.css: url('../assets/') → from css/: url('../assets/') stays same
+        // From css/screens/file.css: url('../../x') → need to adjust
+        // Actually: all CSS files use paths relative to THEIR location.
+        // Bundle is in css/, so we need to fix paths from subdirs.
+        // css/screens/menu.css has url('../assets/') which means -> assets/ from root
+        // css/game.bundle.css needs url('../assets/') too -> same!
+        // css/abilities/bullet-time.css has url('../assets/') -> assets/ from root
+        // css/game.bundle.css needs url('../assets/') -> same!
+        // So actually no rewriting needed IF all subdirs are 1 level deep under css/
+      }
+
+      bundle += `/* === ${f} === */\n`;
+      bundle += css;
+      bundle += '\n\n';
+      count++;
+    } else {
+      console.log('  CSS WARNING: ' + f + ' NOT FOUND');
+      missing++;
+    }
   }
+
+  fs.writeFileSync(path.join(__dirname, CSS_OUTPUT), bundle, 'utf8');
+  console.log(`CSS: ${count} files -> ${CSS_OUTPUT} (${bundle.length} bytes)`);
+  if (missing > 0) console.log(`CSS: ${missing} file(s) missing`);
 }
 
-bundle += '/* === ADVENTURE PRE-LOADED === */\n';
-bundle += '_adventureLoaded = true;\n';
+/* ── BUNDLE JS ── */
 
-fs.writeFileSync(path.join(__dirname, OUTPUT), bundle, 'utf8');
+function bundleJS() {
+  let bundle = '';
+  let count = 0;
+  let missing = 0;
 
-console.log(`Done! ${count} files -> ${OUTPUT} (${bundle.length} bytes)`);
-if (missing > 0) console.log(`${missing} file(s) missing`);
+  for (const f of FILES) {
+    const fp = path.join(__dirname, f);
+    if (fs.existsSync(fp)) {
+      bundle += `/* === ${f} === */\n`;
+      bundle += fs.readFileSync(fp, 'utf8');
+      bundle += '\n\n';
+      count++;
+    } else {
+      console.log('  JS WARNING: ' + f + ' NOT FOUND');
+      missing++;
+    }
+  }
+
+  bundle += '/* === ADVENTURE PRE-LOADED === */\n';
+  bundle += '_adventureLoaded = true;\n';
+
+  fs.writeFileSync(path.join(__dirname, JS_OUTPUT), bundle, 'utf8');
+  console.log(`JS:  ${count} files -> ${JS_OUTPUT} (${bundle.length} bytes)`);
+  if (missing > 0) console.log(`JS: ${missing} file(s) missing`);
+}
+
+/* ── RUN BOTH ── */
+
+console.log('Building bundles...');
+bundleCSS();
+bundleJS();
+console.log('Done!');
