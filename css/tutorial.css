@@ -1,7 +1,109 @@
-/* ── TUTORIAL HINT — desktop (keyboard) ── */
+/* ═══════════════════════════════════════
+   TUTORIAL CSS
+   Camera zoom, bubbles, hints, skip.
+   Only active during first-time tutorial.
+   ═══════════════════════════════════════ */
+
+/* ── Camera zoom (tutorial only) ────── */
+#arena.tutorial-cam {
+  transition: transform 800ms ease-in-out;
+  transform-origin: center center;
+}
+
+#arena.tutorial-cam.tutorial-zoom-in {
+  transform: scale(1.4);
+}
+
+/* ── Bubble base ────────────────────── */
+.tutorial-bubble {
+  position: absolute;
+  z-index: 92;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+}
+
+.tutorial-bubble img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+/* Bounce-in */
+.tutorial-bubble-enter {
+  animation: tutBubbleEnter 0.4s ease-out forwards;
+}
+
+@keyframes tutBubbleEnter {
+  0%   { opacity: 0; transform: translate(-50%, -100%) scale(0); }
+  70%  { transform: translate(-50%, -100%) scale(1.15); }
+  100% { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+}
+
+/* Idle float */
+.tutorial-bubble-float {
+  animation: tutBubbleFloat 1s ease-in-out infinite alternate;
+}
+
+@keyframes tutBubbleFloat {
+  from { transform: translate(-50%, -100%) translateY(0); }
+  to   { transform: translate(-50%, -100%) translateY(-4px); }
+}
+
+/* Fade-out */
+.tutorial-bubble-exit {
+  animation: tutBubbleExit 0.3s ease-in forwards;
+}
+
+@keyframes tutBubbleExit {
+  to { opacity: 0; transform: translate(-50%, -100%) scale(0.7) translateY(-8px); }
+}
+
+/* ── Skip button (bottom center) ────── */
+#tutorial-skip {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 95;
+  padding: 8px 22px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: #888;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+  pointer-events: auto;
+  letter-spacing: 1px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+#tutorial-skip:hover {
+  color: #fff;
+  border-color: #aaa;
+}
+
+/* ── Hint — desktop (arrow + WASD) ──── */
 .tutorial-hint-key {
   filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
   animation: tutorialPulse 0.6s ease-in-out infinite alternate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tutorial-hint-key img {
+  width: 96px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.tutorial-hint-wasd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  letter-spacing: 1px;
 }
 
 @keyframes tutorialPulse {
@@ -9,10 +111,16 @@
   to   { transform: translate(-50%, 40px) scale(1.15); opacity: 1; }
 }
 
-/* ── TUTORIAL HINT — mobile (touch hand) ── */
+/* ── Hint — mobile (touch hand) ─────── */
 .tutorial-hint-touch {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
   animation: tutorialFloat 0.8s ease-in-out infinite alternate;
+}
+
+.tutorial-hint-touch img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
 }
 
 @keyframes tutorialFloat {
@@ -20,24 +128,36 @@
   to   { margin-top: -12px; opacity: 1; }
 }
 
-/* ── SKIP BUTTON ── */
-#tutorial-skip {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 95;
-  padding: 6px 14px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: #aaa;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid #555;
-  border-radius: 6px;
-  cursor: pointer;
-  pointer-events: auto;
+/* ── Hint layout (arrow + WASD together) ── */
+.tutorial-hint-combo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-#tutorial-skip:hover {
-  color: #fff;
-  border-color: #888;
+.tutorial-hint-combo img {
+  width: 64px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.tutorial-hint-or {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tutorial-wasd-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  image-rendering: pixelated;
 }
