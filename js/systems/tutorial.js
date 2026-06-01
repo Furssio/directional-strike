@@ -421,7 +421,7 @@ const Tutorial = (() => {
   function _startPhaseA() {
     _phase = 1;
     _step  = 0;
-    _phaseAEnemy = _spawnFromDir('ravager', 'right', 0.9);
+    _phaseAEnemy = _spawnFromDir('ravager', 'right', 1.2);
     _showRageBubble(_phaseAEnemy);
   }
 
@@ -449,7 +449,7 @@ const Tutorial = (() => {
 
     if (_step === 2) {
       // Second ravager from top
-      _phaseAEnemy = _spawnFromDir('ravager', 'up', 0.8);
+      _phaseAEnemy = _spawnFromDir('ravager', 'up', 1.1);
       _step = 3;
       return;
     }
@@ -468,8 +468,8 @@ const Tutorial = (() => {
 
     if (_step === 5) {
       // Two more ravagers, no hints — player does it alone
-      _spawnFromDir('ravager', 'left',  1.2);
-      _spawnFromDir('ravager', 'down',  1.2);
+      _spawnFromDir('ravager', 'left',  1.5);
+      _spawnFromDir('ravager', 'down',  1.5);
       _step = 6;
       return;
     }
@@ -487,7 +487,7 @@ const Tutorial = (() => {
   function _startPhaseB() {
     _phase = 2;
     _step  = 0;
-    _phaseBCrusher = _spawnFromDir('crusher', 'up', 0.6);
+    _phaseBCrusher = _spawnFromDir('crusher', 'up', 0.8);
   }
 
   function _tickPhaseB() {
@@ -525,10 +525,10 @@ const Tutorial = (() => {
     player.specialCharge = 100;
     if (typeof updateSpecialBar === 'function') updateSpecialBar();
 
-    _spawnFromDir('ravager', 'up',    1.3);
-    _spawnFromDir('ravager', 'down',  1.3);
-    _spawnFromDir('ravager', 'left',  1.3);
-    _spawnFromDir('ravager', 'right', 1.3);
+    _spawnFromDir('ravager', 'up',    1.6);
+    _spawnFromDir('ravager', 'down',  1.6);
+    _spawnFromDir('ravager', 'left',  1.6);
+    _spawnFromDir('ravager', 'right', 1.6);
   }
 
   function _tickPhaseC() {
