@@ -143,6 +143,7 @@ const Tutorial = (() => {
     el.style.marginTop = '-48px';
     a.appendChild(el);
     _playerBubbleEl = el;
+    SFX.tutorialAlert();
 
     // enter → float after animation
     _later(() => {

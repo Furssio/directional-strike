@@ -95,6 +95,8 @@ const SFX = {
   mapDimGlitch:     () => SfxUi.mapDimGlitch(),
   mapDimExplode:    () => SfxUi.mapDimExplode(),
   mapDimReveal:     () => SfxUi.mapDimReveal(),
+  tutorialAlert: () => SfxUi.tutorialAlert(),
+  stampSlam:     () => SfxUi.stampSlam(),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),

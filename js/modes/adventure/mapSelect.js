@@ -286,9 +286,10 @@ function _renderCarousel() {
 function _playStampAndScroll(mapId) {
   // find the stamp element on the center slide
   const stamp = document.querySelector('.map-slide.pos-center .slide-stamp.stamp-pending');
-  if (stamp) {
+ if (stamp) {
     stamp.classList.remove('stamp-pending');
     stamp.classList.add('stamp-slam');
+    SFX.stampSlam();
   }
 
   // after slam animation, auto-scroll to next uncompleted

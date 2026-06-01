@@ -68,7 +68,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: true,
+ debug: false,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -5579,6 +5579,29 @@ const SfxUi = (() => {
       // dark tail noise
       n({ duration: 0.4, gain: 0.1, highpass: 80, lowpass: 1200 });
     },
+
+    /* ── TUTORIAL ALERT: quick "bwip!" — Zelda-style notice ── */
+    tutorialAlert() {
+      t({ type: 'sine', freq: 800, freq2: 1300, duration: 0.1,
+          attack: 0.003, decay: 0.03, sustain: 0.35, release: 0.04, gain: 0.25 });
+      td(60, { type: 'sine', freq: 1300, freq2: 1600, duration: 0.08,
+          attack: 0.003, decay: 0.025, sustain: 0.25, release: 0.03, gain: 0.18 });
+    },
+
+    /* ── STAMP SLAM: heavy ink stamp thud ── */
+    stampSlam() {
+      // deep thud — physical impact
+      t({ type: 'sine', freq: 120, freq2: 60, duration: 0.25,
+          attack: 0.002, decay: 0.07, sustain: 0.35, release: 0.12, gain: 0.45 });
+      // mid punch — paper slap
+      t({ type: 'triangle', freq: 350, freq2: 200, duration: 0.15,
+          attack: 0.002, decay: 0.04, sustain: 0.25, release: 0.08, gain: 0.3 });
+      // ink noise burst
+      n({ duration: 0.12, gain: 0.2, highpass: 200, lowpass: 2000 });
+      // satisfying ring — stamp confirmed
+      td(80, { type: 'sine', freq: 600, freq2: 450, duration: 0.18,
+          attack: 0.005, decay: 0.05, sustain: 0.2, release: 0.08, gain: 0.15 });
+    },
   };
 
 })();
@@ -5893,6 +5916,8 @@ const SFX = {
   mapDimGlitch:     () => SfxUi.mapDimGlitch(),
   mapDimExplode:    () => SfxUi.mapDimExplode(),
   mapDimReveal:     () => SfxUi.mapDimReveal(),
+  tutorialAlert: () => SfxUi.tutorialAlert(),
+  stampSlam:     () => SfxUi.stampSlam(),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),
@@ -11460,7 +11485,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = true;
+const DEV_CHEATS = false;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;
@@ -13887,6 +13912,7 @@ const Tutorial = (() => {
     el.style.marginTop = '-48px';
     a.appendChild(el);
     _playerBubbleEl = el;
+    SFX.tutorialAlert();
 
     // enter → float after animation
     _later(() => {
@@ -17726,9 +17752,10 @@ function _renderCarousel() {
 function _playStampAndScroll(mapId) {
   // find the stamp element on the center slide
   const stamp = document.querySelector('.map-slide.pos-center .slide-stamp.stamp-pending');
-  if (stamp) {
+ if (stamp) {
     stamp.classList.remove('stamp-pending');
     stamp.classList.add('stamp-slam');
+    SFX.stampSlam();
   }
 
   // after slam animation, auto-scroll to next uncompleted
