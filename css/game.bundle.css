@@ -2201,6 +2201,155 @@ button.game-btn:hover{background:#333;}
     1px 1px 0 rgba(0, 0, 0, 0.8),
     0 0 6px rgba(168, 85, 247, 0.4);
 }
+/* ══════════════════════════════════════
+   CHALLENGE BUTTON — galaxy style
+   ══════════════════════════════════════ */
+.mapsel-challenge-btn {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(100, 80, 220, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    rgba(60, 20, 120, 0.6) 0%,
+    rgba(20, 10, 60, 0.8) 50%,
+    rgba(10, 5, 40, 0.9) 100%
+  );
+  animation: galaxyPulse 3s ease-in-out infinite,
+             galaxyFloat 3.5s ease-in-out 1s infinite alternate;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+}
+
+.challenge-btn-icon {
+  font-size: 12px;
+  filter: drop-shadow(0 0 4px rgba(140, 100, 255, 0.6));
+}
+
+.challenge-btn-label {
+  font-size: 7px;
+  color: #c4b5fd;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 6px rgba(140, 100, 255, 0.4),
+    1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* galaxy glow pulse */
+@keyframes galaxyPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(100, 60, 200, 0.3),
+      0 0 20px rgba(80, 40, 180, 0.15),
+      inset 0 0 10px rgba(100, 60, 200, 0.1);
+    border-color: rgba(100, 80, 220, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 14px rgba(120, 80, 240, 0.5),
+      0 0 36px rgba(100, 60, 220, 0.25),
+      0 0 60px rgba(80, 40, 180, 0.1),
+      inset 0 0 15px rgba(120, 80, 240, 0.15);
+    border-color: rgba(140, 100, 255, 0.6);
+  }
+}
+
+/* gentle float */
+@keyframes galaxyFloat {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+/* hover — intensify */
+.mapsel-challenge-btn:hover {
+  border-color: rgba(160, 120, 255, 0.7);
+  box-shadow:
+    0 0 18px rgba(140, 100, 255, 0.6),
+    0 0 40px rgba(120, 80, 240, 0.3),
+    0 0 70px rgba(100, 60, 220, 0.15),
+    inset 0 0 20px rgba(140, 100, 255, 0.2);
+}
+
+.mapsel-challenge-btn:hover .challenge-btn-label {
+  color: #ddd6fe;
+  text-shadow:
+    0 0 10px rgba(160, 120, 255, 0.6),
+    1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.mapsel-challenge-btn:active {
+  transform: scale(0.95);
+}
+
+
+/* ── GALAXY PIXEL STARS ── */
+.galaxy-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #c4b5fd;
+  pointer-events: none;
+  image-rendering: pixelated;
+  animation: starTwinkle 1.8s ease-in-out infinite alternate;
+}
+
+.gs-1 { top: 15%; left: 12%;  background: #ddd6fe; animation-delay: 0s; }
+.gs-2 { top: 25%; right: 10%; background: #a78bfa; animation-delay: 0.4s; width: 3px; height: 3px; }
+.gs-3 { bottom: 20%; left: 25%; background: #e9d5ff; animation-delay: 0.8s; }
+.gs-4 { top: 40%; left: 45%;  background: #c4b5fd; animation-delay: 1.2s; width: 1px; height: 1px; }
+.gs-5 { bottom: 30%; right: 20%; background: #ddd6fe; animation-delay: 0.2s; width: 3px; height: 3px; }
+.gs-6 { top: 10%; left: 55%;  background: #a78bfa; animation-delay: 0.6s; width: 1px; height: 1px; }
+.gs-7 { bottom: 15%; right: 35%; background: #e9d5ff; animation-delay: 1.0s; }
+.gs-8 { top: 50%; right: 8%;  background: #c4b5fd; animation-delay: 1.4s; width: 1px; height: 1px; }
+
+@keyframes starTwinkle {
+  0%   { opacity: 0.15; }
+  50%  { opacity: 1; box-shadow: 0 0 4px rgba(167, 139, 250, 0.7); }
+  100% { opacity: 0.3; }
+}
+
+/* ── SPLASH TEXT (menu style) ── */
+#mapsel-challenge-splash {
+  position: absolute;
+  top: 8%;
+  right: 2%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--c-accent);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  z-index: 21;
+  pointer-events: none;
+  opacity: 0;
+  text-align: right;
+  line-height: 1.8;
+  max-width: 140px;
+  white-space: pre-line;
+}
+
+#mapsel-challenge-splash.visible {
+  opacity: 1;
+  animation: splashIn 0.3s ease-out both,
+             splashWobble 2s ease-in-out infinite alternate;
+}
+
+@keyframes mapselSplashIn {
+  0%   { opacity: 0; transform: rotate(-8deg) scale(0.8); }
+  100% { opacity: 1; transform: rotate(-4deg) scale(1); }
+}
+
+@keyframes mapselSplashWobble {
+  0%   { transform: rotate(-4deg) scale(1); }
+  100% { transform: rotate(-2deg) scale(1.05); }
+}
 
 /* === css/screens/map-complete.css === */
 /* ═══════════════════════════════════════

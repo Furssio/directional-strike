@@ -17782,6 +17782,43 @@ function _bindCarouselButtons() {
       onMapSelected(map.id);
     }
   };
+
+  // challenge mode button
+  const chalBtn = document.getElementById('btn-mapsel-challenge');
+  if (chalBtn) {
+    // click → go to challenge screen
+    chalBtn.onclick = () => {
+      if (Transition.isPlaying()) return;
+      if (typeof DemoMode !== 'undefined') DemoMode.stop();
+      Transition.play('fast', () => {
+        if (typeof buildChallengeScreen === 'function') {
+          buildChallengeScreen();
+          showScreen(sChallenge);
+        } else {
+          showScreen(sMenu);
+        }
+      });
+    };
+
+    // challenge splash on hover (menu style)
+    const splash = document.getElementById('mapsel-challenge-splash');
+    const splashTexts = [
+      'No mercy.\nNo checkpoints.',
+      'Endless chaos\nawaits...',
+      'Think you are\nready? 💀',
+      'How far can\nyou survive?',
+    ];
+    if (splash) {
+      chalBtn.addEventListener('mouseenter', () => {
+        const txt = splashTexts[Math.floor(Math.random() * splashTexts.length)];
+        splash.textContent = txt;
+        splash.classList.add('visible');
+      });
+      chalBtn.addEventListener('mouseleave', () => {
+        splash.classList.remove('visible');
+      });
+    }
+  }
 }
 
 function _shiftCarousel(dir) {

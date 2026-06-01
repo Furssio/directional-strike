@@ -25,7 +25,12 @@ function _setProgress(pct, label) {
   if (_loadText && label) _loadText.textContent = label;
 }
 
-/* ── TIMING HELPER (shows on screen) ── */
+/* ── BOOT TIMING DEBUG ──
+   Uncomment the block below to show on-screen
+   timing breakdown for diagnosing slow loading.
+   Shows a green debug box at the bottom of the
+   screen with ms per boot phase. Auto-hides
+   after 10 seconds.
 
 const _bootTimers = {};
 let _debugDiv = null;
@@ -34,7 +39,6 @@ function _mark(label) {
   const now = performance.now();
   _bootTimers[label] = now;
 
-  // create debug div on first call
   if (!_debugDiv) {
     _debugDiv = document.createElement('div');
     _debugDiv.style.cssText =
@@ -45,7 +49,6 @@ function _mark(label) {
     document.body.appendChild(_debugDiv);
   }
 
-  // show elapsed since previous mark
   const keys = Object.keys(_bootTimers);
   if (keys.length > 1) {
     const prev = _bootTimers[keys[keys.length - 2]];
@@ -55,6 +58,7 @@ function _mark(label) {
     _debugDiv.innerHTML += label + ': ' + Math.round(now) + 'ms<br>';
   }
 }
+── END BOOT TIMING DEBUG ── */
 
 /* ── LOAD HTML PARTIALS (0% → 30%) — PARALLEL ── */
 
@@ -102,8 +106,6 @@ function _loadScript(src) {
 /* ── BOOT SEQUENCE ── */
 
 async function _boot() {
-  _mark('BOOT START');
-
   // tell CrazyGames we're loading
   if (window.CrazyGames && window.CrazyGames.SDK) {
     try { window.CrazyGames.SDK.game.loadingStart(); }
@@ -113,43 +115,30 @@ async function _boot() {
   // Phase 1: load HTML partials (0% → 30%)
   _setProgress(0, 'LOADING');
   await _loadHTMLPartials();
-  _mark('HTML DONE');
 
   // Phase 2: load game bundle (30% → 80%)
   _setProgress(30, 'LOADING');
   await _loadScript('js/game.bundle.js');
-  _mark('JS BUNDLE DONE');
   _setProgress(80, 'LOADING');
 
   // init pause bindings now that DOM + code are ready
   if (typeof _initPauseBindings === 'function') _initPauseBindings();
 
- // Phase 3: init CrazyGames SDK (80% → 90%) — with timeout
+  // Phase 3: init CrazyGames SDK (80% → 90%) — with 2s timeout
   if (typeof CrazySDKWrapper !== 'undefined') {
     await Promise.race([
       CrazySDKWrapper.init(),
       new Promise(resolve => setTimeout(resolve, 2000))
     ]);
   }
-  _mark('SDK DONE');
   _setProgress(90, 'LOADING');
 
   // Phase 4: init UI bindings (90% → 100%)
   if (typeof UiBind !== 'undefined') UiBind.init();
-  _mark('UIBIND DONE');
   _setProgress(100, 'READY');
 
   // Phase 5: boot complete — show game
   _showGame();
-  _mark('BOOT COMPLETE');
-
-  // show total
-  const keys = Object.keys(_bootTimers);
-  const total = Math.round(_bootTimers[keys[keys.length-1]] - _bootTimers[keys[0]]);
-  if (_debugDiv) _debugDiv.innerHTML += '<br><b>TOTAL: ' + total + 'ms</b>';
-
-  // auto-hide debug after 10 seconds
-  setTimeout(() => { if (_debugDiv) _debugDiv.style.display = 'none'; }, 10000);
 }
 
 /* ── SHOW GAME + HIDE LOADING ── */
