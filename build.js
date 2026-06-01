@@ -160,29 +160,8 @@ function bundleCSS() {
   for (const f of CSS_FILES) {
     const fp = path.join(__dirname, f);
     if (fs.existsSync(fp)) {
-      let css = fs.readFileSync(fp, 'utf8');
-
-      // Fix relative paths: css/screens/menu.css references ../assets
-      // In bundle at css/game.bundle.css, paths need adjusting
-      const dir = path.dirname(f); // e.g. 'css/screens' or 'css'
-      const bundleDir = path.dirname(CSS_OUTPUT); // 'css'
-      const relDepth = path.relative(bundleDir, dir); // e.g. 'screens' or ''
-
-      if (relDepth) {
-        // Rewrite url('../ to url(' + correct relative path
-        // From css/screens/file.css: url('../assets/') → from css/: url('../assets/') stays same
-        // From css/screens/file.css: url('../../x') → need to adjust
-        // Actually: all CSS files use paths relative to THEIR location.
-        // Bundle is in css/, so we need to fix paths from subdirs.
-        // css/screens/menu.css has url('../assets/') which means -> assets/ from root
-        // css/game.bundle.css needs url('../assets/') too -> same!
-        // css/abilities/bullet-time.css has url('../assets/') -> assets/ from root
-        // css/game.bundle.css needs url('../assets/') -> same!
-        // So actually no rewriting needed IF all subdirs are 1 level deep under css/
-      }
-
       bundle += `/* === ${f} === */\n`;
-      bundle += css;
+      bundle += fs.readFileSync(fp, 'utf8');
       bundle += '\n\n';
       count++;
     } else {
