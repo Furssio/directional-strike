@@ -260,8 +260,8 @@ function endGame() {
         showPct: true,
         isCompleted: false,
       });
-      setTimeout(() => {
-        ProgressBar.animateTo(wave, {
+     setTimeout(() => {
+        ProgressBar.animateTo(wave - 1, {
           stepDelay: 120,
           onStep: (idx, total) => SFX.progressTick(idx, total),
         });

@@ -68,7 +68,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: true,
+ debug: false,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -8968,8 +8968,8 @@ function endGame() {
         showPct: true,
         isCompleted: false,
       });
-      setTimeout(() => {
-        ProgressBar.animateTo(wave, {
+     setTimeout(() => {
+        ProgressBar.animateTo(wave - 1, {
           stepDelay: 120,
           onStep: (idx, total) => SFX.progressTick(idx, total),
         });
@@ -11759,7 +11759,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = true;
+const DEV_CHEATS = false;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;
