@@ -96,7 +96,8 @@ const SFX = {
   mapDimExplode:    () => SfxUi.mapDimExplode(),
   mapDimReveal:     () => SfxUi.mapDimReveal(),
   tutorialAlert: () => SfxUi.tutorialAlert(),
-  stampSlam:     () => SfxUi.stampSlam(),
+    stampSlam:     () => SfxUi.stampSlam(),
+  progressTick:  (i, t) => SfxUi.progressTick(i, t),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),

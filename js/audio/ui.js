@@ -400,6 +400,19 @@ const SfxUi = (() => {
       td(80, { type: 'sine', freq: 600, freq2: 450, duration: 0.18,
           attack: 0.005, decay: 0.05, sustain: 0.2, release: 0.08, gain: 0.15 });
     },
+
+    /* ── PROGRESS TICK: ascending chime per segment ── */
+    progressTick(index, total) {
+      const progress = total > 1 ? index / (total - 1) : 1;
+      const freq = 300 + progress * 500;  // 300Hz → 800Hz
+      const rnd = 1 + (Math.random() - 0.5) * 0.04;
+      t({ type: 'sine', freq: freq * rnd, freq2: freq * 1.08, duration: 0.08,
+          attack: 0.003, decay: 0.025, sustain: 0.3, release: 0.03, gain: 0.18 });
+      // soft harmonic overtone
+      t({ type: 'sine', freq: freq * 2 * rnd, duration: 0.05,
+          attack: 0.004, decay: 0.02, sustain: 0.15, release: 0.02, gain: 0.06 });
+    },
+
   };
 
 })();

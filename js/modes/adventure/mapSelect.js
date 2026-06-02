@@ -16,14 +16,6 @@ let _pendingStampMap = null;
 
 const BOSS_MAP_IDS = ['map04_temple', 'map08_storm', 'map11_dragon', 'map13_dark'];
 
-const WAVE_COLORS = [
-  '#4ade80', '#4ade80',   // wave 1-2: green
-  '#a3e635', '#a3e635',   // wave 3-4: lime
-  '#fbbf24', '#fbbf24',   // wave 5-6: yellow
-  '#f97316', '#f97316',   // wave 7-8: orange
-  '#ef4444', '#ef4444',   // wave 9-10: red
-  '#a855f7',              // wave 11: purple
-];
 
 const DISPLAY_ORDER = [
   'map01_forest', 'map02_dungeon', 'map03_desert',
@@ -284,18 +276,43 @@ function _renderCarousel() {
 
 /* ── STAMP SLAM + AUTO-SCROLL ── */
 function _playStampAndScroll(mapId) {
-  // find the stamp element on the center slide
-  const stamp = document.querySelector('.map-slide.pos-center .slide-stamp.stamp-pending');
- if (stamp) {
-    stamp.classList.remove('stamp-pending');
-    stamp.classList.add('stamp-slam');
-    SFX.stampSlam();
+  const map = _carouselMaps[_carouselIndex];
+  if (!map) return;
+
+  // animate bar to 100% first, then stamp slam
+  const totalWaves = map.totalWaves || 11;
+  const container  = document.getElementById('map-progress-bar');
+
+  if (container && Progress.isMapCompleted(map.id)) {
+    // render bar empty first, then animate to full
+    ProgressBar.render(container, 0, totalWaves, {
+      showLabels: true,
+      showPct: true,
+      isCompleted: false,
+    });
+
+   ProgressBar.complete({
+      onStep: (idx, total) => SFX.progressTick(idx, total),
+    }, () => {
+      // bar filled — now slam the stamp
+      _doStampSlam();
+    });
+  } else {
+    // no completion animation, just stamp
+    _doStampSlam();
   }
 
-  // after slam animation, auto-scroll to next uncompleted
-  setTimeout(() => {
-    _autoScrollToNext();
-  }, 1400);
+  function _doStampSlam() {
+    const stamp = document.querySelector('.map-slide.pos-center .slide-stamp.stamp-pending');
+    if (stamp) {
+      stamp.classList.remove('stamp-pending');
+      stamp.classList.add('stamp-slam');
+      SFX.stampSlam();
+    }
+    setTimeout(() => {
+      _autoScrollToNext();
+    }, 1400);
+  }
 }
 
 function _autoScrollToNext() {
@@ -454,11 +471,11 @@ const ENEMY_HINTS = {
   wolf:          'Leaps back, charges again faster',
 };
 
+
 /* ── WAVE PROGRESS BAR ── */
 function _renderProgressBar(map) {
   const container = document.getElementById('map-progress-bar');
   if (!container) return;
-  container.innerHTML = '';
 
   if (_isBossMap(map.id)) {
     container.style.display = 'none';
@@ -466,45 +483,16 @@ function _renderProgressBar(map) {
   }
   container.style.display = 'flex';
 
-  const totalWaves = map.totalWaves || 11;
+  const totalWaves  = map.totalWaves || 11;
   const isCompleted = Progress.isMapCompleted(map.id);
-  const bestWave = isCompleted ? totalWaves : Progress.getBestWave(map.id);
-  const pct = totalWaves > 0 ? Math.round((bestWave / totalWaves) * 100) : 0;
+  let bestWave = isCompleted ? totalWaves : Progress.getBestWave(map.id);
+  if (!isCompleted && bestWave >= totalWaves) bestWave = totalWaves - 1;
 
-  // labels row: wave numbers + percentage
-  const labels = document.createElement('div');
-  labels.className = 'progress-labels';
-  for (let i = 0; i < totalWaves; i++) {
-    const lbl = document.createElement('div');
-    lbl.className = 'progress-label' + (i < bestWave ? ' filled' : '');
-    lbl.textContent = i + 1;
-    labels.appendChild(lbl);
-  }
-  const pctEl = document.createElement('div');
-  pctEl.className = 'progress-pct' + (isCompleted ? ' complete' : '');
-  pctEl.textContent = pct + '%';
-  labels.appendChild(pctEl);
-
-  // track
-  const track = document.createElement('div');
-  track.className = 'progress-track' + (isCompleted ? ' complete' : '');
-
-  for (let i = 0; i < totalWaves; i++) {
-    const seg = document.createElement('div');
-    seg.className = 'progress-segment';
-    if (i < bestWave) {
-      seg.classList.add('filled');
-      const col = WAVE_COLORS[i] || '#a855f7';
-      seg.style.background = col;
-      seg.style.boxShadow = '0 0 4px ' + col + '88';
-    } else {
-      seg.classList.add('empty');
-    }
-    track.appendChild(seg);
-  }
-
-  container.appendChild(labels);
-  container.appendChild(track);
+  ProgressBar.render(container, bestWave, totalWaves, {
+    showLabels: true,
+    showPct: true,
+    isCompleted: isCompleted,
+  });
 }
 
 function _renderEnemyCard(map) {

@@ -13,7 +13,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: false,
+ debug: true,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities

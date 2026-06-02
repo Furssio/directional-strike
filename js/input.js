@@ -395,7 +395,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = false;
+const DEV_CHEATS = true;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;

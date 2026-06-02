@@ -9,6 +9,51 @@
                audio.js, Player.js
    ═══════════════════════════════════════ */
 
+
+   /* ── MOCKING MESSAGES — game over taunts ── */
+const MOCK_MESSAGES = {
+  early: [
+    "My grandma lasted longer",
+    "Premature elimination",
+    "That was quick...",
+  ],
+  mid: [
+    "Performance issues?",
+    "Size doesn't matter. Skill does.",
+  ],
+  late: [
+    "Going deep... not deep enough",
+    "Don't stop now... oh wait",
+  ],
+  almost: [
+    "Almost legendary. Almost.",
+    "Victory was RIGHT THERE",
+  ],
+};
+
+const MOCK_COLORS = {
+  early:  '#ef4444',
+  mid:    '#f97316',
+  late:   '#fbbf24',
+  almost: '#a855f7',
+};
+
+function _getMockTier(wave) {
+  if (wave <= 2) return 'early';
+  if (wave <= 5) return 'mid';
+  if (wave <= 8) return 'late';
+  return 'almost';
+}
+
+function _getRandomMock(wave) {
+  const tier = _getMockTier(wave);
+  const pool = MOCK_MESSAGES[tier];
+  return {
+    text:  pool[Math.floor(Math.random() * pool.length)],
+    color: MOCK_COLORS[tier],
+  };
+}
+
 /* ── ABILITY CLEANUP ──
    Removes all ability visual effects and stops audio.
    Called on startGame, endGame, and exit to menu. */
@@ -135,7 +180,7 @@ function endGame() {
   try { localStorage.setItem('ds_first_play_done', '1'); }
   catch (e) { /* silent */ }
 
-running = false;
+  running = false;
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
 
   clearInterval(gameLoop);
@@ -145,47 +190,86 @@ running = false;
                       ActiveDirector === ChallengeDirector;
 
   // ── AD CONTINUE BUTTON ──
-  // Build BEFORE onGameOver so canContinue()
-  // compares current wave vs OLD best, not the
-  // just-updated best
   _buildAdContinueButton();
 
-// challenge: save best wave AFTER ad button check
+  // challenge: save best wave AFTER ad button check
   if (isChallenge && typeof ChallengeDirector.onGameOver === 'function') {
     ChallengeDirector.onGameOver();
-    // submit to CrazyGames leaderboard
     if (typeof CrazySDKWrapper !== 'undefined') {
       CrazySDKWrapper.submitScore(ChallengeDirector.getWave());
     }
-  };
+  }
+
+  // grab new elements
+  const mockEl  = document.getElementById('over-mocking');
+  const progEl  = document.getElementById('over-progress');
+  const killsEl = document.getElementById('over-kills');
 
   if (isChallenge) {
-    // ── CHALLENGE MODE: display waves, not score ──
+    // ── CHALLENGE MODE ──
     const wave     = ChallengeDirector.getWave();
     const bestWave = ChallengeDirector.getBestWave();
     const isNew    = wave > bestWave;
 
     document.getElementById('over-score-label').textContent = 'WAVE';
     finalScoreEl.textContent = wave;
-    finalLevelEl.textContent = player.kills + ' KILLS';
-    bestLabel.textContent    = isNew
+    finalLevelEl.textContent = '';
+    if (killsEl) killsEl.textContent = player.kills + ' KILLS';
+    bestLabel.textContent = isNew
       ? 'NEW RECORD!'
       : 'BEST: WAVE ' + bestWave;
+
+    // hide adventure-only elements
+    if (mockEl) mockEl.textContent = '';
+    if (progEl) progEl.innerHTML = '';
+
   } else {
-    // ── ADVENTURE MODE: display score in points ──
+    // ── ADVENTURE MODE ──
     const best  = getBestScore();
     const isNew = player.score > best;
     if (isNew) saveBestScore(player.score);
 
+    const wave = ActiveDirector.getWave();
+    let totalWaves = 11;
+    const map = AdventureDirector.getCurrentMap();
+    if (map && map.totalWaves) totalWaves = map.totalWaves;
+
     document.getElementById('over-score-label').textContent = 'SCORE';
     finalScoreEl.textContent = player.score.toLocaleString();
-    finalLevelEl.textContent = 'WAVE ' + ActiveDirector.getWave() + ' · ' + player.kills + ' KILLS';
-    bestLabel.textContent    = isNew
+    finalLevelEl.textContent = 'WAVE ' + wave + '/' + totalWaves;
+    if (killsEl) killsEl.textContent = player.kills + ' KILLS';
+    bestLabel.textContent = isNew
       ? 'NEW RECORD!'
       : 'BEST: ' + Math.max(best, player.score).toLocaleString();
+
+    // ── MOCKING MESSAGE ──
+    if (mockEl) {
+      const mock = _getRandomMock(wave);
+      mockEl.textContent = mock.text;
+      mockEl.style.color = mock.color;
+      mockEl.style.textShadow = '0 0 12px ' + mock.color + '88, 1px 1px 0 rgba(0,0,0,0.8)';
+      mockEl.classList.remove('mock-animate');
+      void mockEl.offsetWidth;
+      mockEl.classList.add('mock-animate');
+    }
+
+   // ── PROGRESS BAR (animate from 0 to death wave) ──
+    if (progEl && typeof ProgressBar !== 'undefined') {
+      ProgressBar.render(progEl, 0, totalWaves, {
+        showLabels: true,
+        showPct: true,
+        isCompleted: false,
+      });
+      setTimeout(() => {
+        ProgressBar.animateTo(wave, {
+          stepDelay: 120,
+          onStep: (idx, total) => SFX.progressTick(idx, total),
+        });
+      }, 400);
+    }
   }
 
-   updateMenuBest();
+  updateMenuBest();
 
   // show game over overlay
   overOverlay.classList.remove('hidden');

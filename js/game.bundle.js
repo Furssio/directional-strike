@@ -68,7 +68,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: false,
+ debug: true,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -5602,6 +5602,19 @@ const SfxUi = (() => {
       td(80, { type: 'sine', freq: 600, freq2: 450, duration: 0.18,
           attack: 0.005, decay: 0.05, sustain: 0.2, release: 0.08, gain: 0.15 });
     },
+
+    /* ── PROGRESS TICK: ascending chime per segment ── */
+    progressTick(index, total) {
+      const progress = total > 1 ? index / (total - 1) : 1;
+      const freq = 300 + progress * 500;  // 300Hz → 800Hz
+      const rnd = 1 + (Math.random() - 0.5) * 0.04;
+      t({ type: 'sine', freq: freq * rnd, freq2: freq * 1.08, duration: 0.08,
+          attack: 0.003, decay: 0.025, sustain: 0.3, release: 0.03, gain: 0.18 });
+      // soft harmonic overtone
+      t({ type: 'sine', freq: freq * 2 * rnd, duration: 0.05,
+          attack: 0.004, decay: 0.02, sustain: 0.15, release: 0.02, gain: 0.06 });
+    },
+
   };
 
 })();
@@ -5917,7 +5930,8 @@ const SFX = {
   mapDimExplode:    () => SfxUi.mapDimExplode(),
   mapDimReveal:     () => SfxUi.mapDimReveal(),
   tutorialAlert: () => SfxUi.tutorialAlert(),
-  stampSlam:     () => SfxUi.stampSlam(),
+    stampSlam:     () => SfxUi.stampSlam(),
+  progressTick:  (i, t) => SfxUi.progressTick(i, t),
 
   /* ── MUSIC ── */
   playMusic:    (path, opts) => Music.play(path, opts),
@@ -7793,6 +7807,182 @@ const SlotReels = (() => {
 
 })();
 
+/* === js/ui/progressBar.js === */
+/* ═══════════════════════════════════════
+   PROGRESSBAR.JS
+   Reusable wave progress bar component.
+   Renders a segmented bar with wave colors,
+   labels, and percentage. Supports static
+   render and animated fill.
+
+   Used by: mapSelect.js, screens.js
+   Depends on: (none — pure UI component)
+   ═══════════════════════════════════════ */
+
+const ProgressBar = (() => {
+
+  const WAVE_COLORS = [
+    '#4ade80', '#4ade80',   // wave 1-2: green
+    '#a3e635', '#a3e635',   // wave 3-4: lime
+    '#fbbf24', '#fbbf24',   // wave 5-6: yellow
+    '#f97316', '#f97316',   // wave 7-8: orange
+    '#ef4444', '#ef4444',   // wave 9-10: red
+    '#a855f7',              // wave 11: purple
+  ];
+
+  // internal state
+  let _container  = null;
+  let _totalWaves = 0;
+  let _filled     = 0;
+  let _segments   = [];
+  let _labels     = [];
+  let _pctEl      = null;
+  let _trackEl    = null;
+  let _animTimer  = null;
+
+  /* ── RENDER — build bar from scratch ── */
+  function render(container, filledWaves, totalWaves, opts) {
+    opts = opts || {};
+    reset();
+
+    _container  = container;
+    _totalWaves = totalWaves;
+    _filled     = filledWaves;
+    container.innerHTML = '';
+
+    const showLabels  = opts.showLabels !== false;
+    const showPct     = opts.showPct !== false;
+    const isCompleted = opts.isCompleted || false;
+    const pct = totalWaves > 0
+      ? Math.round((filledWaves / totalWaves) * 100) : 0;
+
+    // labels row: wave numbers + percentage
+    const labelsRow = document.createElement('div');
+    labelsRow.className = 'progress-labels';
+
+    if (showLabels) {
+      for (let i = 0; i < totalWaves; i++) {
+        const lbl = document.createElement('div');
+        lbl.className = 'progress-label' + (i < filledWaves ? ' filled' : '');
+        lbl.textContent = i + 1;
+        labelsRow.appendChild(lbl);
+        _labels.push(lbl);
+      }
+    }
+
+    if (showPct) {
+      _pctEl = document.createElement('div');
+      _pctEl.className = 'progress-pct' + (isCompleted ? ' complete' : '');
+      _pctEl.textContent = pct + '%';
+      labelsRow.appendChild(_pctEl);
+    }
+
+    container.appendChild(labelsRow);
+
+    // track with segments
+    _trackEl = document.createElement('div');
+    _trackEl.className = 'progress-track' + (isCompleted ? ' complete' : '');
+
+    for (let i = 0; i < totalWaves; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'progress-segment';
+      if (i < filledWaves) {
+        _applyFill(seg, i);
+      } else {
+        seg.classList.add('empty');
+      }
+      _trackEl.appendChild(seg);
+      _segments.push(seg);
+    }
+
+    container.appendChild(_trackEl);
+  }
+
+  /* ── FILL single segment visually ── */
+  function _applyFill(seg, index) {
+    seg.classList.remove('empty');
+    seg.classList.add('filled');
+    const col = WAVE_COLORS[index] || '#a855f7';
+    seg.style.background = col;
+    seg.style.boxShadow  = '0 0 4px ' + col + '88';
+  }
+
+  /* ── UPDATE pct + label for a newly filled index ── */
+  function _updateAfterFill(index) {
+    if (_labels[index]) _labels[index].classList.add('filled');
+    _filled = index + 1;
+    if (_pctEl) {
+      const pct = Math.round((_filled / _totalWaves) * 100);
+      _pctEl.textContent = pct + '%';
+    }
+  }
+
+  /* ── ANIMATE TO — fill wave by wave with delay ── */
+  function animateTo(targetWave, opts, callback) {
+    opts = opts || {};
+    const delay = opts.stepDelay || 160;
+    const onStep = opts.onStep || null;
+    const startFrom = _filled;
+
+    if (targetWave <= startFrom) {
+      if (callback) callback();
+      return;
+    }
+
+    let current = startFrom;
+    _animTimer = setInterval(() => {
+      _applyFill(_segments[current], current);
+      _updateAfterFill(current);
+      if (onStep) onStep(current, targetWave);
+      current++;
+      if (current >= targetWave) {
+        clearInterval(_animTimer);
+        _animTimer = null;
+        if (callback) callback();
+      }
+    }, delay);
+  }
+
+  /* ── COMPLETE — fill all + add glow ── */
+  function complete(opts, callback) {
+    // backward compat: complete(callback) still works
+    if (typeof opts === 'function') {
+      callback = opts;
+      opts = {};
+    }
+    opts = opts || {};
+    const stepDelay = opts.stepDelay || 100;
+    const onStep = opts.onStep || null;
+
+    animateTo(_totalWaves, { stepDelay: stepDelay, onStep: onStep }, () => {
+      if (_trackEl) _trackEl.classList.add('complete');
+      if (_pctEl) {
+        _pctEl.classList.add('complete');
+        _pctEl.textContent = '100%';
+      }
+      if (callback) callback();
+    });
+  }
+
+  /* ── RESET — clean everything ── */
+  function reset() {
+    if (_animTimer) {
+      clearInterval(_animTimer);
+      _animTimer = null;
+    }
+    if (_container) _container.innerHTML = '';
+    _container  = null;
+    _segments   = [];
+    _labels     = [];
+    _pctEl      = null;
+    _trackEl    = null;
+    _totalWaves = 0;
+    _filled     = 0;
+  }
+
+  return { render, animateTo, complete, reset };
+})();
+
 /* === js/systems/juice.js === */
 /* ═══════════════════════════════════════
    JUICE.JS
@@ -8527,6 +8717,51 @@ function getAdjacentDirs(dir) {
                audio.js, Player.js
    ═══════════════════════════════════════ */
 
+
+   /* ── MOCKING MESSAGES — game over taunts ── */
+const MOCK_MESSAGES = {
+  early: [
+    "My grandma lasted longer",
+    "Premature elimination",
+    "That was quick...",
+  ],
+  mid: [
+    "Performance issues?",
+    "Size doesn't matter. Skill does.",
+  ],
+  late: [
+    "Going deep... not deep enough",
+    "Don't stop now... oh wait",
+  ],
+  almost: [
+    "Almost legendary. Almost.",
+    "Victory was RIGHT THERE",
+  ],
+};
+
+const MOCK_COLORS = {
+  early:  '#ef4444',
+  mid:    '#f97316',
+  late:   '#fbbf24',
+  almost: '#a855f7',
+};
+
+function _getMockTier(wave) {
+  if (wave <= 2) return 'early';
+  if (wave <= 5) return 'mid';
+  if (wave <= 8) return 'late';
+  return 'almost';
+}
+
+function _getRandomMock(wave) {
+  const tier = _getMockTier(wave);
+  const pool = MOCK_MESSAGES[tier];
+  return {
+    text:  pool[Math.floor(Math.random() * pool.length)],
+    color: MOCK_COLORS[tier],
+  };
+}
+
 /* ── ABILITY CLEANUP ──
    Removes all ability visual effects and stops audio.
    Called on startGame, endGame, and exit to menu. */
@@ -8653,7 +8888,7 @@ function endGame() {
   try { localStorage.setItem('ds_first_play_done', '1'); }
   catch (e) { /* silent */ }
 
-running = false;
+  running = false;
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStop();
 
   clearInterval(gameLoop);
@@ -8663,47 +8898,86 @@ running = false;
                       ActiveDirector === ChallengeDirector;
 
   // ── AD CONTINUE BUTTON ──
-  // Build BEFORE onGameOver so canContinue()
-  // compares current wave vs OLD best, not the
-  // just-updated best
   _buildAdContinueButton();
 
-// challenge: save best wave AFTER ad button check
+  // challenge: save best wave AFTER ad button check
   if (isChallenge && typeof ChallengeDirector.onGameOver === 'function') {
     ChallengeDirector.onGameOver();
-    // submit to CrazyGames leaderboard
     if (typeof CrazySDKWrapper !== 'undefined') {
       CrazySDKWrapper.submitScore(ChallengeDirector.getWave());
     }
-  };
+  }
+
+  // grab new elements
+  const mockEl  = document.getElementById('over-mocking');
+  const progEl  = document.getElementById('over-progress');
+  const killsEl = document.getElementById('over-kills');
 
   if (isChallenge) {
-    // ── CHALLENGE MODE: display waves, not score ──
+    // ── CHALLENGE MODE ──
     const wave     = ChallengeDirector.getWave();
     const bestWave = ChallengeDirector.getBestWave();
     const isNew    = wave > bestWave;
 
     document.getElementById('over-score-label').textContent = 'WAVE';
     finalScoreEl.textContent = wave;
-    finalLevelEl.textContent = player.kills + ' KILLS';
-    bestLabel.textContent    = isNew
+    finalLevelEl.textContent = '';
+    if (killsEl) killsEl.textContent = player.kills + ' KILLS';
+    bestLabel.textContent = isNew
       ? 'NEW RECORD!'
       : 'BEST: WAVE ' + bestWave;
+
+    // hide adventure-only elements
+    if (mockEl) mockEl.textContent = '';
+    if (progEl) progEl.innerHTML = '';
+
   } else {
-    // ── ADVENTURE MODE: display score in points ──
+    // ── ADVENTURE MODE ──
     const best  = getBestScore();
     const isNew = player.score > best;
     if (isNew) saveBestScore(player.score);
 
+    const wave = ActiveDirector.getWave();
+    let totalWaves = 11;
+    const map = AdventureDirector.getCurrentMap();
+    if (map && map.totalWaves) totalWaves = map.totalWaves;
+
     document.getElementById('over-score-label').textContent = 'SCORE';
     finalScoreEl.textContent = player.score.toLocaleString();
-    finalLevelEl.textContent = 'WAVE ' + ActiveDirector.getWave() + ' · ' + player.kills + ' KILLS';
-    bestLabel.textContent    = isNew
+    finalLevelEl.textContent = 'WAVE ' + wave + '/' + totalWaves;
+    if (killsEl) killsEl.textContent = player.kills + ' KILLS';
+    bestLabel.textContent = isNew
       ? 'NEW RECORD!'
       : 'BEST: ' + Math.max(best, player.score).toLocaleString();
+
+    // ── MOCKING MESSAGE ──
+    if (mockEl) {
+      const mock = _getRandomMock(wave);
+      mockEl.textContent = mock.text;
+      mockEl.style.color = mock.color;
+      mockEl.style.textShadow = '0 0 12px ' + mock.color + '88, 1px 1px 0 rgba(0,0,0,0.8)';
+      mockEl.classList.remove('mock-animate');
+      void mockEl.offsetWidth;
+      mockEl.classList.add('mock-animate');
+    }
+
+   // ── PROGRESS BAR (animate from 0 to death wave) ──
+    if (progEl && typeof ProgressBar !== 'undefined') {
+      ProgressBar.render(progEl, 0, totalWaves, {
+        showLabels: true,
+        showPct: true,
+        isCompleted: false,
+      });
+      setTimeout(() => {
+        ProgressBar.animateTo(wave, {
+          stepDelay: 120,
+          onStep: (idx, total) => SFX.progressTick(idx, total),
+        });
+      }, 400);
+    }
   }
 
-   updateMenuBest();
+  updateMenuBest();
 
   // show game over overlay
   overOverlay.classList.remove('hidden');
@@ -11485,7 +11759,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = false;
+const DEV_CHEATS = true;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;
@@ -17482,14 +17756,6 @@ let _pendingStampMap = null;
 
 const BOSS_MAP_IDS = ['map04_temple', 'map08_storm', 'map11_dragon', 'map13_dark'];
 
-const WAVE_COLORS = [
-  '#4ade80', '#4ade80',   // wave 1-2: green
-  '#a3e635', '#a3e635',   // wave 3-4: lime
-  '#fbbf24', '#fbbf24',   // wave 5-6: yellow
-  '#f97316', '#f97316',   // wave 7-8: orange
-  '#ef4444', '#ef4444',   // wave 9-10: red
-  '#a855f7',              // wave 11: purple
-];
 
 const DISPLAY_ORDER = [
   'map01_forest', 'map02_dungeon', 'map03_desert',
@@ -17750,18 +18016,43 @@ function _renderCarousel() {
 
 /* ── STAMP SLAM + AUTO-SCROLL ── */
 function _playStampAndScroll(mapId) {
-  // find the stamp element on the center slide
-  const stamp = document.querySelector('.map-slide.pos-center .slide-stamp.stamp-pending');
- if (stamp) {
-    stamp.classList.remove('stamp-pending');
-    stamp.classList.add('stamp-slam');
-    SFX.stampSlam();
+  const map = _carouselMaps[_carouselIndex];
+  if (!map) return;
+
+  // animate bar to 100% first, then stamp slam
+  const totalWaves = map.totalWaves || 11;
+  const container  = document.getElementById('map-progress-bar');
+
+  if (container && Progress.isMapCompleted(map.id)) {
+    // render bar empty first, then animate to full
+    ProgressBar.render(container, 0, totalWaves, {
+      showLabels: true,
+      showPct: true,
+      isCompleted: false,
+    });
+
+   ProgressBar.complete({
+      onStep: (idx, total) => SFX.progressTick(idx, total),
+    }, () => {
+      // bar filled — now slam the stamp
+      _doStampSlam();
+    });
+  } else {
+    // no completion animation, just stamp
+    _doStampSlam();
   }
 
-  // after slam animation, auto-scroll to next uncompleted
-  setTimeout(() => {
-    _autoScrollToNext();
-  }, 1400);
+  function _doStampSlam() {
+    const stamp = document.querySelector('.map-slide.pos-center .slide-stamp.stamp-pending');
+    if (stamp) {
+      stamp.classList.remove('stamp-pending');
+      stamp.classList.add('stamp-slam');
+      SFX.stampSlam();
+    }
+    setTimeout(() => {
+      _autoScrollToNext();
+    }, 1400);
+  }
 }
 
 function _autoScrollToNext() {
@@ -17920,11 +18211,11 @@ const ENEMY_HINTS = {
   wolf:          'Leaps back, charges again faster',
 };
 
+
 /* ── WAVE PROGRESS BAR ── */
 function _renderProgressBar(map) {
   const container = document.getElementById('map-progress-bar');
   if (!container) return;
-  container.innerHTML = '';
 
   if (_isBossMap(map.id)) {
     container.style.display = 'none';
@@ -17932,45 +18223,16 @@ function _renderProgressBar(map) {
   }
   container.style.display = 'flex';
 
-  const totalWaves = map.totalWaves || 11;
+  const totalWaves  = map.totalWaves || 11;
   const isCompleted = Progress.isMapCompleted(map.id);
-  const bestWave = isCompleted ? totalWaves : Progress.getBestWave(map.id);
-  const pct = totalWaves > 0 ? Math.round((bestWave / totalWaves) * 100) : 0;
+  let bestWave = isCompleted ? totalWaves : Progress.getBestWave(map.id);
+  if (!isCompleted && bestWave >= totalWaves) bestWave = totalWaves - 1;
 
-  // labels row: wave numbers + percentage
-  const labels = document.createElement('div');
-  labels.className = 'progress-labels';
-  for (let i = 0; i < totalWaves; i++) {
-    const lbl = document.createElement('div');
-    lbl.className = 'progress-label' + (i < bestWave ? ' filled' : '');
-    lbl.textContent = i + 1;
-    labels.appendChild(lbl);
-  }
-  const pctEl = document.createElement('div');
-  pctEl.className = 'progress-pct' + (isCompleted ? ' complete' : '');
-  pctEl.textContent = pct + '%';
-  labels.appendChild(pctEl);
-
-  // track
-  const track = document.createElement('div');
-  track.className = 'progress-track' + (isCompleted ? ' complete' : '');
-
-  for (let i = 0; i < totalWaves; i++) {
-    const seg = document.createElement('div');
-    seg.className = 'progress-segment';
-    if (i < bestWave) {
-      seg.classList.add('filled');
-      const col = WAVE_COLORS[i] || '#a855f7';
-      seg.style.background = col;
-      seg.style.boxShadow = '0 0 4px ' + col + '88';
-    } else {
-      seg.classList.add('empty');
-    }
-    track.appendChild(seg);
-  }
-
-  container.appendChild(labels);
-  container.appendChild(track);
+  ProgressBar.render(container, bestWave, totalWaves, {
+    showLabels: true,
+    showPct: true,
+    isCompleted: isCompleted,
+  });
 }
 
 function _renderEnemyCard(map) {

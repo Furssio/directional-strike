@@ -43,6 +43,7 @@ const CSS_FILES = [
   'css/enemies/kitsune.css',
   'css/enemies/turtle.css',
   'css/enemies/eagle.css',
+  'css/progress-bar.css',
   'css/tutorial.css',
 ];
 
@@ -107,6 +108,7 @@ const FILES = [
   'js/ui/abilityScreen.js',
   'js/ui/slotMachine.js',
   'js/ui/slotReels.js',
+  'js/ui/progressBar.js',
   'js/systems/juice.js',
   'js/systems/spawn.js',
   'js/systems/combat.js',

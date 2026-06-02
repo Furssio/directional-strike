@@ -1,0 +1,87 @@
+/* ══════════════════════════════════════
+   PROGRESS BAR — reusable component
+   Wave progress bar with colored segments.
+   ══════════════════════════════════════ */
+
+.progress-labels {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  padding: 0 1px;
+}
+
+.progress-label {
+  flex: 1;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 4px;
+  color: rgba(255, 255, 255, 0.25);
+  line-height: 1;
+}
+
+.progress-label.filled {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.progress-pct {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: var(--c-text-dim);
+  text-align: right;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+  transition: color 0.4s;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  display: flex;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  padding: 1px;
+  image-rendering: pixelated;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+
+.progress-segment {
+  flex: 1;
+  border-radius: 1px;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.progress-segment.empty {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── complete state — full bar glow ── */
+.progress-track.complete {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow:
+    0 0 8px rgba(168, 85, 247, 0.3),
+    0 0 20px rgba(168, 85, 247, 0.12);
+  animation: progressGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes progressGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(168, 85, 247, 0.3),
+      0 0 20px rgba(168, 85, 247, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 12px rgba(168, 85, 247, 0.5),
+      0 0 28px rgba(168, 85, 247, 0.2);
+  }
+}
+
+.progress-pct.complete {
+  color: #a855f7;
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.8),
+    0 0 6px rgba(168, 85, 247, 0.4);
+}
