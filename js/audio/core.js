@@ -120,7 +120,6 @@ const AudioCore = (() => {
 
     if (CONFIG.audio.volume <= 0) {
       SfxAbilities.stopAll();
-      Music.stop();
     }
   }
 
@@ -245,6 +244,8 @@ const AudioCore = (() => {
       _paused:    false,
       _stopped:   false,
       _playing:   false,
+      _rate:      1.0,
+      onEnded:    null,
 
       get volume()  { return this._volume; },
       set volume(v) {
@@ -273,6 +274,18 @@ const AudioCore = (() => {
         if (this._source) this._source.loop = v;
       },
 
+      get playbackRate() { return this._rate; },
+      set playbackRate(r) {
+        this._rate = r;
+        if (this._source) {
+          try { this._source.playbackRate.value = r; } catch (e) {}
+        }
+      },
+
+      get duration() {
+        return this._buffer ? this._buffer.duration : 0;
+      },
+
       _start(buffer) {
         if (this._stopped) return;
         if (!ctx || ctx.state === 'closed') return;
@@ -285,6 +298,7 @@ const AudioCore = (() => {
         this._source = ctx.createBufferSource();
         this._source.buffer = buffer;
         this._source.loop   = this._loop;
+        this._source.playbackRate.value = this._rate;
         this._source.connect(this._gain);
 
         this._source.onended = () => {
@@ -293,6 +307,7 @@ const AudioCore = (() => {
             this._stopped = true;
             if (this._gain) { this._gain.disconnect(); this._gain = null; }
             this._source = null;
+            if (this.onEnded) this.onEnded();
           }
         };
 
@@ -349,8 +364,8 @@ const AudioCore = (() => {
   /* ═══════════════════════════════════
      playFile — PUBLIC API
      ═══════════════════════════════════ */
-  function playFile(path, { loop = false, volume = 1.0 } = {}) {
-    if (_isMuted()) return null;
+function playFile(path, { loop = false, volume = 1.0, force = false } = {}) {
+    if (!force && _isMuted()) return null;
     if (!_ensureCtx()) return null;
 
     const handle = _createHandle({ loop, volume });

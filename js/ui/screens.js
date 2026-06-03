@@ -12,7 +12,10 @@ function showScreen(s) {
   [sMenu, sGame, sAbility, sMapSelect, sChallenge].forEach(x => {
     if (x) x.style.display = 'none';
   });
-  s.style.display = 'block';
+ s.style.display = 'block';
+
+  // stop map music when entering game (playMap starts it in startGame)
+  if (s === sGame && typeof Music !== 'undefined') Music.stop();
 
   // always hide overlays when switching screens
   if (overOverlay) overOverlay.classList.add('hidden');
@@ -77,6 +80,9 @@ function showMapComplete(map, hasSlot) {
   // stop game loop
   running = false;
   clearInterval(gameLoop);
+
+  // fade out map music
+  if (typeof Music !== 'undefined') Music.fadeOut();
 
   // mark first play as done
   try { localStorage.setItem('ds_first_play_done', '1'); }

@@ -65,8 +65,12 @@ function resumeGame() {
 
 function _syncPauseVolume() {
   const slider = document.getElementById('pause-volume-slider');
-  if (!slider) return;
-  slider.value = Math.round(CONFIG.audio.volume * 100);
+  if (slider) slider.value = Math.round(CONFIG.audio.volume * 100);
+
+  const musicSlider = document.getElementById('pause-music-slider');
+  if (musicSlider && CONFIG.music) {
+    musicSlider.value = Math.round(CONFIG.music.volume * 100);
+  }
 }
 
 /* ── BUTTON BINDINGS ── */
@@ -135,14 +139,23 @@ function _initPauseBindings() {
     });
   });
 
-  // volume slider binding
+ // volume slider binding
   const volSlider = document.getElementById('pause-volume-slider');
   if (volSlider) {
     volSlider.addEventListener('input', (e) => {
       const vol = parseInt(e.target.value) / 100;
       CONFIG.audio.volume = vol;
-      if (typeof AudioCore !== 'undefined') AudioCore.vol(vol);
-      try { localStorage.setItem('ds_volume', vol); } catch(x) {}
+      if (typeof AudioCore !== 'undefined') AudioCore.setVolume(vol);
+      try { localStorage.setItem('ds_volume', vol.toFixed(2)); } catch(x) {}
+    });
+  }
+
+  // music volume slider binding
+  const musicSlider = document.getElementById('pause-music-slider');
+  if (musicSlider) {
+    musicSlider.addEventListener('input', (e) => {
+      const vol = parseInt(e.target.value) / 100;
+      if (typeof Music !== 'undefined') Music.setVolume(vol);
     });
   }
 }

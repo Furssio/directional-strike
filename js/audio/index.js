@@ -99,8 +99,8 @@ const SFX = {
     stampSlam:     () => SfxUi.stampSlam(),
   progressTick:  (i, t) => SfxUi.progressTick(i, t),
 
-  /* ── MUSIC ── */
-  playMusic:    (path, opts) => Music.play(path, opts),
+ /* ── MUSIC ── */
+  playMap:      (mapId) => Music.playMap(mapId),
   stopMusic:    () => Music.stop(),
   musicPlaying: () => Music.isPlaying(),
 

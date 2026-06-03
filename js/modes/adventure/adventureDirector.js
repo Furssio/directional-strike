@@ -571,11 +571,19 @@ Progress.saveBestWave(currentMap.id, 1);
     },
 
     /* ── START WAVE ───────────────────── */
-    _startWave(newWave) {
+   _startWave(newWave) {
       // save best wave reached
   if (currentMap) Progress.saveBestWave(currentMap.id, newWave);
 
   wave         = newWave;
+
+      // music speed ramp — increment every N waves
+      if (typeof Music !== 'undefined' && CONFIG.music && wave > 1) {
+        const every = CONFIG.music.speedEveryWaves || 2;
+        if ((wave - 1) % every === 0) {
+          Music.incrementRate(CONFIG.music.speedIncrement || 0.05);
+        }
+      }
       waveElapsed  = 0;
       spawnTimer   = 0;
       draining     = false;

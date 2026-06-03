@@ -154,6 +154,13 @@ function startGame(delayLoop) {
 
 showScreen(sGame);
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
+
+  // start map music (adventure mode)
+  if (typeof Music !== 'undefined' && typeof AdventureDirector !== 'undefined' &&
+      ActiveDirector === AdventureDirector) {
+    const _map = AdventureDirector.getCurrentMap();
+    if (_map) Music.playMap(_map.id);
+  }
   setTimeout(updateRangeCircle, 50);
 
   clearInterval(gameLoop);
@@ -175,6 +182,9 @@ function startGameLoop() {
 function endGame() {
   cleanupAbilityEffects();
   SFX.gameOver();
+
+  // fade out map music
+  if (typeof Music !== 'undefined') Music.fadeOut();
 
   // mark first play as done (for first-time direct play flow)
   try { localStorage.setItem('ds_first_play_done', '1'); }
@@ -341,6 +351,15 @@ function _executeContinue() {
 
   // re-activate game loop flag
   running = true;
+
+  // restore music after ad continue
+  if (typeof Music !== 'undefined') {
+    Music.cancelFade();
+    if (!Music.isPlaying() && typeof AdventureDirector !== 'undefined') {
+      const _cmap = AdventureDirector.getCurrentMap();
+      if (_cmap) Music.playMap(_cmap.id);
+    }
+  }
 
   // show countdown then start loop
   _showContinueCountdown(() => {

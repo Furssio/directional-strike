@@ -127,6 +127,42 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
     enabled: true,
     volume: (() => { try { return parseFloat(localStorage.getItem('ds_volume')) || 1.0; } catch(e) { return 1.0; } })(),
 },
+
+  /* ── MUSIC ──────────────────────────
+     Map music system.
+     volume:           independent music volume 0.0 → 1.0
+     fadeOutDuration:   ms for end-game/complete fade
+     speedIncrement:    playbackRate bump per step
+     speedEveryWaves:   increment rate every N waves
+     maxSpeed:          playbackRate cap
+     menuBaseVol:       menu music base volume (scaled by slider)
+     mapTracks:         mapId → track name
+     breathTracks:      tracks that use fade-restart instead of seamless loop
+     breathPause:       ms of silence between breath loops
+  ─────────────────────────────────────── */
+  music: {
+    volume: (() => { try { const v = parseFloat(localStorage.getItem('ds_music_volume')); return isNaN(v) ? 0.4 : v; } catch(e) { return 0.4; } })(),
+    fadeOutDuration: 3000,
+    speedIncrement: 0.05,
+    speedEveryWaves: 2,
+    maxSpeed: 1.35,
+    menuBaseVol: 0.4,
+
+    mapTracks: {
+      map01_forest:  'forest',
+      map03_desert:  'forest',
+      map06_beach:   'forest',
+      map02_dungeon: 'dungeon',
+      map09_volcano: 'dungeon',
+      map05_snow:    'snow',
+      map07_clouds:  'snow',
+      map10_sakura:  'sakura',
+      map12_moon:    'moon',
+    },
+
+    breathTracks: ['moon'],
+    breathPause: 800,
+  },
   /* ── JUICE ──────────────────────────────
      Visual feedback parameters.
   ─────────────────────────────────────── */

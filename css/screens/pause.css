@@ -145,3 +145,11 @@
   flex: 1;
   width: auto;
 }
+
+.pause-vol-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #aaa;
+  min-width: 42px;
+  text-align: right;
+}
