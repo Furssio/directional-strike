@@ -13,7 +13,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: false,
+ debug: true,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -141,12 +141,13 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
      breathPause:       ms of silence between breath loops
   ─────────────────────────────────────── */
   music: {
-    volume: (() => { try { const v = parseFloat(localStorage.getItem('ds_music_volume')); return isNaN(v) ? 0.4 : v; } catch(e) { return 0.4; } })(),
+    volume: (() => { try { const v = parseFloat(localStorage.getItem('ds_music_volume')); return isNaN(v) ? 1.0 : v; } catch(e) { return 1.0; } })(),
     fadeOutDuration: 3000,
-    speedIncrement: 0.05,
-    speedEveryWaves: 2,
+    speedIncrement: 0.01,
+    speedEveryWaves: 4,
     maxSpeed: 1.35,
-    menuBaseVol: 0.4,
+    menuBaseVol: 0.35,
+gameBaseVol: 0.20,
 
     mapTracks: {
       map01_forest:  'forest',
@@ -161,7 +162,7 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
     },
 
     breathTracks: ['moon'],
-    breathPause: 800,
+    breathPause: 1500,
   },
   /* ── JUICE ──────────────────────────────
      Visual feedback parameters.

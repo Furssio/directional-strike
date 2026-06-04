@@ -155,12 +155,18 @@ function startGame(delayLoop) {
 showScreen(sGame);
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
 
-  // start map music (adventure mode)
-  if (typeof Music !== 'undefined' && typeof AdventureDirector !== 'undefined' &&
-      ActiveDirector === AdventureDirector) {
+// start map music (adventure mode)
+if (typeof Music !== 'undefined' && typeof AdventureDirector !== 'undefined' &&
+    ActiveDirector === AdventureDirector) {
     const _map = AdventureDirector.getCurrentMap();
     if (_map) Music.playMap(_map.id);
-  }
+}
+// start map music (challenge mode)
+if (typeof Music !== 'undefined' && typeof ChallengeDirector !== 'undefined' &&
+    ActiveDirector === ChallengeDirector) {
+    const _cmap = ChallengeDirector.getCurrentMap();
+    if (_cmap) Music.playMap(_cmap.id);
+}
   setTimeout(updateRangeCircle, 50);
 
   clearInterval(gameLoop);
@@ -352,14 +358,23 @@ function _executeContinue() {
   // re-activate game loop flag
   running = true;
 
-  // restore music after ad continue
-  if (typeof Music !== 'undefined') {
+ // restore music after ad continue — resume from same position + speed
+if (typeof Music !== 'undefined') {
     Music.cancelFade();
-    if (!Music.isPlaying() && typeof AdventureDirector !== 'undefined') {
-      const _cmap = AdventureDirector.getCurrentMap();
-      if (_cmap) Music.playMap(_cmap.id);
+    if (!Music.isPlaying()) {
+      // fade killed the audio — restart, but keep current rate
+      Music.resume();
+      if (!Music.isPlaying()) {
+    let _cmap = null;
+    if (typeof AdventureDirector !== 'undefined' && ActiveDirector === AdventureDirector) {
+        _cmap = AdventureDirector.getCurrentMap();
+    } else if (typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector) {
+        _cmap = ChallengeDirector.getCurrentMap();
     }
-  }
+    if (_cmap) Music.playMap(_cmap.id, { keepRate: true });
+}
+    }
+}
 
   // show countdown then start loop
   _showContinueCountdown(() => {

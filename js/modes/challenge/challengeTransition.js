@@ -56,6 +56,20 @@ const ChallengeTransition = (() => {
     const themeDark  = colors[mapId] ? colors[mapId][1] : '#888888';
     const displayName = (newMap.name || mapId).toUpperCase();
 
+    // fade out current music before animation
+    if (typeof Music !== 'undefined') {
+      Music.fadeOut(800);
+    }
+
+    // schedule new map music near end of animation
+    // dimension: silence during dimension wave (eerie feel)
+    // normal: start music at ~3/4 of animation
+    if (typeof Music !== 'undefined' && !isDim) {
+      setTimeout(() => {
+        Music.playMap(mapId);
+      }, 3500);
+    }
+
     if (isDim) {
       return MapTransition.playDimension(onSwapBg);
     } else {
@@ -63,7 +77,7 @@ const ChallengeTransition = (() => {
         displayName, themeColor, themeDark, onSwapBg
       );
     }
-  }
+}
 
   return {
     reset,

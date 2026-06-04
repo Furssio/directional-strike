@@ -228,8 +228,19 @@ const ChallengeDirector = (() => {
       this._startWave(wave + 1);
     },
    _startWave(newWave) {
-      wave         = newWave;
-      waveElapsed  = 0;
+    wave         = newWave;
+
+    // music speed ramp
+    if (typeof Music !== 'undefined' && CONFIG.music && wave > 1) {
+        const every = CONFIG.music.speedEveryWaves || 4;
+        if ((wave - 1) % every === 0) {
+            Music.incrementRate(CONFIG.music.speedIncrement || 0.02);
+        }
+    }
+
+    waveElapsed  = 0;
+    spawnTimer   = 0;
+    draining     = false;
       spawnTimer   = 0;
       draining     = false;
       drainPauseMs = 0;

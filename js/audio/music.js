@@ -73,7 +73,8 @@ const Music = (() => {
     _introHandle = AudioCore.playFile(introPath, { loop: false, volume: 1.0, force: true });
     if (!_introHandle) { _phase = 'idle'; return; }
 
-    _introHandle.volume       = _vol();
+    const gVol = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+_introHandle.volume       = _vol() * gVol;
     _introHandle.playbackRate = _rate;
 
     _introHandle.onEnded = () => {
@@ -84,7 +85,8 @@ const Music = (() => {
       _phase      = 'loop';
       _loopHandle = AudioCore.playFile(loopPath, { loop: true, volume: 1.0, force: true });
       if (_loopHandle) {
-        _loopHandle.volume       = _vol();
+        const gVol2 = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+_loopHandle.volume       = _vol() * gVol2;
         _loopHandle.playbackRate = _rate;
       }
     };
@@ -105,11 +107,61 @@ const Music = (() => {
   function _playBreathOnce() {
     if (_phase !== 'breath' || !_breathPath) return;
 
+    const gVol = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+    const targetVol = _vol() * gVol;
+    const fadeDur = (CONFIG.music && CONFIG.music.breathFade) || 1500;
+    const fadeStep = 30;
+    const fadeTicks = Math.max(1, Math.floor(fadeDur / fadeStep));
+
     _loopHandle = AudioCore.playFile(_breathPath, { loop: false, volume: 1.0, force: true });
     if (!_loopHandle) return;
 
-    _loopHandle.volume       = _vol();
+    // fade in from 0
+    _loopHandle.volume       = 0;
     _loopHandle.playbackRate = _rate;
+
+    let fadeInStep = 0;
+    const fadeInTimer = setInterval(() => {
+      fadeInStep++;
+      if (!_loopHandle || _phase !== 'breath') { clearInterval(fadeInTimer); return; }
+      _loopHandle.volume = targetVol * (fadeInStep / fadeTicks);
+      if (fadeInStep >= fadeTicks) {
+        clearInterval(fadeInTimer);
+        _loopHandle.volume = targetVol;
+      }
+    }, fadeStep);
+
+// schedule fade out before track ends
+    const _schedFadeOut = () => {
+      if (!_loopHandle || !_loopHandle.duration || _phase !== 'breath') return;
+      const dur = _loopHandle.duration / _rate;
+      const fadeStart = Math.max(0, (dur - fadeDur / 1000) * 1000);
+      _breathTimer = setTimeout(() => {
+        _breathTimer = null;
+        if (!_loopHandle || _phase !== 'breath') return;
+        let fadeOutStep = 0;
+        const curVol = _loopHandle.volume;
+        const foTimer = setInterval(() => {
+          fadeOutStep++;
+          if (!_loopHandle) { clearInterval(foTimer); return; }
+          _loopHandle.volume = Math.max(0, curVol * (1 - fadeOutStep / fadeTicks));
+          if (fadeOutStep >= fadeTicks) clearInterval(foTimer);
+        }, fadeStep);
+      }, fadeStart);
+    };
+
+    // buffer might not be loaded yet — wait for duration
+    if (_loopHandle.duration > 0) {
+      _schedFadeOut();
+    } else {
+      const _waitDur = setInterval(() => {
+        if (!_loopHandle) { clearInterval(_waitDur); return; }
+        if (_loopHandle.duration > 0) {
+          clearInterval(_waitDur);
+          _schedFadeOut();
+        }
+      }, 100);
+    }
 
     _loopHandle.onEnded = () => {
       _loopHandle = null;
@@ -128,13 +180,14 @@ const Music = (() => {
      ═══════════════════════════════════ */
 
   /* ── PLAY MAP MUSIC ── */
-  function playMap(mapId) {
+ function playMap(mapId, opts) {
     if (!CONFIG.music || !CONFIG.music.mapTracks) return;
     const trackName = CONFIG.music.mapTracks[mapId];
     if (!trackName) return;
 
+    const keepRate = (opts && opts.keepRate);
     _kill();
-    _rate          = 1.0;
+    if (!keepRate) _rate = 1.0;
     _currentTrack  = trackName;
 
     if (_vol() <= 0) return;
@@ -239,12 +292,15 @@ const Music = (() => {
   }
 
   /* ── VOLUME ── */
-  function setVolume(val) {
+ function setVolume(val) {
     _volume = Math.max(0, Math.min(1, val));
+    if (CONFIG.music) CONFIG.music.volume = _volume;
+    try { localStorage.setItem('ds_music_volume', _volume.toFixed(2)); } catch (e) {}
     try { localStorage.setItem('ds_music_volume', _volume.toFixed(2)); } catch (e) {}
 
-    _applyVol(_introHandle, 1.0);
-    _applyVol(_loopHandle,  1.0);
+    const gVol = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+_applyVol(_introHandle, gVol);
+_applyVol(_loopHandle,  gVol);
 
     const baseVol = (CONFIG.music && CONFIG.music.menuBaseVol) || 0.4;
     _applyVol(_menuHandle, baseVol);

@@ -68,7 +68,7 @@ const CONFIG = {
   /* ── DEBUG ──────────────────────────────
      debug: enables debug overlay + hotkeys
   ─────────────────────────────────────── */
- debug: false,
+ debug: true,
 
   /* ── DEV MODE ───────────────────────────
      devUnlockAll: true = all maps + abilities
@@ -196,12 +196,13 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
      breathPause:       ms of silence between breath loops
   ─────────────────────────────────────── */
   music: {
-    volume: (() => { try { const v = parseFloat(localStorage.getItem('ds_music_volume')); return isNaN(v) ? 0.4 : v; } catch(e) { return 0.4; } })(),
+    volume: (() => { try { const v = parseFloat(localStorage.getItem('ds_music_volume')); return isNaN(v) ? 1.0 : v; } catch(e) { return 1.0; } })(),
     fadeOutDuration: 3000,
-    speedIncrement: 0.05,
-    speedEveryWaves: 2,
+    speedIncrement: 0.01,
+    speedEveryWaves: 4,
     maxSpeed: 1.35,
-    menuBaseVol: 0.4,
+    menuBaseVol: 0.35,
+gameBaseVol: 0.20,
 
     mapTracks: {
       map01_forest:  'forest',
@@ -216,7 +217,7 @@ devUnlockMapsOnly: false,  // unlock maps but NOT abilities (for slot testing)
     },
 
     breathTracks: ['moon'],
-    breathPause: 800,
+    breathPause: 1500,
   },
   /* ── JUICE ──────────────────────────────
      Visual feedback parameters.
@@ -5851,7 +5852,8 @@ const Music = (() => {
     _introHandle = AudioCore.playFile(introPath, { loop: false, volume: 1.0, force: true });
     if (!_introHandle) { _phase = 'idle'; return; }
 
-    _introHandle.volume       = _vol();
+    const gVol = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+_introHandle.volume       = _vol() * gVol;
     _introHandle.playbackRate = _rate;
 
     _introHandle.onEnded = () => {
@@ -5862,7 +5864,8 @@ const Music = (() => {
       _phase      = 'loop';
       _loopHandle = AudioCore.playFile(loopPath, { loop: true, volume: 1.0, force: true });
       if (_loopHandle) {
-        _loopHandle.volume       = _vol();
+        const gVol2 = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+_loopHandle.volume       = _vol() * gVol2;
         _loopHandle.playbackRate = _rate;
       }
     };
@@ -5883,11 +5886,61 @@ const Music = (() => {
   function _playBreathOnce() {
     if (_phase !== 'breath' || !_breathPath) return;
 
+    const gVol = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+    const targetVol = _vol() * gVol;
+    const fadeDur = (CONFIG.music && CONFIG.music.breathFade) || 1500;
+    const fadeStep = 30;
+    const fadeTicks = Math.max(1, Math.floor(fadeDur / fadeStep));
+
     _loopHandle = AudioCore.playFile(_breathPath, { loop: false, volume: 1.0, force: true });
     if (!_loopHandle) return;
 
-    _loopHandle.volume       = _vol();
+    // fade in from 0
+    _loopHandle.volume       = 0;
     _loopHandle.playbackRate = _rate;
+
+    let fadeInStep = 0;
+    const fadeInTimer = setInterval(() => {
+      fadeInStep++;
+      if (!_loopHandle || _phase !== 'breath') { clearInterval(fadeInTimer); return; }
+      _loopHandle.volume = targetVol * (fadeInStep / fadeTicks);
+      if (fadeInStep >= fadeTicks) {
+        clearInterval(fadeInTimer);
+        _loopHandle.volume = targetVol;
+      }
+    }, fadeStep);
+
+// schedule fade out before track ends
+    const _schedFadeOut = () => {
+      if (!_loopHandle || !_loopHandle.duration || _phase !== 'breath') return;
+      const dur = _loopHandle.duration / _rate;
+      const fadeStart = Math.max(0, (dur - fadeDur / 1000) * 1000);
+      _breathTimer = setTimeout(() => {
+        _breathTimer = null;
+        if (!_loopHandle || _phase !== 'breath') return;
+        let fadeOutStep = 0;
+        const curVol = _loopHandle.volume;
+        const foTimer = setInterval(() => {
+          fadeOutStep++;
+          if (!_loopHandle) { clearInterval(foTimer); return; }
+          _loopHandle.volume = Math.max(0, curVol * (1 - fadeOutStep / fadeTicks));
+          if (fadeOutStep >= fadeTicks) clearInterval(foTimer);
+        }, fadeStep);
+      }, fadeStart);
+    };
+
+    // buffer might not be loaded yet — wait for duration
+    if (_loopHandle.duration > 0) {
+      _schedFadeOut();
+    } else {
+      const _waitDur = setInterval(() => {
+        if (!_loopHandle) { clearInterval(_waitDur); return; }
+        if (_loopHandle.duration > 0) {
+          clearInterval(_waitDur);
+          _schedFadeOut();
+        }
+      }, 100);
+    }
 
     _loopHandle.onEnded = () => {
       _loopHandle = null;
@@ -5906,13 +5959,14 @@ const Music = (() => {
      ═══════════════════════════════════ */
 
   /* ── PLAY MAP MUSIC ── */
-  function playMap(mapId) {
+ function playMap(mapId, opts) {
     if (!CONFIG.music || !CONFIG.music.mapTracks) return;
     const trackName = CONFIG.music.mapTracks[mapId];
     if (!trackName) return;
 
+    const keepRate = (opts && opts.keepRate);
     _kill();
-    _rate          = 1.0;
+    if (!keepRate) _rate = 1.0;
     _currentTrack  = trackName;
 
     if (_vol() <= 0) return;
@@ -6017,12 +6071,15 @@ const Music = (() => {
   }
 
   /* ── VOLUME ── */
-  function setVolume(val) {
+ function setVolume(val) {
     _volume = Math.max(0, Math.min(1, val));
+    if (CONFIG.music) CONFIG.music.volume = _volume;
+    try { localStorage.setItem('ds_music_volume', _volume.toFixed(2)); } catch (e) {}
     try { localStorage.setItem('ds_music_volume', _volume.toFixed(2)); } catch (e) {}
 
-    _applyVol(_introHandle, 1.0);
-    _applyVol(_loopHandle,  1.0);
+    const gVol = (CONFIG.music && CONFIG.music.gameBaseVol) || 0.35;
+_applyVol(_introHandle, gVol);
+_applyVol(_loopHandle,  gVol);
 
     const baseVol = (CONFIG.music && CONFIG.music.menuBaseVol) || 0.4;
     _applyVol(_menuHandle, baseVol);
@@ -9110,12 +9167,18 @@ function startGame(delayLoop) {
 showScreen(sGame);
   if (typeof CrazySDKWrapper !== 'undefined') CrazySDKWrapper.gameplayStart();
 
-  // start map music (adventure mode)
-  if (typeof Music !== 'undefined' && typeof AdventureDirector !== 'undefined' &&
-      ActiveDirector === AdventureDirector) {
+// start map music (adventure mode)
+if (typeof Music !== 'undefined' && typeof AdventureDirector !== 'undefined' &&
+    ActiveDirector === AdventureDirector) {
     const _map = AdventureDirector.getCurrentMap();
     if (_map) Music.playMap(_map.id);
-  }
+}
+// start map music (challenge mode)
+if (typeof Music !== 'undefined' && typeof ChallengeDirector !== 'undefined' &&
+    ActiveDirector === ChallengeDirector) {
+    const _cmap = ChallengeDirector.getCurrentMap();
+    if (_cmap) Music.playMap(_cmap.id);
+}
   setTimeout(updateRangeCircle, 50);
 
   clearInterval(gameLoop);
@@ -9307,14 +9370,23 @@ function _executeContinue() {
   // re-activate game loop flag
   running = true;
 
-  // restore music after ad continue
-  if (typeof Music !== 'undefined') {
+ // restore music after ad continue — resume from same position + speed
+if (typeof Music !== 'undefined') {
     Music.cancelFade();
-    if (!Music.isPlaying() && typeof AdventureDirector !== 'undefined') {
-      const _cmap = AdventureDirector.getCurrentMap();
-      if (_cmap) Music.playMap(_cmap.id);
+    if (!Music.isPlaying()) {
+      // fade killed the audio — restart, but keep current rate
+      Music.resume();
+      if (!Music.isPlaying()) {
+    let _cmap = null;
+    if (typeof AdventureDirector !== 'undefined' && ActiveDirector === AdventureDirector) {
+        _cmap = AdventureDirector.getCurrentMap();
+    } else if (typeof ChallengeDirector !== 'undefined' && ActiveDirector === ChallengeDirector) {
+        _cmap = ChallengeDirector.getCurrentMap();
     }
-  }
+    if (_cmap) Music.playMap(_cmap.id, { keepRate: true });
+}
+    }
+}
 
   // show countdown then start loop
   _showContinueCountdown(() => {
@@ -12038,7 +12110,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DEV CHEATS ── */
-const DEV_CHEATS = false;
+const DEV_CHEATS = true;
 
 document.addEventListener('keydown', e => {
   if (!DEV_CHEATS || !running) return;
@@ -12455,8 +12527,19 @@ const ChallengeDirector = (() => {
       this._startWave(wave + 1);
     },
    _startWave(newWave) {
-      wave         = newWave;
-      waveElapsed  = 0;
+    wave         = newWave;
+
+    // music speed ramp
+    if (typeof Music !== 'undefined' && CONFIG.music && wave > 1) {
+        const every = CONFIG.music.speedEveryWaves || 4;
+        if ((wave - 1) % every === 0) {
+            Music.incrementRate(CONFIG.music.speedIncrement || 0.02);
+        }
+    }
+
+    waveElapsed  = 0;
+    spawnTimer   = 0;
+    draining     = false;
       spawnTimer   = 0;
       draining     = false;
       drainPauseMs = 0;
@@ -13459,6 +13542,20 @@ const ChallengeTransition = (() => {
     const themeDark  = colors[mapId] ? colors[mapId][1] : '#888888';
     const displayName = (newMap.name || mapId).toUpperCase();
 
+    // fade out current music before animation
+    if (typeof Music !== 'undefined') {
+      Music.fadeOut(800);
+    }
+
+    // schedule new map music near end of animation
+    // dimension: silence during dimension wave (eerie feel)
+    // normal: start music at ~3/4 of animation
+    if (typeof Music !== 'undefined' && !isDim) {
+      setTimeout(() => {
+        Music.playMap(mapId);
+      }, 3500);
+    }
+
     if (isDim) {
       return MapTransition.playDimension(onSwapBg);
     } else {
@@ -13466,7 +13563,7 @@ const ChallengeTransition = (() => {
         displayName, themeColor, themeDark, onSwapBg
       );
     }
-  }
+}
 
   return {
     reset,
