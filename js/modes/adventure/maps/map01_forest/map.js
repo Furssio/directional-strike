@@ -11,22 +11,17 @@ MapRegistry.register({
   minEnemiesAlive: 1,
   maxPerDirection: 4,
 
-  scalingAt: {
-    11: {
-      ravager: { speedMult: 1.2 },
-    },
-  },
 
   waveConfig: {
 
     // ── Wave 1 — TUTORIAL ──
     // Tutorial.js handles spawning. Fallback only.
     1: {
-      duration: 12,
+      duration: 7,
       spawnInterval: 3000,
-      maxAlive: 2,
+      maxAlive: 3,
       minAlive: 1,
-      pool: { ravager: 7, crusher: 3 },
+      pool: { ravager: 10 },
       burstChance: 0,
       burstSize: 1,
     },
@@ -35,13 +30,18 @@ MapRegistry.register({
     2: {
       duration: 13,
       spawnInterval: 1800,
-      maxAlive: 4,
+      maxAlive: 3,
       minAlive: 1,
       pool: { ravager: 8, crusher: 2 },
       combos: {
-        single: 8,
-        pair_opposite: 2,
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 1200,
     },
 
@@ -52,13 +52,17 @@ MapRegistry.register({
       duration: 13,
       spawnInterval: 1800,
       maxAlive: 4,
-      minAlive: 1,
+      minAlive: 2,
       pool: { ravager: 7, crusher: 3 },
       combos: {
-        single: 6,
-        pair_opposite: 3,
-        burst_single: 1,
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 1100,
     },
 
@@ -70,10 +74,14 @@ MapRegistry.register({
       minAlive: 2,
       pool: { ravager: 7, crusher: 3 },
       combos: {
-        single: 5,
-        pair_opposite: 3,
-        burst_single: 2,
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 1000,
     },
 
@@ -107,6 +115,9 @@ MapRegistry.register({
         burst_single:  { weight: 3, stagger: 350 },
         pair_opposite: { weight: 2, stagger: 550 },
       },
+      speedOverrides: {
+    ravager: 1.6,
+  },
       dirCooldown: 900,
     },
 
@@ -133,7 +144,7 @@ MapRegistry.register({
       duration: 16,
       spawnInterval: 2200,
       maxAlive: 3,
-      minAlive: 1,
+      minAlive: 2,
       pool: { crusher: 10 },
       combos: {
         single: 6,
@@ -170,12 +181,12 @@ MapRegistry.register({
       pool: { ravager: 6, crusher: 4 },
       combos: {
         single: 3,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 550 },
+        pair_opposite: { weight: 3, stagger: 650 },
+        pair_adjacent: { weight: 2, stagger: 700 },
         burst_single:  { weight: 2, stagger: 400 },
         triple:        { weight: 1, stagger: 550 },
       },
-      dirCooldown: 800,
+      dirCooldown: 1200,
     },
 
     // ── UPGRADE 5 ──

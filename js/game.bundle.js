@@ -1497,7 +1497,7 @@ EnemyRegistry.register({
   spriteFrameH:  100,
   spriteSpeed:   1.0,
   size:          100,
-  hpPct:     1.50,
+  hpPct:     2.10,
   damagePct: 0.50,
   speedMult: 0.75,
   points:    4538,
@@ -2692,7 +2692,7 @@ EnemyRegistry.register({
   size:          76,
   hpPct:     0.30,
   damagePct: 0.30,
-  speedMult: 0.75,
+  speedMult: 0.80,
   points:    1755,
   hitSound:  'flesh',
   shoots:    false,
@@ -2767,7 +2767,7 @@ EnemyRegistry.register({
   size:          110,
   hpPct:     2.10,
   damagePct: 0.40,
-  speedMult: 0.60,
+  speedMult: 0.90,
   points:    4890,
   hitSound:  'demon',
   shoots:    false,
@@ -8517,9 +8517,14 @@ if (!_isIntro) {
 
   // per-map speed override for specific enemy types
   const _mapOverrides = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
-  if (_mapOverrides && _mapOverrides.speedOverrides && _mapOverrides.speedOverrides[def.id]) {
-    sMult *= (_mapOverrides.speedOverrides[def.id] / def.speedMult);
-  }
+  // speedOverrides: check waveConfig first, then map-level fallback
+const _waveConfig = _map && _map.waveConfig && _map.waveConfig[_wave];
+const _waveOverrides = _waveConfig && _waveConfig.speedOverrides;
+const _mapLevelOverrides = _mapOverrides && _mapOverrides.speedOverrides;
+const _activeOverrides = _waveOverrides || _mapLevelOverrides;
+if (_activeOverrides && _activeOverrides[def.id]) {
+  sMult = _activeOverrides[def.id];
+}
 
   
 
@@ -15871,22 +15876,17 @@ MapRegistry.register({
   minEnemiesAlive: 1,
   maxPerDirection: 4,
 
-  scalingAt: {
-    11: {
-      ravager: { speedMult: 1.2 },
-    },
-  },
 
   waveConfig: {
 
     // ── Wave 1 — TUTORIAL ──
     // Tutorial.js handles spawning. Fallback only.
     1: {
-      duration: 12,
+      duration: 7,
       spawnInterval: 3000,
-      maxAlive: 2,
+      maxAlive: 3,
       minAlive: 1,
-      pool: { ravager: 7, crusher: 3 },
+      pool: { ravager: 10 },
       burstChance: 0,
       burstSize: 1,
     },
@@ -15895,13 +15895,18 @@ MapRegistry.register({
     2: {
       duration: 13,
       spawnInterval: 1800,
-      maxAlive: 4,
+      maxAlive: 3,
       minAlive: 1,
       pool: { ravager: 8, crusher: 2 },
       combos: {
-        single: 8,
-        pair_opposite: 2,
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 1200,
     },
 
@@ -15912,13 +15917,17 @@ MapRegistry.register({
       duration: 13,
       spawnInterval: 1800,
       maxAlive: 4,
-      minAlive: 1,
+      minAlive: 2,
       pool: { ravager: 7, crusher: 3 },
       combos: {
-        single: 6,
-        pair_opposite: 3,
-        burst_single: 1,
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 1100,
     },
 
@@ -15930,10 +15939,14 @@ MapRegistry.register({
       minAlive: 2,
       pool: { ravager: 7, crusher: 3 },
       combos: {
-        single: 5,
-        pair_opposite: 3,
-        burst_single: 2,
+        single: 4,
+        pair_opposite: { weight: 3, stagger: 550 },
+        pair_adjacent: { weight: 2, stagger: 500 },
+        burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 1000,
     },
 
@@ -15967,6 +15980,9 @@ MapRegistry.register({
         burst_single:  { weight: 3, stagger: 350 },
         pair_opposite: { weight: 2, stagger: 550 },
       },
+      speedOverrides: {
+    ravager: 1.6,
+  },
       dirCooldown: 900,
     },
 
@@ -15993,7 +16009,7 @@ MapRegistry.register({
       duration: 16,
       spawnInterval: 2200,
       maxAlive: 3,
-      minAlive: 1,
+      minAlive: 2,
       pool: { crusher: 10 },
       combos: {
         single: 6,
@@ -16030,12 +16046,12 @@ MapRegistry.register({
       pool: { ravager: 6, crusher: 4 },
       combos: {
         single: 3,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 550 },
+        pair_opposite: { weight: 3, stagger: 650 },
+        pair_adjacent: { weight: 2, stagger: 700 },
         burst_single:  { weight: 2, stagger: 400 },
         triple:        { weight: 1, stagger: 550 },
       },
-      dirCooldown: 800,
+      dirCooldown: 1200,
     },
 
     // ── UPGRADE 5 ──
@@ -16087,7 +16103,7 @@ MapRegistry.register({
 
     // ── Wave 1 — Intro ──
     1: {
-      duration: 13,
+      duration: 10,
       spawnInterval: 1400,
       maxAlive: 3,
       minAlive: 2,
@@ -16098,6 +16114,9 @@ MapRegistry.register({
         burst_single: 2,
         triple: 2,
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 600,
     },
 
@@ -16113,6 +16132,10 @@ MapRegistry.register({
         pair_opposite: 5,
         burst_single: 3,
       },
+      speedOverrides: {
+    ravager: 1.5,
+    slime_large: 1.1,
+  },
       dirCooldown: 600,
     },
 
@@ -16124,12 +16147,17 @@ MapRegistry.register({
       spawnInterval: 1900,
       maxAlive: 4,
       minAlive: 2,
-      pool: { ravager: 3, slime_large: 4, golem: 3 },
+      pool: { ravager: 4, slime_large: 4, golem: 2 },
       combos: {
         single: 6,
         pair_opposite: 3,
         burst_single: 1,
       },
+      speedOverrides: {
+    ravager: 1.5,
+    slime_large: 1.2,
+    golem: 1.0,
+  },
       dirCooldown: 900,
     },
 
@@ -16145,6 +16173,9 @@ MapRegistry.register({
         pair_opposite: 3,
         burst_single: 2,
       },
+      speedOverrides: {
+    golem: 1.3,
+  },
       dirCooldown: 1000,
     },
 
@@ -16163,6 +16194,10 @@ MapRegistry.register({
         pair_adjacent: { weight: 2, stagger: 500 },
         burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.6,
+    slime_large: 1.4,
+  },
       dirCooldown: 1000,
     },
 
@@ -16178,6 +16213,10 @@ MapRegistry.register({
         burst_single:  { weight: 4, stagger: 350 },
         pair_opposite: { weight: 2, stagger: 550 },
       },
+      speedOverrides: {
+    ravager: 1.6,
+    golem: 2.0,
+  },
       dirCooldown: 900,
     },
 
@@ -17308,36 +17347,48 @@ MapRegistry.register({
     // Slime_lava spits parryable lava + splits.
     // Singles mostly so player learns the split.
     1: {
-      duration: 15,
-      spawnInterval: 2200,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { ravager: 6, slime_lava: 4 },
-      combos: {
-        single: 6,
-        pair_opposite: 2,
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+  duration: 15,
+  spawnInterval: 1800,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { ravager: 5, slime_lava: 3, crusher: 1, golem_lava: 1 },
+  speedOverrides: {
+    ravager: 1.15,
+    slime_lava: 1.2,
+    crusher: 1.15,
+    golem_lava: 1.25,
+  },
+  combos: {
+    single: 6,
+    pair_opposite: 2,
+    burst_single: 2,
+  },
+  dirCooldown: 1100,
+},
 
     // ── Wave 2 — Pairs start ──
     // Slime_lava from one side, ravager opposite.
     // Splits start filling the field naturally.
-    2: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { ravager: 3, slime_lava: 4, crusher: 3 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 500 },
-        pair_adjacent: { weight: 2, stagger: 450 },
-        burst_single: 1,
-      },
-      dirCooldown: 1100,
-    },
+   2: {
+  duration: 18,
+  spawnInterval: 1700,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { ravager: 4, slime_lava: 3, crusher: 2, golem_lava: 1 },
+  speedOverrides: {
+    ravager: 1.2,
+    slime_lava: 1.25,
+    crusher: 1.2,
+    golem_lava: 1.3,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 500 },
+    pair_adjacent: { weight: 2, stagger: 450 },
+    burst_single: 1,
+  },
+  dirCooldown: 1000,
+},
 
     // ── UPGRADE 1 ──
 
@@ -17346,36 +17397,48 @@ MapRegistry.register({
     // prioritize: kill crusher before it shoots,
     // or deal with slime splits first?
     3: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { ravager: 2, slime_lava: 4, crusher: 4 },
-      combos: {
-        single: 5,
-        pair_opposite: { weight: 3, stagger: 550 },
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+  duration: 18,
+  spawnInterval: 1700,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { ravager: 3, slime_lava: 3, crusher: 2, golem_lava: 2 },
+  speedOverrides: {
+    ravager: 1.25,
+    slime_lava: 1.3,
+    crusher: 1.25,
+    golem_lava: 1.35,
+  },
+  combos: {
+    single: 5,
+    pair_opposite: { weight: 3, stagger: 550 },
+    burst_single: 2,
+  },
+  dirCooldown: 1000,
+},
 
     // ── Wave 4 — Crusher more present ──
     // Crusher + slime_lava pairs = bullet dodging
     // while managing splits. Adjacent combos appear.
     4: {
-      duration: 20,
-      spawnInterval: 1900,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { ravager: 2, golem_lava: 3, crusher: 5 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 550 },
-        burst_single: 1,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 20,
+  spawnInterval: 1600,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { ravager: 2, slime_lava: 3, crusher: 3, golem_lava: 2 },
+  speedOverrides: {
+    ravager: 1.3,
+    slime_lava: 1.35,
+    crusher: 1.3,
+    golem_lava: 1.4,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 600 },
+    pair_adjacent: { weight: 2, stagger: 550 },
+    burst_single: 1,
+  },
+  dirCooldown: 950,
+},
 
     // ── UPGRADE 2 ──
 
@@ -17575,37 +17638,49 @@ MapRegistry.register({
     // Kitsune (slow, lunges) + nara_deer (fades, changes dir).
     // Both have tricky movement — player learns
     // to watch before attacking.
-    1: {
-      duration: 15,
-      spawnInterval: 2200,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { kitsune: 5, nara_deer: 5 },
-      combos: {
-        single: 6,
-        pair_opposite: 2,
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+   1: {
+  duration: 15,
+  spawnInterval: 1900,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { kitsune: 4, nara_deer: 4, frog: 1, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.2,
+    nara_deer: 1.1,
+    frog: 1.1,
+    oni: 1.2,
+  },
+  combos: {
+    single: 6,
+    pair_opposite: 2,
+    burst_single: 2,
+  },
+  dirCooldown: 1100,
+},
 
     // ── Wave 2 — Pairs start ──
     // Kitsune from one side, nara_deer opposite.
     // Nara_deer fades in/out — can surprise.
     2: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { kitsune: 5, nara_deer: 5 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 550 },
-        pair_adjacent: { weight: 2, stagger: 500 },
-        burst_single: 1,
-      },
-      dirCooldown: 1100,
-    },
+  duration: 18,
+  spawnInterval: 1800,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { kitsune: 4, nara_deer: 3, frog: 2, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.25,
+    nara_deer: 1.15,
+    frog: 1.15,
+    oni: 1.25,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 550 },
+    pair_adjacent: { weight: 2, stagger: 500 },
+    burst_single: 1,
+  },
+  dirCooldown: 1000,
+},
 
     // ── UPGRADE 1 ──
 
@@ -17613,37 +17688,49 @@ MapRegistry.register({
     // 3 parryable jumps then walks to center.
     // Player learns parry timing on jumps.
     // Mostly singles to focus on frog mechanic.
-    3: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { kitsune: 4, nara_deer: 3, frog: 3 },
-      combos: {
-        single: 5,
-        pair_opposite: { weight: 3, stagger: 550 },
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+   3: {
+  duration: 18,
+  spawnInterval: 1700,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { kitsune: 3, nara_deer: 3, frog: 3, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.3,
+    nara_deer: 1.2,
+    frog: 1.2,
+    oni: 1.3,
+  },
+  combos: {
+    single: 5,
+    pair_opposite: { weight: 3, stagger: 550 },
+    burst_single: 2,
+  },
+  dirCooldown: 1000,
+},
 
     // ── Wave 4 — Frog more present ──
     // Frog + kitsune from adjacent sides =
     // frog jumping while kitsune lunges. Tricky.
     4: {
-      duration: 20,
-      spawnInterval: 1900,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { kitsune: 3, nara_deer: 3, frog: 4 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 600 },
-        burst_single: 1,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 20,
+  spawnInterval: 1600,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { kitsune: 3, nara_deer: 3, frog: 3, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.35,
+    nara_deer: 1.25,
+    frog: 1.25,
+    oni: 1.35,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 600 },
+    pair_adjacent: { weight: 2, stagger: 600 },
+    burst_single: 1,
+  },
+  dirCooldown: 950,
+},
 
     // ── UPGRADE 2 ──
 
@@ -17865,36 +17952,46 @@ MapRegistry.register({
     // Spectral_deer + star right away with pairs.
     // Player knows both — jump straight into action.
     1: {
-      duration: 15,
-      spawnInterval: 1800,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { spectral_deer: 5, star: 5 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        burst_single: 3,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 15,
+  spawnInterval: 1600,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { spectral_deer: 3, star: 3, eagle: 2, thunder_hound: 1, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.2,
+    thunder_hound: 1.7,
+    oni: 1.1,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 600 },
+    burst_single: 3,
+  },
+  dirCooldown: 950,
+},
 
     // ── Wave 2 — Already pressing ──
     // Adjacent pairs + burst. Tempo already
     // higher than most maps' wave 4.
     2: {
-      duration: 18,
-      spawnInterval: 1700,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { spectral_deer: 5, star: 5 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 600 },
-        burst_single: 2,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 18,
+  spawnInterval: 1500,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { spectral_deer: 3, star: 3, eagle: 2, thunder_hound: 1, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.25,
+    thunder_hound: 1.75,
+    oni: 1.15,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 600 },
+    pair_adjacent: { weight: 2, stagger: 600 },
+    burst_single: 2,
+  },
+  dirCooldown: 950,
+},
 
     // ── UPGRADE 1 ──
 
@@ -17902,38 +17999,48 @@ MapRegistry.register({
     // 2-phase rush + shoot. No easing in —
     // eagle appears alongside star and deer.
     3: {
-      duration: 18,
-      spawnInterval: 1650,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 4, star: 3, eagle: 3 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 650 },
-        pair_adjacent: { weight: 2, stagger: 650 },
-        burst_single: 2,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 18,
+  spawnInterval: 1500,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 3, eagle: 2, thunder_hound: 2, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.3,
+    thunder_hound: 1.8,
+    oni: 1.2,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 650 },
+    pair_adjacent: { weight: 2, stagger: 650 },
+    burst_single: 2,
+  },
+  dirCooldown: 900,
+},
 
     // ── Wave 4 — Thunder_hound enters ──
     // Teleport dodge + eagle 2-phase = both
     // punish mindless attacking. Player must
     // be precise with every swing.
     4: {
-      duration: 20,
-      spawnInterval: 1600,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 3, star: 3, eagle: 2, thunder_hound: 2 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 700 },
-        pair_adjacent: { weight: 2, stagger: 700 },
-        burst_single: 2,
-      },
-      dirCooldown: 950,
-    },
+  duration: 20,
+  spawnInterval: 1450,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 3, eagle: 2, thunder_hound: 2, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.35,
+    thunder_hound: 1.85,
+    oni: 1.25,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 700 },
+    pair_adjacent: { weight: 2, stagger: 700 },
+    burst_single: 2,
+  },
+  dirCooldown: 900,
+},
 
     // ── UPGRADE 2 ──
 
@@ -17942,38 +18049,43 @@ MapRegistry.register({
     // oni changes the entire field dynamic.
     // All 5 enemies now in play.
     5: {
-      duration: 22,
-      spawnInterval: 1550,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 3, eagle: 2, thunder_hound: 2, oni: 1 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 750 },
-        pair_adjacent: { weight: 2, stagger: 700 },
-        burst_single: 2,
-      },
-      dirCooldown: 950,
-    },
+  duration: 22,
+  spawnInterval: 1400,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.4,
+    thunder_hound: 1.9,
+    oni: 1.3,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 750 },
+    pair_adjacent: { weight: 2, stagger: 700 },
+    burst_single: 2,
+  },
+  dirCooldown: 900,
+},
 
     // ── Wave 6 — BREATHER ──
     // Star only. Pure speed parry rush.
     // Even the breather is fast — this is Moon.
     // Burst + rush = parry chains for days.
     6: {
-      duration: 20,
-      spawnInterval: 1500,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { star: 10 },
-      combos: {
-        single: 2,
-        burst_single: 4,
-        rush: { weight: 2, stagger: 500 },
-        pair_opposite: { weight: 2, stagger: 650 },
-      },
-      dirCooldown: 850,
-    },
+  duration: 20,
+  spawnInterval: 1400,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { star: 6, frog: 4 },
+  combos: {
+    single: 2,
+    burst_single: 4,
+    rush: { weight: 2, stagger: 500 },
+    pair_opposite: { weight: 2, stagger: 650 },
+  },
+  dirCooldown: 800,
+},
 
     // ── UPGRADE 3 ──
 
@@ -17981,38 +18093,48 @@ MapRegistry.register({
     // All 5 back. Triple already here —
     // other maps waited until wave 8-9.
     7: {
-      duration: 25,
-      spawnInterval: 1450,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 2,
-        pair_opposite: { weight: 3, stagger: 750 },
-        burst_single: 2,
-        triple: { weight: 2, stagger: 850 },
-      },
-      dirCooldown: 850,
-    },
+  duration: 25,
+  spawnInterval: 1350,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.45,
+    thunder_hound: 1.95,
+    oni: 1.35,
+  },
+  combos: {
+    single: 2,
+    pair_opposite: { weight: 3, stagger: 750 },
+    burst_single: 2,
+    triple: { weight: 2, stagger: 850 },
+  },
+  dirCooldown: 850,
+},
 
     // ── Wave 8 — Heavy triples ──
     // More triples, adjacent pairs nastier.
     // Oni weight up — bouncing tanks everywhere.
     8: {
-      duration: 25,
-      spawnInterval: 1400,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 2,
-        pair_opposite: { weight: 3, stagger: 800 },
-        pair_adjacent: { weight: 2, stagger: 800 },
-        burst_single: 2,
-        triple: { weight: 2, stagger: 850 },
-      },
-      dirCooldown: 800,
-    },
+  duration: 25,
+  spawnInterval: 1300,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.5,
+    thunder_hound: 2.0,
+    oni: 1.4,
+  },
+  combos: {
+    single: 2,
+    pair_opposite: { weight: 3, stagger: 800 },
+    pair_adjacent: { weight: 2, stagger: 800 },
+    burst_single: 2,
+    triple: { weight: 2, stagger: 850 },
+  },
+  dirCooldown: 800,
+},
 
     // ── UPGRADE 4 ──
 
@@ -18020,42 +18142,52 @@ MapRegistry.register({
     // SpawnInterval at 1350. Rush appears.
     // 3 stars same side = parry chain relief
     // between the tricky enemies.
-    9: {
-      duration: 28,
-      spawnInterval: 1350,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 2,
-        pair_opposite: { weight: 3, stagger: 850 },
-        burst_single: 2,
-        rush: { weight: 2, stagger: 650 },
-        triple: { weight: 2, stagger: 900 },
-      },
-      dirCooldown: 800,
-    },
+   9: {
+  duration: 28,
+  spawnInterval: 1250,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.55,
+    thunder_hound: 2.05,
+    oni: 1.45,
+  },
+  combos: {
+    single: 2,
+    pair_opposite: { weight: 3, stagger: 850 },
+    burst_single: 2,
+    rush: { weight: 2, stagger: 650 },
+    triple: { weight: 2, stagger: 900 },
+  },
+  dirCooldown: 800,
+},
 
     // ── Wave 10 — Last stand ──
     // Surround appears. Everything at max.
     // This is the hardest non-final wave
     // in the entire game.
     10: {
-      duration: 28,
-      spawnInterval: 1300,
-      maxAlive: 5,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 1,
-        pair_opposite: { weight: 3, stagger: 850 },
-        burst_single: 2,
-        rush: { weight: 2, stagger: 650 },
-        triple: { weight: 2, stagger: 900 },
-        surround: { weight: 1, stagger: 950 },
-      },
-      dirCooldown: 750,
-    },
+  duration: 28,
+  spawnInterval: 1200,
+  maxAlive: 5,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.6,
+    thunder_hound: 2.1,
+    oni: 1.5,
+  },
+  combos: {
+    single: 1,
+    pair_opposite: { weight: 3, stagger: 850 },
+    burst_single: 2,
+    rush: { weight: 2, stagger: 650 },
+    triple: { weight: 2, stagger: 900 },
+    surround: { weight: 1, stagger: 950 },
+  },
+  dirCooldown: 750,
+},
 
     // ── UPGRADE 5 ──
 
@@ -18066,20 +18198,25 @@ MapRegistry.register({
     // If the player survives this, they've beaten
     // Directional Strike.
     11: {
-      duration: 30,
-      spawnInterval: 1200,
-      maxAlive: 5,
-      minAlive: 3,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        pair_opposite: { weight: 3, stagger: 850 },
-        burst_single: 2,
-        rush: { weight: 2, stagger: 650 },
-        triple: { weight: 3, stagger: 900 },
-        surround: { weight: 2, stagger: 950 },
-      },
-      dirCooldown: 600,
-    },
+  duration: 30,
+  spawnInterval: 1100,
+  maxAlive: 5,
+  minAlive: 3,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.65,
+    thunder_hound: 2.1,
+    oni: 1.55,
+  },
+  combos: {
+    pair_opposite: { weight: 3, stagger: 850 },
+    burst_single: 2,
+    rush: { weight: 2, stagger: 650 },
+    triple: { weight: 3, stagger: 900 },
+    surround: { weight: 2, stagger: 950 },
+  },
+  dirCooldown: 600,
+},
 
   },
 

@@ -38,37 +38,49 @@ MapRegistry.register({
     // Kitsune (slow, lunges) + nara_deer (fades, changes dir).
     // Both have tricky movement — player learns
     // to watch before attacking.
-    1: {
-      duration: 15,
-      spawnInterval: 2200,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { kitsune: 5, nara_deer: 5 },
-      combos: {
-        single: 6,
-        pair_opposite: 2,
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+   1: {
+  duration: 15,
+  spawnInterval: 1900,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { kitsune: 4, nara_deer: 4, frog: 1, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.2,
+    nara_deer: 1.1,
+    frog: 1.1,
+    oni: 1.2,
+  },
+  combos: {
+    single: 6,
+    pair_opposite: 2,
+    burst_single: 2,
+  },
+  dirCooldown: 1100,
+},
 
     // ── Wave 2 — Pairs start ──
     // Kitsune from one side, nara_deer opposite.
     // Nara_deer fades in/out — can surprise.
     2: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { kitsune: 5, nara_deer: 5 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 550 },
-        pair_adjacent: { weight: 2, stagger: 500 },
-        burst_single: 1,
-      },
-      dirCooldown: 1100,
-    },
+  duration: 18,
+  spawnInterval: 1800,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { kitsune: 4, nara_deer: 3, frog: 2, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.25,
+    nara_deer: 1.15,
+    frog: 1.15,
+    oni: 1.25,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 550 },
+    pair_adjacent: { weight: 2, stagger: 500 },
+    burst_single: 1,
+  },
+  dirCooldown: 1000,
+},
 
     // ── UPGRADE 1 ──
 
@@ -76,37 +88,49 @@ MapRegistry.register({
     // 3 parryable jumps then walks to center.
     // Player learns parry timing on jumps.
     // Mostly singles to focus on frog mechanic.
-    3: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { kitsune: 4, nara_deer: 3, frog: 3 },
-      combos: {
-        single: 5,
-        pair_opposite: { weight: 3, stagger: 550 },
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+   3: {
+  duration: 18,
+  spawnInterval: 1700,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { kitsune: 3, nara_deer: 3, frog: 3, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.3,
+    nara_deer: 1.2,
+    frog: 1.2,
+    oni: 1.3,
+  },
+  combos: {
+    single: 5,
+    pair_opposite: { weight: 3, stagger: 550 },
+    burst_single: 2,
+  },
+  dirCooldown: 1000,
+},
 
     // ── Wave 4 — Frog more present ──
     // Frog + kitsune from adjacent sides =
     // frog jumping while kitsune lunges. Tricky.
     4: {
-      duration: 20,
-      spawnInterval: 1900,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { kitsune: 3, nara_deer: 3, frog: 4 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 600 },
-        burst_single: 1,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 20,
+  spawnInterval: 1600,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { kitsune: 3, nara_deer: 3, frog: 3, oni: 1 },
+  speedOverrides: {
+    kitsune: 1.35,
+    nara_deer: 1.25,
+    frog: 1.25,
+    oni: 1.35,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 600 },
+    pair_adjacent: { weight: 2, stagger: 600 },
+    burst_single: 1,
+  },
+  dirCooldown: 950,
+},
 
     // ── UPGRADE 2 ──
 

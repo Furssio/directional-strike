@@ -13,7 +13,7 @@ EnemyRegistry.register({
   spriteFrameH:  100,
   spriteSpeed:   1.0,
   size:          100,
-  hpPct:     1.50,
+  hpPct:     2.10,
   damagePct: 0.50,
   speedMult: 0.75,
   points:    4538,

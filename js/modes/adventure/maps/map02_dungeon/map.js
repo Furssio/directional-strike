@@ -17,7 +17,7 @@ MapRegistry.register({
 
     // ── Wave 1 — Intro ──
     1: {
-      duration: 13,
+      duration: 10,
       spawnInterval: 1400,
       maxAlive: 3,
       minAlive: 2,
@@ -28,6 +28,9 @@ MapRegistry.register({
         burst_single: 2,
         triple: 2,
       },
+      speedOverrides: {
+    ravager: 1.5,
+  },
       dirCooldown: 600,
     },
 
@@ -43,6 +46,10 @@ MapRegistry.register({
         pair_opposite: 5,
         burst_single: 3,
       },
+      speedOverrides: {
+    ravager: 1.5,
+    slime_large: 1.1,
+  },
       dirCooldown: 600,
     },
 
@@ -54,12 +61,17 @@ MapRegistry.register({
       spawnInterval: 1900,
       maxAlive: 4,
       minAlive: 2,
-      pool: { ravager: 3, slime_large: 4, golem: 3 },
+      pool: { ravager: 4, slime_large: 4, golem: 2 },
       combos: {
         single: 6,
         pair_opposite: 3,
         burst_single: 1,
       },
+      speedOverrides: {
+    ravager: 1.5,
+    slime_large: 1.2,
+    golem: 1.0,
+  },
       dirCooldown: 900,
     },
 
@@ -75,6 +87,9 @@ MapRegistry.register({
         pair_opposite: 3,
         burst_single: 2,
       },
+      speedOverrides: {
+    golem: 1.3,
+  },
       dirCooldown: 1000,
     },
 
@@ -93,6 +108,10 @@ MapRegistry.register({
         pair_adjacent: { weight: 2, stagger: 500 },
         burst_single:  { weight: 1, stagger: 350 },
       },
+      speedOverrides: {
+    ravager: 1.6,
+    slime_large: 1.4,
+  },
       dirCooldown: 1000,
     },
 
@@ -108,6 +127,10 @@ MapRegistry.register({
         burst_single:  { weight: 4, stagger: 350 },
         pair_opposite: { weight: 2, stagger: 550 },
       },
+      speedOverrides: {
+    ravager: 1.6,
+    golem: 2.0,
+  },
       dirCooldown: 900,
     },
 

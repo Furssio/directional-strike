@@ -36,36 +36,46 @@ MapRegistry.register({
     // Spectral_deer + star right away with pairs.
     // Player knows both — jump straight into action.
     1: {
-      duration: 15,
-      spawnInterval: 1800,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { spectral_deer: 5, star: 5 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        burst_single: 3,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 15,
+  spawnInterval: 1600,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { spectral_deer: 3, star: 3, eagle: 2, thunder_hound: 1, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.2,
+    thunder_hound: 1.7,
+    oni: 1.1,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 600 },
+    burst_single: 3,
+  },
+  dirCooldown: 950,
+},
 
     // ── Wave 2 — Already pressing ──
     // Adjacent pairs + burst. Tempo already
     // higher than most maps' wave 4.
     2: {
-      duration: 18,
-      spawnInterval: 1700,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { spectral_deer: 5, star: 5 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 600 },
-        burst_single: 2,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 18,
+  spawnInterval: 1500,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { spectral_deer: 3, star: 3, eagle: 2, thunder_hound: 1, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.25,
+    thunder_hound: 1.75,
+    oni: 1.15,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 600 },
+    pair_adjacent: { weight: 2, stagger: 600 },
+    burst_single: 2,
+  },
+  dirCooldown: 950,
+},
 
     // ── UPGRADE 1 ──
 
@@ -73,38 +83,48 @@ MapRegistry.register({
     // 2-phase rush + shoot. No easing in —
     // eagle appears alongside star and deer.
     3: {
-      duration: 18,
-      spawnInterval: 1650,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 4, star: 3, eagle: 3 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 650 },
-        pair_adjacent: { weight: 2, stagger: 650 },
-        burst_single: 2,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 18,
+  spawnInterval: 1500,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 3, eagle: 2, thunder_hound: 2, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.3,
+    thunder_hound: 1.8,
+    oni: 1.2,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 650 },
+    pair_adjacent: { weight: 2, stagger: 650 },
+    burst_single: 2,
+  },
+  dirCooldown: 900,
+},
 
     // ── Wave 4 — Thunder_hound enters ──
     // Teleport dodge + eagle 2-phase = both
     // punish mindless attacking. Player must
     // be precise with every swing.
     4: {
-      duration: 20,
-      spawnInterval: 1600,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 3, star: 3, eagle: 2, thunder_hound: 2 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 700 },
-        pair_adjacent: { weight: 2, stagger: 700 },
-        burst_single: 2,
-      },
-      dirCooldown: 950,
-    },
+  duration: 20,
+  spawnInterval: 1450,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 3, eagle: 2, thunder_hound: 2, oni: 1, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.35,
+    thunder_hound: 1.85,
+    oni: 1.25,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 700 },
+    pair_adjacent: { weight: 2, stagger: 700 },
+    burst_single: 2,
+  },
+  dirCooldown: 900,
+},
 
     // ── UPGRADE 2 ──
 
@@ -113,38 +133,43 @@ MapRegistry.register({
     // oni changes the entire field dynamic.
     // All 5 enemies now in play.
     5: {
-      duration: 22,
-      spawnInterval: 1550,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 3, eagle: 2, thunder_hound: 2, oni: 1 },
-      combos: {
-        single: 3,
-        pair_opposite: { weight: 3, stagger: 750 },
-        pair_adjacent: { weight: 2, stagger: 700 },
-        burst_single: 2,
-      },
-      dirCooldown: 950,
-    },
+  duration: 22,
+  spawnInterval: 1400,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.4,
+    thunder_hound: 1.9,
+    oni: 1.3,
+  },
+  combos: {
+    single: 3,
+    pair_opposite: { weight: 3, stagger: 750 },
+    pair_adjacent: { weight: 2, stagger: 700 },
+    burst_single: 2,
+  },
+  dirCooldown: 900,
+},
 
     // ── Wave 6 — BREATHER ──
     // Star only. Pure speed parry rush.
     // Even the breather is fast — this is Moon.
     // Burst + rush = parry chains for days.
     6: {
-      duration: 20,
-      spawnInterval: 1500,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { star: 10 },
-      combos: {
-        single: 2,
-        burst_single: 4,
-        rush: { weight: 2, stagger: 500 },
-        pair_opposite: { weight: 2, stagger: 650 },
-      },
-      dirCooldown: 850,
-    },
+  duration: 20,
+  spawnInterval: 1400,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { star: 6, frog: 4 },
+  combos: {
+    single: 2,
+    burst_single: 4,
+    rush: { weight: 2, stagger: 500 },
+    pair_opposite: { weight: 2, stagger: 650 },
+  },
+  dirCooldown: 800,
+},
 
     // ── UPGRADE 3 ──
 
@@ -152,38 +177,48 @@ MapRegistry.register({
     // All 5 back. Triple already here —
     // other maps waited until wave 8-9.
     7: {
-      duration: 25,
-      spawnInterval: 1450,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 2,
-        pair_opposite: { weight: 3, stagger: 750 },
-        burst_single: 2,
-        triple: { weight: 2, stagger: 850 },
-      },
-      dirCooldown: 850,
-    },
+  duration: 25,
+  spawnInterval: 1350,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.45,
+    thunder_hound: 1.95,
+    oni: 1.35,
+  },
+  combos: {
+    single: 2,
+    pair_opposite: { weight: 3, stagger: 750 },
+    burst_single: 2,
+    triple: { weight: 2, stagger: 850 },
+  },
+  dirCooldown: 850,
+},
 
     // ── Wave 8 — Heavy triples ──
     // More triples, adjacent pairs nastier.
     // Oni weight up — bouncing tanks everywhere.
     8: {
-      duration: 25,
-      spawnInterval: 1400,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 2,
-        pair_opposite: { weight: 3, stagger: 800 },
-        pair_adjacent: { weight: 2, stagger: 800 },
-        burst_single: 2,
-        triple: { weight: 2, stagger: 850 },
-      },
-      dirCooldown: 800,
-    },
+  duration: 25,
+  spawnInterval: 1300,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.5,
+    thunder_hound: 2.0,
+    oni: 1.4,
+  },
+  combos: {
+    single: 2,
+    pair_opposite: { weight: 3, stagger: 800 },
+    pair_adjacent: { weight: 2, stagger: 800 },
+    burst_single: 2,
+    triple: { weight: 2, stagger: 850 },
+  },
+  dirCooldown: 800,
+},
 
     // ── UPGRADE 4 ──
 
@@ -191,42 +226,52 @@ MapRegistry.register({
     // SpawnInterval at 1350. Rush appears.
     // 3 stars same side = parry chain relief
     // between the tricky enemies.
-    9: {
-      duration: 28,
-      spawnInterval: 1350,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 2,
-        pair_opposite: { weight: 3, stagger: 850 },
-        burst_single: 2,
-        rush: { weight: 2, stagger: 650 },
-        triple: { weight: 2, stagger: 900 },
-      },
-      dirCooldown: 800,
-    },
+   9: {
+  duration: 28,
+  spawnInterval: 1250,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.55,
+    thunder_hound: 2.05,
+    oni: 1.45,
+  },
+  combos: {
+    single: 2,
+    pair_opposite: { weight: 3, stagger: 850 },
+    burst_single: 2,
+    rush: { weight: 2, stagger: 650 },
+    triple: { weight: 2, stagger: 900 },
+  },
+  dirCooldown: 800,
+},
 
     // ── Wave 10 — Last stand ──
     // Surround appears. Everything at max.
     // This is the hardest non-final wave
     // in the entire game.
     10: {
-      duration: 28,
-      spawnInterval: 1300,
-      maxAlive: 5,
-      minAlive: 2,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        single: 1,
-        pair_opposite: { weight: 3, stagger: 850 },
-        burst_single: 2,
-        rush: { weight: 2, stagger: 650 },
-        triple: { weight: 2, stagger: 900 },
-        surround: { weight: 1, stagger: 950 },
-      },
-      dirCooldown: 750,
-    },
+  duration: 28,
+  spawnInterval: 1200,
+  maxAlive: 5,
+  minAlive: 2,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.6,
+    thunder_hound: 2.1,
+    oni: 1.5,
+  },
+  combos: {
+    single: 1,
+    pair_opposite: { weight: 3, stagger: 850 },
+    burst_single: 2,
+    rush: { weight: 2, stagger: 650 },
+    triple: { weight: 2, stagger: 900 },
+    surround: { weight: 1, stagger: 950 },
+  },
+  dirCooldown: 750,
+},
 
     // ── UPGRADE 5 ──
 
@@ -237,20 +282,25 @@ MapRegistry.register({
     // If the player survives this, they've beaten
     // Directional Strike.
     11: {
-      duration: 30,
-      spawnInterval: 1200,
-      maxAlive: 5,
-      minAlive: 3,
-      pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2 },
-      combos: {
-        pair_opposite: { weight: 3, stagger: 850 },
-        burst_single: 2,
-        rush: { weight: 2, stagger: 650 },
-        triple: { weight: 3, stagger: 900 },
-        surround: { weight: 2, stagger: 950 },
-      },
-      dirCooldown: 600,
-    },
+  duration: 30,
+  spawnInterval: 1100,
+  maxAlive: 5,
+  minAlive: 3,
+  pool: { spectral_deer: 2, star: 2, eagle: 2, thunder_hound: 2, oni: 2, frog: 1 },
+  speedOverrides: {
+    spectral_deer: 1.65,
+    thunder_hound: 2.1,
+    oni: 1.55,
+  },
+  combos: {
+    pair_opposite: { weight: 3, stagger: 850 },
+    burst_single: 2,
+    rush: { weight: 2, stagger: 650 },
+    triple: { weight: 3, stagger: 900 },
+    surround: { weight: 2, stagger: 950 },
+  },
+  dirCooldown: 600,
+},
 
   },
 

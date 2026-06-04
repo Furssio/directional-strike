@@ -40,36 +40,48 @@ MapRegistry.register({
     // Slime_lava spits parryable lava + splits.
     // Singles mostly so player learns the split.
     1: {
-      duration: 15,
-      spawnInterval: 2200,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { ravager: 6, slime_lava: 4 },
-      combos: {
-        single: 6,
-        pair_opposite: 2,
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+  duration: 15,
+  spawnInterval: 1800,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { ravager: 5, slime_lava: 3, crusher: 1, golem_lava: 1 },
+  speedOverrides: {
+    ravager: 1.15,
+    slime_lava: 1.2,
+    crusher: 1.15,
+    golem_lava: 1.25,
+  },
+  combos: {
+    single: 6,
+    pair_opposite: 2,
+    burst_single: 2,
+  },
+  dirCooldown: 1100,
+},
 
     // ── Wave 2 — Pairs start ──
     // Slime_lava from one side, ravager opposite.
     // Splits start filling the field naturally.
-    2: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 2,
-      pool: { ravager: 3, slime_lava: 4, crusher: 3 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 500 },
-        pair_adjacent: { weight: 2, stagger: 450 },
-        burst_single: 1,
-      },
-      dirCooldown: 1100,
-    },
+   2: {
+  duration: 18,
+  spawnInterval: 1700,
+  maxAlive: 3,
+  minAlive: 2,
+  pool: { ravager: 4, slime_lava: 3, crusher: 2, golem_lava: 1 },
+  speedOverrides: {
+    ravager: 1.2,
+    slime_lava: 1.25,
+    crusher: 1.2,
+    golem_lava: 1.3,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 500 },
+    pair_adjacent: { weight: 2, stagger: 450 },
+    burst_single: 1,
+  },
+  dirCooldown: 1000,
+},
 
     // ── UPGRADE 1 ──
 
@@ -78,36 +90,48 @@ MapRegistry.register({
     // prioritize: kill crusher before it shoots,
     // or deal with slime splits first?
     3: {
-      duration: 18,
-      spawnInterval: 2000,
-      maxAlive: 3,
-      minAlive: 1,
-      pool: { ravager: 2, slime_lava: 4, crusher: 4 },
-      combos: {
-        single: 5,
-        pair_opposite: { weight: 3, stagger: 550 },
-        burst_single: 2,
-      },
-      dirCooldown: 1100,
-    },
+  duration: 18,
+  spawnInterval: 1700,
+  maxAlive: 3,
+  minAlive: 1,
+  pool: { ravager: 3, slime_lava: 3, crusher: 2, golem_lava: 2 },
+  speedOverrides: {
+    ravager: 1.25,
+    slime_lava: 1.3,
+    crusher: 1.25,
+    golem_lava: 1.35,
+  },
+  combos: {
+    single: 5,
+    pair_opposite: { weight: 3, stagger: 550 },
+    burst_single: 2,
+  },
+  dirCooldown: 1000,
+},
 
     // ── Wave 4 — Crusher more present ──
     // Crusher + slime_lava pairs = bullet dodging
     // while managing splits. Adjacent combos appear.
     4: {
-      duration: 20,
-      spawnInterval: 1900,
-      maxAlive: 4,
-      minAlive: 2,
-      pool: { ravager: 2, golem_lava: 3, crusher: 5 },
-      combos: {
-        single: 4,
-        pair_opposite: { weight: 3, stagger: 600 },
-        pair_adjacent: { weight: 2, stagger: 550 },
-        burst_single: 1,
-      },
-      dirCooldown: 1000,
-    },
+  duration: 20,
+  spawnInterval: 1600,
+  maxAlive: 4,
+  minAlive: 2,
+  pool: { ravager: 2, slime_lava: 3, crusher: 3, golem_lava: 2 },
+  speedOverrides: {
+    ravager: 1.3,
+    slime_lava: 1.35,
+    crusher: 1.3,
+    golem_lava: 1.4,
+  },
+  combos: {
+    single: 4,
+    pair_opposite: { weight: 3, stagger: 600 },
+    pair_adjacent: { weight: 2, stagger: 550 },
+    burst_single: 1,
+  },
+  dirCooldown: 950,
+},
 
     // ── UPGRADE 2 ──
 

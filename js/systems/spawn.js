@@ -58,9 +58,14 @@ if (!_isIntro) {
 
   // per-map speed override for specific enemy types
   const _mapOverrides = ActiveDirector.getCurrentMap && ActiveDirector.getCurrentMap();
-  if (_mapOverrides && _mapOverrides.speedOverrides && _mapOverrides.speedOverrides[def.id]) {
-    sMult *= (_mapOverrides.speedOverrides[def.id] / def.speedMult);
-  }
+  // speedOverrides: check waveConfig first, then map-level fallback
+const _waveConfig = _map && _map.waveConfig && _map.waveConfig[_wave];
+const _waveOverrides = _waveConfig && _waveConfig.speedOverrides;
+const _mapLevelOverrides = _mapOverrides && _mapOverrides.speedOverrides;
+const _activeOverrides = _waveOverrides || _mapLevelOverrides;
+if (_activeOverrides && _activeOverrides[def.id]) {
+  sMult = _activeOverrides[def.id];
+}
 
   
 
